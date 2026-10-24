@@ -20,32 +20,32 @@ The blockchain provides an observable record and enforces the specified payment 
 
 ## 2. Changes from version 0.1
 
-| Original requirement | Version 0.2 decision |
-| --- | --- |
-| Build a sovereign EVM chain | Deploy Solidity contracts to Polygon Amoy |
-| Implement consensus and validator staking | Reuse the existing network |
-| Build an EVM, mempool, P2P layer, and state database | Remove these implementation requirements |
-| Operate a custom RPC service, explorer, and faucet | Use existing services |
-| Create VERA or TVERA | Use native test POL for gas and bonds |
-| Large set of protocol contracts | One non-upgradeable Veracity contract |
-| Public identity registry | Experiment-controlled participant addresses |
-| On-chain jury sampling and randomness beacon | Seeded jury assignment in Rust |
-| Queued and sequential challenges | One designated challenger and at most one challenge per episode |
-| Jury invitations, replacements, and extensions | Fixed jury, fixed deadlines, and deterministic timeout settlement |
-| On-chain reputation and assessment evaluation | Record and evaluate off-chain |
-| Required social feed and wallet UI | Rust CLI and machine-readable results first |
+| Original requirement                                 | Version 0.2 decision                                              |
+| ---------------------------------------------------- | ----------------------------------------------------------------- |
+| Build a sovereign EVM chain                          | Deploy Solidity contracts to Polygon Amoy                         |
+| Implement consensus and validator staking            | Reuse the existing network                                        |
+| Build an EVM, mempool, P2P layer, and state database | Remove these implementation requirements                          |
+| Operate a custom RPC service, explorer, and faucet   | Use existing services                                             |
+| Create VERA or TVERA                                 | Use native test POL for gas and bonds                             |
+| Large set of protocol contracts                      | One non-upgradeable Veracity contract                             |
+| Public identity registry                             | Experiment-controlled participant addresses                       |
+| On-chain jury sampling and randomness beacon         | Seeded jury assignment in Rust                                    |
+| Queued and sequential challenges                     | One designated challenger and at most one challenge per episode   |
+| Jury invitations, replacements, and extensions       | Fixed jury, fixed deadlines, and deterministic timeout settlement |
+| On-chain reputation and assessment evaluation        | Record and evaluate off-chain                                     |
+| Required social feed and wallet UI                   | Rust CLI and machine-readable results first                       |
 
 The core mechanism retained is equal creator and challenger bonds, juror bonds, commit-reveal voting, and distribution of the losing bond. Public identity, decentralised selection, repeated challenges, and reputation are deferred. Results from this reduced mechanism must be described accordingly.
 
 ## 3. System boundaries
 
-| Component | Responsibilities |
-| --- | --- |
-| Rust runner | Load scenarios, assign roles, control observations, execute agents, schedule actions, and export results |
-| Rust chain adapter | Encode calls, sign transactions, track nonces and receipts, and collect contract events |
-| Solidity contract | Register episode rules, escrow bonds, verify commitments, count votes, and credit withdrawals |
-| Polygon Amoy | Execute transactions and provide the public ledger |
-| Local storage | Store scenarios, model outputs, messages, assessments, receipts, and analysis records |
+| Component          | Responsibilities                                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------------------------- |
+| Rust runner        | Load scenarios, assign roles, control observations, execute agents, schedule actions, and export results |
+| Rust chain adapter | Encode calls, sign transactions, track nonces and receipts, and collect contract events                  |
+| Solidity contract  | Register episode rules, escrow bonds, verify commitments, count votes, and credit withdrawals            |
+| Polygon Amoy       | Execute transactions and provide the public ledger                                                       |
+| Local storage      | Store scenarios, model outputs, messages, assessments, receipts, and analysis records                    |
 
 Begin with one Rust process, one SQLite database, and a local artifact directory. An external queue, separate indexer service, web server, and distributed agent infrastructure are unnecessary for the MVP.
 
@@ -55,14 +55,14 @@ Separate deterministic protocol bookkeeping from model calls and network I/O. Lo
 
 ### 4.1 Development and public execution
 
-| Setting | Local development | Public experiment |
-| --- | --- | --- |
-| Network | Anvil | Polygon Amoy |
-| Chain ID | 31337 | 80002 |
-| Native gas and bond asset | Anvil development currency | Test POL |
-| HTTP RPC | `http://127.0.0.1:8545` | Configured provider, with `https://polygon-amoy.drpc.org` as a documented public endpoint |
-| Explorer | Optional | `https://amoy.polygonscan.com/` |
-| Funding | Prefunded development accounts | Existing Amoy faucets and operator-funded experiment wallets |
+| Setting                   | Local development              | Public experiment                                                                         |
+| ------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------- |
+| Network                   | Anvil                          | Polygon Amoy                                                                              |
+| Chain ID                  | 31337                          | 80002                                                                                     |
+| Native gas and bond asset | Anvil development currency     | Test POL                                                                                  |
+| HTTP RPC                  | `http://127.0.0.1:8545`        | Configured provider, with `https://polygon-amoy.drpc.org` as a documented public endpoint |
+| Explorer                  | Optional                       | `https://amoy.polygonscan.com/`                                                           |
+| Funding                   | Prefunded development accounts | Existing Amoy faucets and operator-funded experiment wallets                              |
 
 Amoy network values follow Polygon documentation checked on 2026-10-24. Keep RPC endpoints configurable because availability and rate limits can change. Polygon documentation links to available faucet services.
 
@@ -70,15 +70,15 @@ Use Anvil for unit tests, rapid iteration, and larger batches. Use Amoy for publ
 
 ### 4.2 Implementation choices
 
-| Area | Initial choice |
-| --- | --- |
-| Runtime | Rust with Tokio |
-| Ethereum integration | Alloy with typed bindings generated from the contract ABI |
-| Configuration and records | Serde, TOML configuration, and JSON Lines exports |
-| Local database | SQLite |
-| Contract development | Solidity and Foundry |
-| Contract tests | Forge unit, fuzz, and invariant tests |
-| Telemetry | Rust tracing and structured logs |
+| Area                      | Initial choice                                            |
+| ------------------------- | --------------------------------------------------------- |
+| Runtime                   | Rust with Tokio                                           |
+| Ethereum integration      | Alloy with typed bindings generated from the contract ABI |
+| Configuration and records | Serde, TOML configuration, and JSON Lines exports         |
+| Local database            | SQLite                                                    |
+| Contract development      | Solidity and Foundry                                      |
+| Contract tests            | Forge unit, fuzz, and invariant tests                     |
+| Telemetry                 | Rust tracing and structured logs                          |
 
 Pin Rust, dependencies, Foundry, and the Solidity compiler in the repository. Set the compiler EVM target explicitly and verify its output on the selected networks before running experiments. There is no custom EVM implementation or network fork to maintain.
 
@@ -86,15 +86,15 @@ Pin Rust, dependencies, Foundry, and the Solidity compiler in the repository. Se
 
 An experiment contains one or more independent episodes. Each episode contains one claim, one creator, one designated challenger, and a fixed jury. An unchallenged episode has no vote or jury payouts.
 
-| Record | Required information |
-| --- | --- |
-| Experiment | Unique ID, hypothesis, configuration hash, code revision, dataset version, and seeds |
-| Episode | Unique bytes32 ID, experiment ID, scenario ID, assigned participants, and protocol parameters |
-| Agent | Agent ID, address, role, model identifier, prompt version, and declared objective |
-| Scenario | Claim, evidence, observation permissions, and ground truth where available |
-| Action | Agent, phase, structured request, validation result, and transaction reference if submitted |
-| Message | Sender, allowed recipients, channel, phase, and exact content |
-| Outcome | Contract result, evaluator result, payouts, costs, and completion status |
+| Record     | Required information                                                                          |
+| ---------- | --------------------------------------------------------------------------------------------- |
+| Experiment | Unique ID, hypothesis, configuration hash, code revision, dataset version, and seeds          |
+| Episode    | Unique bytes32 ID, experiment ID, scenario ID, assigned participants, and protocol parameters |
+| Agent      | Agent ID, address, role, model identifier, prompt version, and declared objective             |
+| Scenario   | Claim, evidence, observation permissions, and ground truth where available                    |
+| Action     | Agent, phase, structured request, validation result, and transaction reference if submitted   |
+| Message    | Sender, allowed recipients, channel, phase, and exact content                                 |
+| Outcome    | Contract result, evaluator result, payouts, costs, and completion status                      |
 
 Freeze the episode configuration before posting. Record role assignments and communication permissions before observing model outputs. Never change labels or treatment rules after seeing the verdict.
 
@@ -106,11 +106,11 @@ Start with scripted agents for integration tests and a model-backed adapter for 
 
 Agents supply artifact text and decisions. Rust saves the artifact bytes, computes their hashes, generates vote salts, and builds commitments and transaction calldata. Models do not need to calculate cryptographic hashes or construct raw transactions.
 
-| Role | Available protocol actions |
-| --- | --- |
-| Creator | Submit a claim and bond |
-| Challenger | Challenge with evidence and a matching bond, or abstain |
-| Juror | Commit a verdict and assessment hash with a juror bond, then reveal |
+| Role             | Available protocol actions                                              |
+| ---------------- | ----------------------------------------------------------------------- |
+| Creator          | Submit a claim and bond                                                 |
+| Challenger       | Challenge with evidence and a matching bond, or abstain                 |
+| Juror            | Commit a verdict and assessment hash with a juror bond, then reveal     |
 | All participants | Read permitted observations and request withdrawal of their own credits |
 
 Explicit communication actions are enabled only when the treatment permits them. The runner logs messages and enforces recipient and phase restrictions. Agents cannot execute arbitrary shell commands, access the runner database, choose another participant's signer, or call administrative functions.
@@ -135,17 +135,17 @@ This is a controlled experiment roster, not proof of unique human identity or de
 
 ### 7.2 Lifecycle
 
-| State | Entry condition | Permitted next result |
-| --- | --- | --- |
-| Registered | Operator fixes the episode | Creator posts or episode expires unfunded |
-| Open | Creator posts the claim and beta | Designated challenger challenges or creator is refunded after expiry |
-| Commit | Challenger submits evidence and beta | Selected jurors submit commitments and juror bonds |
-| Reveal | Commit deadline is reached | Committed jurors reveal valid votes and assessment hashes |
-| SettledCreator | Reveal deadline passed and creator has the required votes | Withdrawal of credited balances |
-| SettledChallenger | Reveal deadline passed and challenger has the required votes | Withdrawal of credited balances |
-| Aborted | Reveal deadline passed without a majority | Party bond refunds and juror bond accounting |
-| ExpiredUnchallenged | Challenge deadline passed without a challenge | Full creator bond refund |
-| ExpiredUnfunded | Posting deadline passed without a creator deposit | No financial settlement |
+| State               | Entry condition                                              | Permitted next result                                                |
+| ------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------- |
+| Registered          | Operator fixes the episode                                   | Creator posts or episode expires unfunded                            |
+| Open                | Creator posts the claim and beta                             | Designated challenger challenges or creator is refunded after expiry |
+| Commit              | Challenger submits evidence and beta                         | Selected jurors submit commitments and juror bonds                   |
+| Reveal              | Commit deadline is reached                                   | Committed jurors reveal valid votes and assessment hashes            |
+| SettledCreator      | Reveal deadline passed and creator has the required votes    | Withdrawal of credited balances                                      |
+| SettledChallenger   | Reveal deadline passed and challenger has the required votes | Withdrawal of credited balances                                      |
+| Aborted             | Reveal deadline passed without a majority                    | Party bond refunds and juror bond accounting                         |
+| ExpiredUnchallenged | Challenge deadline passed without a challenge                | Full creator bond refund                                             |
+| ExpiredUnfunded     | Posting deadline passed without a creator deposit            | No financial settlement                                              |
 
 Commit and reveal phases may be derived from stored deadlines rather than requiring a separate transaction to advance each phase. Emit events for recorded actions and terminal transitions.
 
@@ -155,16 +155,16 @@ No background contract task runs automatically. The Rust runner submits settleme
 
 ### 7.3 Entry points
 
-| Function | Caller and effect |
-| --- | --- |
-| `registerEpisode` | Operator records immutable participants and parameters |
-| `postClaim` | Assigned creator supplies the content hash and exactly beta in native currency |
-| `challenge` | Assigned challenger supplies the evidence hash and exactly beta before challenge expiry |
-| `commitVote` | Selected juror submits one commitment and exactly the juror bond during Commit |
-| `revealVote` | Same juror reveals the committed verdict, assessment hash, and salt during Reveal |
-| `settle` | Anyone settles or aborts a challenged episode after the reveal deadline |
-| `expire` | Anyone expires an unfunded or unchallenged episode after its deadline |
-| `withdraw` | Caller receives only their own accumulated withdrawal credit |
+| Function          | Caller and effect                                                                       |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `registerEpisode` | Operator records immutable participants and parameters                                  |
+| `postClaim`       | Assigned creator supplies the content hash and exactly beta in native currency          |
+| `challenge`       | Assigned challenger supplies the evidence hash and exactly beta before challenge expiry |
+| `commitVote`      | Selected juror submits one commitment and exactly the juror bond during Commit          |
+| `revealVote`      | Same juror reveals the committed verdict, assessment hash, and salt during Reveal       |
+| `settle`          | Anyone settles or aborts a challenged episode after the reveal deadline                 |
+| `expire`          | Anyone expires an unfunded or unchallenged episode after its deadline                   |
+| `withdraw`        | Caller receives only their own accumulated withdrawal credit                            |
 
 Registration is non-payable. Posting, challenging, and committing reject both underpayment and overpayment. A party cannot bond twice. A juror cannot replace a commitment or reveal twice. Reject zero content, evidence, assessment, and commitment hashes.
 
@@ -204,14 +204,14 @@ Commit-reveal conceals votes until revelation. It does not prevent private agree
 
 ### 9.1 Parameters
 
-| Parameter | MVP rule |
-| --- | --- |
-| beta | Equal creator and challenger bond, positive integer native base units |
-| gammaBps | Juror bond multiplier, strictly between 0 and 10000 |
-| jurorBond | `floor(beta * gammaBps / 10000)`, required to be at least one base unit |
-| winnerBps | Default 6000 |
-| jurorBps | Default 3000 |
-| protocolBps | Default 1000 |
+| Parameter   | MVP rule                                                                |
+| ----------- | ----------------------------------------------------------------------- |
+| beta        | Equal creator and challenger bond, positive integer native base units   |
+| gammaBps    | Juror bond multiplier, strictly between 0 and 10000                     |
+| jurorBond   | `floor(beta * gammaBps / 10000)`, required to be at least one base unit |
+| winnerBps   | Default 6000                                                            |
+| jurorBps    | Default 3000                                                            |
+| protocolBps | Default 1000                                                            |
 
 Require the three payout shares to sum to 10000. Validate ranges and arithmetic bounds at registration. Use integer arithmetic for all monetary values, with 18 decimal places for native currency amounts.
 
@@ -267,13 +267,13 @@ The MVP trusts the operator for scenario construction, assignment, private obser
 
 Start with claims that have independently checkable answers. Separate verdict accuracy from evidence of coordination.
 
-| Condition | Question |
-| --- | --- |
-| Independent baseline | How accurate are agents under the mechanism without an explicit shared coalition objective or private channel? |
-| Coalition objective without messaging | Does a shared objective alter votes without an enabled communication channel? |
-| Coalition objective with messaging | Does private communication increase coordinated false verdicts? |
-| Creator and juror coordination | Do jurors support a creator's false claim when given an explicit coalition objective or simulated bribe offer? |
-| Reveal withholding | Can coordinated non-revelation force aborts, and what bonds are lost? |
+| Condition                             | Question                                                                                                       |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Independent baseline                  | How accurate are agents under the mechanism without an explicit shared coalition objective or private channel? |
+| Coalition objective without messaging | Does a shared objective alter votes without an enabled communication channel?                                  |
+| Coalition objective with messaging    | Does private communication increase coordinated false verdicts?                                                |
+| Creator and juror coordination        | Do jurors support a creator's false claim when given an explicit coalition objective or simulated bribe offer? |
+| Reveal withholding                    | Can coordinated non-revelation force aborts, and what bonds are lost?                                          |
 
 Compare minority and majority coalitions while keeping the total jury size fixed. Include scripted honest and adversarial policies to verify that the expected protocol outcomes are reachable before interpreting model behaviour.
 
@@ -283,16 +283,16 @@ Predefine trial counts, coalition membership, allowed channels, and success crit
 
 ### 11.1 Required measurements
 
-| Metric | Definition |
-| --- | --- |
-| Verdict accuracy | Correct contract verdicts divided by settled episodes with known ground truth |
-| False-verdict rate | Incorrect contract verdicts divided by settled episodes with known ground truth |
-| Attack success rate | Attack-target outcomes divided by all assigned attack episodes, with abort and infrastructure counts reported separately |
-| Completion rate | Settled episodes divided by all scheduled episodes |
-| Valid reveal rate | Valid revealed votes divided by assigned jury slots |
-| Coalition benefit | Total coalition settlement entitlements minus its deposited bonds, with gas costs and simulated utility reported separately |
-| Participation loss | Juror bonds forfeited through failed revelation |
-| Infrastructure failure rate | Episodes blocked by RPC, funding, model-provider, or runner failures divided by scheduled episodes |
+| Metric                      | Definition                                                                                                                  |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Verdict accuracy            | Correct contract verdicts divided by settled episodes with known ground truth                                               |
+| False-verdict rate          | Incorrect contract verdicts divided by settled episodes with known ground truth                                             |
+| Attack success rate         | Attack-target outcomes divided by all assigned attack episodes, with abort and infrastructure counts reported separately    |
+| Completion rate             | Settled episodes divided by all scheduled episodes                                                                          |
+| Valid reveal rate           | Valid revealed votes divided by assigned jury slots                                                                         |
+| Coalition benefit           | Total coalition settlement entitlements minus its deposited bonds, with gas costs and simulated utility reported separately |
+| Participation loss          | Juror bonds forfeited through failed revelation                                                                             |
+| Infrastructure failure rate | Episodes blocked by RPC, funding, model-provider, or runner failures divided by scheduled episodes                          |
 
 Report unknown-truth and unchallenged episodes separately. Record both the agent's chosen action and transaction inclusion outcome so a network delay is not silently classified as intentional non-participation. Use repeated trials and report uncertainty rather than presenting one successful attack as a measured rate.
 
@@ -304,12 +304,12 @@ The contract stores episode IDs, configuration hashes, claim and evidence hashes
 
 Each export must retain enough information to join agent behaviour to the ledger.
 
-| Category | Required fields |
-| --- | --- |
-| Provenance | Experiment and episode IDs, configuration digest, code revision, model and prompt versions |
-| Execution | Observations, visible messages, structured actions, validation failures, token usage, and model latency |
+| Category       | Required fields                                                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Provenance     | Experiment and episode IDs, configuration digest, code revision, model and prompt versions                                        |
+| Execution      | Observations, visible messages, structured actions, validation failures, token usage, and model latency                           |
 | Chain evidence | Chain ID, contract address, transaction hash, receipt status, block number and hash, log index, gas used, and effective gas price |
-| Evaluation | Reference label where available, evaluator version, predicted and actual outcome, reward components, and failure reason |
+| Evaluation     | Reference label where available, evaluator version, predicted and actual outcome, reward components, and failure reason           |
 
 Generate SQLite records and JSON Lines exports from the same collected event stream. SQLite is the local research record, while contract state is authoritative for financial settlement. Rebuild the contract projection by replaying logs from its deployment block. Model observations and private messages require their off-chain records and cannot be reconstructed from the blockchain alone.
 
@@ -331,45 +331,45 @@ Contract deadlines use chain time. The runner schedules actions with a margin fo
 
 ## 14. Implementation layout and build order
 
-| Path | Purpose |
-| --- | --- |
-| `contracts/` | Foundry project, Veracity contract, deployment script, and contract tests |
-| `runner/` | Rust executable with agent, experiment, chain, and storage modules |
-| `scenarios/` | Versioned claim and evidence fixtures |
-| `configs/` | Experiment parameters and treatment definitions |
+| Path           | Purpose                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| `contracts/`   | Foundry project, Veracity contract, deployment script, and contract tests                |
+| `runner/`      | Rust executable with agent, experiment, chain, and storage modules                       |
+| `scenarios/`   | Versioned claim and evidence fixtures                                                    |
+| `configs/`     | Experiment parameters and treatment definitions                                          |
 | `deployments/` | Chain IDs, addresses, deployment blocks, compiler settings, code hashes, and ABI digests |
 
 Start with modules in one Rust crate. Split crates or services when implementation needs justify it.
 
-| Phase | Deliverable and completion condition |
-| --- | --- |
-| 1 | Contract tests cover every terminal outcome and conserve deposited funds |
-| 2 | Scripted Rust agents complete claim, challenge, vote, settlement, and withdrawal on Anvil |
-| 3 | Model adapter runs baseline and controlled coordination treatments with complete records |
-| 4 | Same contract and runner flow completes on Amoy with public transaction references |
-| 5 | Paired repeated trials produce inspectable exports and a short findings summary |
+| Phase | Deliverable and completion condition                                                      |
+| ----- | ----------------------------------------------------------------------------------------- |
+| 1     | Contract tests cover every terminal outcome and conserve deposited funds                  |
+| 2     | Scripted Rust agents complete claim, challenge, vote, settlement, and withdrawal on Anvil |
+| 3     | Model adapter runs baseline and controlled coordination treatments with complete records  |
+| 4     | Same contract and runner flow completes on Amoy with public transaction references        |
+| 5     | Paired repeated trials produce inspectable exports and a short findings summary           |
 
 Before Amoy execution, record the exact deployment manifest, fund isolated test wallets, verify the deployed bytecode, and complete a small smoke run. Bulk local runs and public-network runs must be identified separately in the results.
 
 ## 15. Verification and acceptance
 
-| Area | Required check |
-| --- | --- |
-| Registration | Duplicate jurors, party conflicts, invalid jury size, duplicate IDs, and invalid parameters are rejected |
-| Bonds | Exact deposits are enforced and double deposits are rejected |
-| Commit integrity | Rust and Solidity agree on commitment encoding; incorrect salt, address, verdict, or assessment hash fails |
-| Phase boundaries | Actions at each deadline obey the same exclusive and inclusive rules |
-| Verdicts | Creator and challenger outcomes both work; the full-jury threshold is never reduced |
-| Timeouts | Missing commits, missing reveals, and no-majority cases settle according to the specified refund rules |
-| Expiry | Unfunded and unchallenged episodes expire safely without inappropriate fees |
-| Accounting | Fuzz tests cover rounding and invariants cover locked funds, credits, withdrawals, and single settlement |
-| Withdrawals | Reentrant and reverting recipients cannot steal funds or block other recipients |
-| Operator boundary | Operator cannot edit active rules, choose verdicts, or withdraw participant balances |
-| Runner recovery | Restart resumes pending transactions and retained reveal material without duplicate actions |
-| Collection | Duplicate events and simulated reorganisations do not duplicate payouts or research records |
-| Observation boundaries | Private labels, keys, and restricted agent messages do not enter other agents' observations |
-| End-to-end | Both winning sides and a timeout complete through withdrawal on Anvil; a full challenged flow completes on Amoy |
-| Research output | Every scheduled episode has a status, treatment, trace reference, and explicit evaluation eligibility |
+| Area                   | Required check                                                                                                  |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Registration           | Duplicate jurors, party conflicts, invalid jury size, duplicate IDs, and invalid parameters are rejected        |
+| Bonds                  | Exact deposits are enforced and double deposits are rejected                                                    |
+| Commit integrity       | Rust and Solidity agree on commitment encoding; incorrect salt, address, verdict, or assessment hash fails      |
+| Phase boundaries       | Actions at each deadline obey the same exclusive and inclusive rules                                            |
+| Verdicts               | Creator and challenger outcomes both work; the full-jury threshold is never reduced                             |
+| Timeouts               | Missing commits, missing reveals, and no-majority cases settle according to the specified refund rules          |
+| Expiry                 | Unfunded and unchallenged episodes expire safely without inappropriate fees                                     |
+| Accounting             | Fuzz tests cover rounding and invariants cover locked funds, credits, withdrawals, and single settlement        |
+| Withdrawals            | Reentrant and reverting recipients cannot steal funds or block other recipients                                 |
+| Operator boundary      | Operator cannot edit active rules, choose verdicts, or withdraw participant balances                            |
+| Runner recovery        | Restart resumes pending transactions and retained reveal material without duplicate actions                     |
+| Collection             | Duplicate events and simulated reorganisations do not duplicate payouts or research records                     |
+| Observation boundaries | Private labels, keys, and restricted agent messages do not enter other agents' observations                     |
+| End-to-end             | Both winning sides and a timeout complete through withdrawal on Anvil; a full challenged flow completes on Amoy |
+| Research output        | Every scheduled episode has a status, treatment, trace reference, and explicit evaluation eligibility           |
 
 The MVP is complete when the Rust runner executes the specified treatments, contracts settle without manual payout decisions, and exported results link each scored observation to its configuration and chain evidence.
 
