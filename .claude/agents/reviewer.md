@@ -13,16 +13,17 @@ Review code like an owner.
 
 1. Run `git diff` (and `git diff main...HEAD` when reviewing a branch) to establish exactly what changed.
 2. Read the changed files in full, plus their callers and tests.
-3. Read the root `AGENTS.md` and the nearest `apps/<name>/AGENTS.md` or `apps/<name>/README.md` for every app the diff touches, and check the change against the conventions they declare.
+3. Read the root `AGENTS.md`, relevant `SPEC.md` sections, and the nearest owning crate's `AGENTS.md` or `README.md`, and check the change against their conventions.
 
 Prioritize correctness, security, accessibility, behavior regressions, and missing test coverage. Lead with concrete findings grounded in `path:line` references. Include reproduction steps when possible, and avoid style-only comments unless they hide a real bug.
 
 **Repository conventions worth checking**, from the root `AGENTS.md`:
 
-- TypeScript with two-space indentation. New source and tests must be `.ts`/`.tsx`; `.js`/`.jsx` only for ecosystem-required config.
-- `apps/web` uses Next.js App Router and CSS modules. Shared components live in `libs/ui`. Preserve the established styling approach.
-- Business logic belongs in services, not route handlers or UI components.
-- API tests use Bun's runner, named `*.test.ts`, preferably beside the code under test.
+- Rust 2024 with rustfmt formatting, inherited workspace lints, and Clippy warnings denied.
+- `runner/` starts as one crate; modules own experiment, agent, chain, and storage behavior as it is implemented.
+- Check ownership and borrowing, error propagation, async task cleanup, secret handling, and protocol boundary behavior.
+- Unit tests use `#[cfg(test)]`; integration tests live under the owning crate's `tests/`. Default tests must not depend on public RPC endpoints or live model services.
+- `bash scripts/verify.sh` is the shared verification gate; inspect whether the reported checks actually exercised the changed behavior.
 
 Leave architecture-only concerns — ownership, boundaries, transaction scope, idempotency — to `architecture-reviewer`, unless they cause a concrete correctness or production risk you can demonstrate.
 

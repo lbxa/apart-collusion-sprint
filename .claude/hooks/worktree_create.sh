@@ -57,13 +57,9 @@ fi
 # from the remote default branch and fall back to local HEAD when there is no
 # cached origin/HEAD. Nothing is fetched here; run `git fetch` for a newer base.
 #
-# CRISPR_WORKTREE_BASE_REF overrides the base. The smoke test needs a worktree
-# built from the branch under test: without it the test can only ever provision
-# from the published default branch, so it grades main's scripts/setup.sh no
-# matter what the branch changed. That blind spot is how its .env.local
-# assertion stayed red without failing anyone's run.
-if [ -n "${CRISPR_WORKTREE_BASE_REF:-}" ]; then
-  BASE_REF="$CRISPR_WORKTREE_BASE_REF"
+# Override the base when validating setup changes on a feature branch.
+if [ -n "${VERACITY_WORKTREE_BASE_REF:-}" ]; then
+  BASE_REF="$VERACITY_WORKTREE_BASE_REF"
 elif git -C "$SCRIPT_DIR" rev-parse --verify --quiet origin/HEAD >/dev/null 2>&1; then
   BASE_REF="origin/HEAD"
 else

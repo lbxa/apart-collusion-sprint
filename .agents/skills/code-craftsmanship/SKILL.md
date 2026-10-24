@@ -44,11 +44,12 @@ If a service, job, workflow, harness, or runtime path is not observable, the
 implementation is not complete. Future agents need enough telemetry to diagnose
 what happened without rediscovering the system from source and terminal scraps.
 
-Use `@crispr/observability` from `libs/observability` for server and harness
-telemetry. Next.js configures it in `apps/web/instrumentation.ts`; reusable
-libraries inherit the parent configuration through `configureOnceFromEnv`.
-Use structured, stable event names and carry `harness_run_id`, `task_id`, and
-`session_id` through long-running operations. See `docs/agent-harness.md`.
+The specification chooses Rust `tracing` for runtime telemetry. Introduce it
+with the runtime behavior that needs it; no telemetry dependency exists in the
+empty runner scaffold. Configure subscribers at the executable boundary and
+use structured spans for experiment, episode, agent, and transaction identities
+where those concepts are implemented. Read `SPEC.md` for collection and
+observation-boundary requirements.
 
 Instrument meaningful runtime behavior:
 

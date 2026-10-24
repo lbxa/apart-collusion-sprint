@@ -1,87 +1,46 @@
 ---
 name: tdd
-description: Use when adding or changing behavior with tests first, writing unit tests, creating regression tests for bugs, implementing TDD, improving test coverage, or following Red-Green-Refactor. Enforces failing-test-first workflow, Arrange-Act-Assert structure, focused assertions, and testability during feature work.
+description: Use failing-test-first development for new Rust behavior and bug regressions. Prove important outcomes through Cargo tests, then implement and refactor within scope.
 metadata:
-  labels: [tdd, testing, quality, red-green-refactor]
-  triggers:
-    files:
-      [
-        '**/*.test.ts',
-        '**/*.spec.ts',
-        '**/*_test.go',
-        '**/*Test.java',
-        '**/*_test.dart',
-        '**/*_spec.rb',
-      ]
-    keywords: [tdd, unit test, write test, red green refactor, failing test, test coverage]
+  labels: [tdd, testing, quality, rust]
 ---
 
-# Test-Driven Development (TDD)
+# Test-Driven Development
 
-## **Priority: P1 (OPERATIONAL)**
+Use this workflow for meaningful behavior changes and regressions. Documentation,
+empty scaffolds, and reversible formatting changes do not need artificial tests.
 
-## **The Iron Law**
+## Red, Green, Refactor
 
-> **NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.**
-> Code written before the test must be deleted. Start over.
+1. Add a focused test for an observable outcome or invariant.
+2. Run it and confirm failure for the intended reason. A typo or missing fixture
+   does not demonstrate the behavior under test.
+3. Implement the smallest change that satisfies the requirement.
+4. Rerun the focused test, then refactor while preserving behavior.
+5. Run `bash scripts/verify.sh` before handoff.
 
-## **The TDD Cycle**
+## Rust Test Layout
 
-1. **RED**: Write a minimal failing test. **Verify failure** (Expected error, not typo).
-2. **GREEN**: Write simplest code to pass. **Verify pass**.
-3. **REFACTOR**: Clean up code while staying green.
+Put unit tests in `#[cfg(test)] mod tests` near the implementation. Put integration
+tests under the owning crate's `tests/` directory and public examples in doctests.
+Use descriptive `snake_case` names such as `rejects_duplicate_episode_ids`.
+Arrange inputs, act through the public boundary, and assert one coherent outcome.
 
-## **AAA Structure (Mandatory)**
+```sh
+cargo test -p veracity-runner <test_name>
+cargo test --workspace --all-features --locked
+```
 
-Every test must follow Arrange-Act-Assert:
+Use Cargo's built-in test harness. When async behavior is introduced, select
+tests appropriate to the installed runtime and fetch current API documentation.
+Do not add a framework simply to test synchronous code.
 
-- **Arrange**: Set up inputs, stubs, mocks, and expected values.
-- **Act**: Call the single unit under test.
-- **Assert**: Verify output and side effects. One logical assertion per test.
-  **(See [AAA Example](references/aaa_example.md) for code structure)**.
+## Deterministic Boundaries
 
-## **Coverage Thresholds**
+Use fixed seeds, controlled clocks, temporary directories, and local database
+fixtures where applicable. Isolate model APIs and public RPC endpoints; local
+Anvil belongs in explicit chain integration tests. Test recovery and failure
+paths alongside happy paths, especially for commitments and transaction intents.
 
-- **Minimum**: 80% (Statements, Functions, Lines), 75% (Branches).
-- **Target**: 90% (Statements, Functions, Lines), 85% (Branches).
-- Configure in test runner config (e.g. `jest.config.ts`, `vitest.config.ts`). Coverage below minimum is a build-gate failure.
-
-## **Test Runner Commands**
-
-| Language      | Runner            | Watch Mode                  | Coverage                     |
-| ------------- | ----------------- | --------------------------- | ---------------------------- |
-| TypeScript/JS | `jest` / `vitest` | `vitest --watch`            | `vitest run --coverage`      |
-| Go            | `go test`         | `go test -v ./... -count=1` | `go test -cover ./...`       |
-| Java          | JUnit 5 + Maven   | `mvn test`                  | `mvn verify -P coverage`     |
-| Kotlin        | JUnit 5 + Kotest  | `./gradlew test`            | `./gradlew jacocoTestReport` |
-| Dart/Flutter  | `flutter test`    | `flutter test --watch`      | `flutter test --coverage`    |
-
-## **Core Principles**
-
-- **Watch it Fail**: Prove the test works.
-- **Minimalism**: Don't add features/options beyond current test (YAGNI).
-- **Real Over Mock**: Prefer real dependencies unless slow/flaky.
-- **One Reason to Fail**: Test one behavior per test.
-- **Descriptive Names**: e.g. `should_returnError_when_emailIsInvalid`.
-
-## **When to Use Mocks vs Real Dependencies**
-
-- **Database**: Real DB (test container) or in-memory; mock as last resort.
-- **HTTP/External APIs**: Always mock.
-- **Filesystem**: Use temp dir; mock for unit isolation.
-- **Time/Dates**: Always mock/control.
-- **Internal services**: Real if fast (<200ms); mock if cross-network.
-
-## **Verification Checklist**
-
-- [ ] Every new function/method has a failing test first?
-- [ ] Failure message was expected?
-- [ ] Minimal code implemented passed?
-- [ ] AAA structure followed?
-- [ ] Coverage thresholds met?
-
-## **Expert References**
-
-- [AAA Example](references/aaa_example.md)
-- [TDD Patterns](references/tdd_patterns.md)
-- [Testing Anti-Patterns](references/testing_anti_patterns.md)
+There is no configured coverage percentage. Prove the important invariants;
+introduce a measurable coverage gate only with its actual tooling and agreement.

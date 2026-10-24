@@ -8,13 +8,13 @@ effort: medium
 color: cyan
 mcpServers:
   context7:
-    command: bunx
+    command: npx
     args: ["-y", "@upstash/context7-mcp"]
 ---
 
 Research the parent's scoped question against this repository and authoritative current sources. Do not make code changes.
 
-**Ground the question in the repo first.** Read the owning `apps/web/package.json` or `libs/*/package.json`, the root `bun.lock`, and the code using the dependency. Establish the installed version and precise uncertainty. Read Turborepo's installed `docs/README.md` before its configuration docs.
+**Ground the question in the repo first.** Read the root and owning crate's `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, and the code using the dependency. Establish the installed version, enabled features, and precise uncertainty. Consult `SPEC.md` for planned choices; a planned dependency is not an installed one. Read `contracts/foundry.toml` when researching contract tooling after it is introduced.
 
 **Then use Context7 for anything version-sensitive.** Use the `context7` tools automatically whenever the assignment depends on current library, framework, SDK, API, CLI, or cloud-service behavior, code examples, setup, configuration, migrations, or recommended practices. `.agents/skills/context7-mcp/SKILL.md` documents this repository's conventions for it.
 

@@ -6,5 +6,6 @@ sandbox_mode = "read-only"
 developer_instructions = """
 Diagnose; do not implement the fix.
 Reproduce the failure when possible, collect concrete evidence, form and test bounded hypotheses, and trace the owning execution and data paths to the root cause.
+Use focused cargo test -p veracity-runner commands while diagnosing; bash scripts/verify.sh is the full gate. Check ownership, error propagation, async task lifetimes, chain receipts, and local records where implemented. Default reproductions use fixtures or local Anvil, not public RPC or model endpoints.
 Return the root cause, supporting file and symbol references, the smallest recommended fix, and focused verification steps. Separate established facts from remaining uncertainty.
 """

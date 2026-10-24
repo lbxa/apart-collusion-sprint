@@ -1,6 +1,6 @@
 ---
 name: context7-mcp
-description: This skill should be used when the user asks about libraries, frameworks, API references, or needs code examples. Activates for setup questions, code generation involving libraries, or mentions of specific frameworks like React, Vue, Next.js, Prisma, Supabase, etc.
+description: Fetch current dependency and tool documentation for setup, configuration, API usage, and version-specific questions, including Rust crates, Cargo, Tokio, Alloy, Serde, and Foundry. Do not use for ordinary business-logic debugging or general programming concepts.
 ---
 
 When the user asks about libraries, frameworks, or needs code examples, use Context7 to fetch current documentation instead of relying on training data.
@@ -9,10 +9,10 @@ When the user asks about libraries, frameworks, or needs code examples, use Cont
 
 Activate this skill when the user:
 
-- Asks setup or configuration questions ("How do I configure Next.js middleware?")
-- Requests code involving libraries ("Write a Prisma query for...")
-- Needs API references ("What are the Supabase auth methods?")
-- Mentions specific frameworks (React, Vue, Svelte, Express, Tailwind, etc.)
+- Asks setup or configuration questions ("How do I configure a Cargo workspace?")
+- Requests library-specific code ("How do Alloy providers track receipts?")
+- Needs API references ("How do Tokio task cancellation APIs work?")
+- Needs version-specific crate, SDK, CLI, or cloud-service behavior.
 
 ## How to Fetch Documentation
 
@@ -28,14 +28,15 @@ Call `resolve-library-id` with:
 From the resolution results, choose based on:
 
 - Exact or closest name match to what the user asked for
+- Description relevance, snippet coverage, and source reputation (prefer High or Medium)
 - Higher benchmark scores indicate better documentation quality
-- If the user mentioned a version (e.g., "React 19"), prefer version-specific IDs
+- If the user mentioned a version, prefer version-specific IDs
 
 ### Step 3: Fetch the Documentation
 
 Call `query-docs` with:
 
-- `libraryId`: The selected Context7 library ID (e.g., `/vercel/next.js`)
+- `libraryId`: The exact ID returned by resolution
 - `query`: The user's specific question
 
 ### Step 4: Use the Documentation
@@ -49,5 +50,5 @@ Incorporate the fetched documentation into your response:
 ## Guidelines
 
 - **Be specific**: Pass the user's full question as the query for better results
-- **Version awareness**: When users mention versions ("Next.js 15", "React 19"), use version-specific library IDs if available from the resolution step
+- **Version awareness**: Read `Cargo.lock`, the owning manifest's feature flags, and `rust-toolchain.toml` before choosing version-specific documentation.
 - **Prefer official sources**: When multiple matches exist, prefer official/primary packages over community forks

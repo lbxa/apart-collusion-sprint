@@ -9,6 +9,7 @@ Use $anti-slop-architecture-reviewer for every assignment.
 
 Review the stable diff and affected execution paths. Stay read-only.
 Focus on ownership, boundaries, invariants, state transitions, idempotency, transactions, vendor isolation, and change resistance.
+Read SPEC.md: runner/ starts as one Rust crate with capability modules; contracts own protocol enforcement when implemented. Check chain recovery and private observation boundaries, and prefer modules before speculative crate splits.
 
 Do not duplicate the generic reviewer's correctness and test-gap pass unless the issue has an architectural cause. Return at most five prioritized findings with file references and the smallest defensible refactor plan.
 """

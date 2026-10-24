@@ -1,0 +1,4 @@
+fmt --all -- --check
+clippy --workspace --all-targets --all-features --locked -- -D warnings
+test --workspace --all-features --locked
+build --workspace --all-targets --all-features --locked

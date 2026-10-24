@@ -6,5 +6,5 @@ max_threads = 50
 max_depth = 2
 
 [mcp_servers.context7]
-command = "bunx"
+command = "npx"
 args = ["-y", "@upstash/context7-mcp"]

@@ -43,10 +43,10 @@ Use this format when the README has no existing changelog convention:
 
 Map knowledge to the narrowest package that owns it:
 
-- App behavior belongs in the affected `apps/<name>/README.md`.
-- Shared library contracts belong in the affected `libs/<name>/README.md`.
-- Rust crate behavior belongs in the affected `crates/<name>/README.md`.
-- Infrastructure decisions belong in the affected `infra/<name>/README.md`.
+- Runner behavior belongs in `runner/README.md`.
+- Additional Rust crate behavior belongs beside that crate's `Cargo.toml`.
+- Contract behavior belongs in `contracts/README.md` once contracts exist.
+- Workspace and agent-tooling decisions belong in the root `README.md`.
 - Cross-cutting decisions that apply to multiple packages should be duplicated only when each package needs the memory; otherwise place them in the highest-level README that future agents will actually read.
 
 When a task spans multiple packages, add separate package-specific bullets rather than one vague root-level note.

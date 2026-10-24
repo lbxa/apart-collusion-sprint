@@ -1,73 +1,45 @@
 ---
 name: quality-assurance
-description: Use when the user asks to improve or review code quality, testing integrity, linting, formatting, type safety, CI quality gates, automated checks, test strategy, test coverage, pre-commit hooks, or code hygiene. Applies standards for reliable automated verification, risk-based testing, and maintainable refactors.
+description: Review or improve Rust code quality, deterministic tests, linting, formatting, and verification hooks. Apply risk-based testing and maintainable changes without inventing coverage gates.
 metadata:
   labels: [quality-assurance, testing, linting, code-quality]
-  triggers:
-    keywords: [test, qa, lint, quality, assurance]
 ---
 
 # Quality Assurance
 
-Standards for maintaining code hygiene, automated checks, and testing integrity.
+Read `AGENTS.md`, `SPEC.md`, and the owning crate's manifest before choosing
+checks. The workspace uses Rust 2024, rustfmt, inherited Rust lints, and Clippy
+with warnings denied. Preserve the committed `Cargo.lock` and pinned toolchain.
 
-## **Priority: P1 (MAINTENANCE)**
+## Verification
 
-Standards for maintaining code quality, automated checks, and testing integrity.
+Use `bash scripts/verify.sh`: it runs hook tests, formatting, Clippy, tests, and
+builds. Both agent Stop hooks use this same gate; avoid duplicate pipelines.
+Iterate with a focused `cargo test -p veracity-runner <test_name>`, then rerun the
+full gate after fixes. A failed or skipped runtime check is not success.
 
-## 🔍 Code Quality & Linting
+## Tests That Prove Behavior
 
-- **Zero Tolerance**: Treat all linter warnings/infos as fatal errors in CI.
-- **Automated Formatting**: Enforce strict formatting on every commit using hooks.
-- **Type Safety**: Never use `any` or `dynamic` unless absolutely necessary. Use specific interfaces/types for all data boundaries.
-- **Dead Code**: Proactively remove unused imports, variables, and deprecated methods.
+Use `#[cfg(test)]` modules for unit tests, crate-local `tests/` for integration
+tests, and doctests for public examples. Test public behavior and invariants,
+not private implementation details. Keep fixtures deterministic and use local
+temporary directories for filesystem tests. Default tests must not require
+public RPC, funded wallets, or live model APIs.
 
-## 🧪 Testing & TDD
+As the spec is implemented, prioritize commitment encoding agreement, deadline
+boundaries, conservation of funds, transaction recovery, and private observation
+isolation. Add Foundry fuzz/invariant tests and local Anvil integration checks
+with the owning contract implementation. No numerical coverage threshold is
+configured; do not claim an unenforced percentage is a passing or failing gate.
 
-- **F-I-R-S-T**: Test must be Fast, Independent, Repeatable, Self-Validating, and Timely.
-- **TDD (Red-Green-Refactor)**: See our dedicated [TDD Skill](../tdd/SKILL.md) for strict cycle enforcement.
-- **Edge Cases**: Always test null/empty states, boundary limits, and error conditions.
-- **Mock Dependencies**: Isolate code by mocking external systems (APIs, DBs) to ensure deterministic results.
+## Code and Review
 
-## 🔺 The Test Pyramid
+Prefer typed errors and explicit handling of `Result` and `Option`. Check task
+cancellation, resource lifetimes, and error context across async boundaries.
+Document public APIs with `///`. Keep domain decisions in their owning modules
+and keep external SDK types at integration boundaries. Apply small changes
+within the task's scope instead of unrelated cleanup.
 
-- **Unit Tests (70%)**: Fast, isolated, test individual functions/classes. (TDD focus).
-- **Integration Tests (20%)**: Test interactions between modules (e.g., Service + DB).
-- **E2E Tests (10%)**: Slow, realistic, test user flows from UI to Backend.
-
-## 🎯 Risk-Based Testing
-
-- **Prioritize Critical Paths**: Login, Payments, Data Integrity must have the highest coverage.
-- **Impact Analysis**: Ask "What happens if this fails?" If the answer is "Data Loss", test it thoroughly.
-
-## 🛠 Refactoring & Code Reviews
-
-- **Code Smells**: Proactively refactor duplicated code, long methods (>20 lines), and "god classes".
-- **Incremental Changes**: Perform small, behavior-preserving transformations (Extract Method, Rename Variable).
-- **Quality Gate**: Use peer reviews to share knowledge and catch logic errors before merging.
-- **Constructive Feedback**: Critique the code, not the author. Explain the "why" behind suggestions.
-
-## 🛠 Automation & Hooks
-
-- **Pre-commit Hooks**: Validate linting, formatting, and unit tests before every push.
-- **Documentation**: Keep public APIs documented. Use triple-slash/JSDoc.
-- **Strict Dependencies**: Use the root `bun.lock` and `workspace:*` internal dependencies. Setup uses `bun install --frozen-lockfile`.
-
-## Crispr verification
-
-Run `bun run verify` for hook tests and Turbo lint/type/test/build tasks. The
-Codex and Claude Stop hooks share this gate; do not add a second pipeline.
-Use `bun run verify:browser` and the `browser-harness` skill for Next.js/runtime
-changes. Browser integration skips are not runtime proof. Preserve failures and
-evidence under `.harness/`, and report environmental blockers separately.
-
-## 🚫 Anti-Patterns
-
-- **Broken Window**: `**No Ignoring Warnings**: Leaving "small" lint errors leads to codebase rot.`
-- **Testing Implementation**: `**No Testing Internals**: Changes to private methods shouldn't break tests.`
-- **Manual QA Dependency**: `**No "Test-Last"**: Verification must be automated and continuous, not a final manual gate.`
-- **Magic Strings**: `**No Hardcoded IDs**: Use constants or generated keys for accessibility/test IDs.`
-
-## 📚 References
-
-- [TDD Cycle & Feedback Examples](references/TDD_FEEDBACK.md)
+Hook changes need observable success/failure tests, valid event output, and
+bounded retries. Preserve diagnostic logs under `.harness/verification/` and
+report unresolved failures or environmental blockers in the handoff.

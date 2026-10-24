@@ -2,36 +2,34 @@
 
 ## Project Structure & Module Organization
 
-This repository is currently a starting scaffold containing agent tooling. Application source code, tests, assets, and dependency manifests have not been added.
+This Cargo workspace follows the Veracity agent testing specification in `SPEC.md`. Start with modules in `runner/`; add crates only for concrete ownership boundaries. `runner/src/main.rs` is currently an empty entry point.
 
-- `.agents/skills/`: reusable agent instructions and supporting references.
-- `.codex/`: Codex agent definitions, configuration, hooks, rules, and environment settings.
-- `.claude/`: Claude agent definitions, skills, hooks, and settings.
-
-Keep application code separate from these tooling directories. Document source, test, and asset locations when introducing the first implementation.
+The spec reserves `contracts/` for Foundry, `scenarios/` for fixtures, `configs/` for experiment definitions, and `deployments/` for chain manifests. Add these with their implementations. Shared skills live in `.agents/skills/`; `.claude/skills` points there. Agent definitions and hooks live in `.codex/` and `.claude/`.
 
 ## Build, Test, and Development Commands
 
-No working application build, test, or development command is defined yet. Useful repository checks include:
+- `bash scripts/setup.sh`: check prerequisites and fetch locked dependencies.
+- `bash scripts/verify.sh`: run hook tests, formatting, Clippy, tests, and builds.
+- `cargo build --workspace --locked`: build workspace packages.
+- `cargo test --workspace --locked`: run unit, integration, and documentation tests.
+- `cargo test -p veracity-runner`: test the runner during iteration.
+- `cargo fmt --all`: format Rust sources.
+- `cargo clippy --workspace --all-targets --all-features --locked -- -D warnings`: reject lint warnings.
 
-- `git status --short`: inspect modified and untracked files.
-- `git diff --check`: check tracked changes for whitespace errors.
-- `bash -n .codex/hooks/stop_checks.sh`: validate the existing hook's shell syntax.
-
-The Codex environment references `bun run dev`, `scripts/setup.sh`, and `scripts/cleanup.sh`; the stop hook delegates to `scripts/agent-hooks/stop-checks.sh`. The required manifest and scripts are absent. Add and verify the intended tooling before treating those commands as usable.
+Rust, rustfmt, and Clippy are pinned in `rust-toolchain.toml`. Commit `Cargo.lock`; update dependencies deliberately.
 
 ## Coding Style & Naming Conventions
 
-Match neighboring files: use two-space indentation in JSON and preserve existing TOML and shell formatting. Use descriptive filenames and focused modules. Keep Markdown headings descriptive and examples executable. No repository-wide formatter or linter is configured; document any introduced tools and their commands alongside the implementation.
+Use Rust 2024 and rustfmt's default four-space indentation. Use `snake_case` for modules, functions, and variables; `PascalCase` for types and traits; and `SCREAMING_SNAKE_CASE` for constants. Prefer explicit ownership, typed errors, and narrow module boundaries. Share dependency versions through `[workspace.dependencies]` when needed. Workspace members inherit the unsafe-code prohibition.
 
 ## Testing Guidelines
 
-No test framework, test naming convention, or coverage threshold is established. When adding executable behavior, include tests for important outcomes, edge cases, and failures. Follow the selected runner's discovery conventions and document the exact test command. For documentation changes, verify referenced paths and commands; for shell changes, run syntax checks and exercise behavior when dependencies exist.
+Put unit tests beside implementation in `#[cfg(test)]` modules and integration tests under `runner/tests/`. Name tests after observable behavior. Cover protocol boundaries, transaction recovery, commitment encoding, and observation isolation as features arrive. Default tests must be deterministic and independent of public networks, funded wallets, and model APIs. No coverage percentage is configured yet.
 
 ## Commit & Pull Request Guidelines
 
-There are no commits from which to infer a convention. Use concise, imperative messages; a suggested format is `docs: add repository guidelines`. Keep commits focused. Pull requests should explain the change, link relevant issues, list verification performed and any blockers, and include screenshots when changing visible UI.
+Existing history uses short descriptive subjects. Prefer focused, imperative messages such as `Add Cargo verification hooks`. Pull requests should describe behavior, link relevant spec sections or issues, and report verification results and blockers.
 
 ## Agent-Specific Instructions
 
-For library, framework, SDK, API, CLI, or cloud-service documentation, use Context7: resolve the library ID, then query documentation with the full question. Author source and documentation directly with editing tools; keep notebook explanations in Markdown cells. Confirm referenced paths exist before applying bundled skills that assume application infrastructure.
+Use Context7 for current dependency and tool documentation: resolve the library ID, then query the full question. Author source and documentation directly with editing tools. Never commit wallet keys, credentials, or private observations. Both Stop hooks share `scripts/agent-hooks/stop-checks.sh`; disclose failures even when a repeated failure permits handoff.

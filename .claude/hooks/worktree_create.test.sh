@@ -2,7 +2,7 @@
 set -euo pipefail
 # Real Git worktrees in an isolated fixture; no network, copied secrets, or HEAD required.
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-fixture="$(mktemp -d "${TMPDIR:-/tmp}/crispr-worktree-test.XXXXXX")"
+fixture="$(mktemp -d "${TMPDIR:-/tmp}/veracity-worktree-test.XXXXXX")"
 fixture="$(cd "$fixture" && pwd -P)"
 trap 'rm -rf "$fixture"' EXIT
 mkdir -p "$fixture/.claude/hooks" "$fixture/scripts"
@@ -11,16 +11,28 @@ cp "$repo_root/scripts/agent-hooks/fixtures/setup.sh" "$fixture/scripts/setup.sh
 git -C "$fixture" init -q
 git -C "$fixture" add .
 git -C "$fixture" -c user.name=Test -c user.email=test@example.invalid -c commit.gpgsign=false commit -qm fixture
-export CRISPR_WORKTREE_BASE_REF=HEAD
+git -C "$fixture" branch test-base
+touch "$fixture/.head-only"
+git -C "$fixture" add .head-only
+git -C "$fixture" -c user.name=Test -c user.email=test@example.invalid -c commit.gpgsign=false commit -qm head-marker
+export VERACITY_WORKTREE_BASE_REF=test-base
 hook="$fixture/.claude/hooks/worktree_create.sh"
 target="$fixture/.claude/worktrees/test"
 created="$(printf '{"name":"test"}' | bash "$hook" 2>"$fixture/output.log")"
 [ "$created" = "$target" ]
 [ -f "$target/.setup-complete" ]
+[ ! -f "$target/.head-only" ]
 reused="$(printf '{"name":"test"}' | bash "$hook" 2>>"$fixture/output.log")"
 [ "$reused" = "$target" ]
 explicit="$fixture/explicit"
 [ "$(printf '{"worktree_path":"%s"}' "$explicit" | bash "$hook" 2>>"$fixture/output.log")" = "$explicit" ]
+fallback="$fixture/.claude/worktrees/fallback"
+[ "$(printf '{"name":"fallback"}' | VERACITY_WORKTREE_BASE_REF= bash "$hook" 2>>"$fixture/output.log")" = "$fallback" ]
+[ -f "$fallback/.head-only" ]
+if printf '{"name":"missing-ref"}' | VERACITY_WORKTREE_BASE_REF=does-not-exist bash "$hook" >/dev/null 2>&1; then
+  printf 'Missing base ref was accepted\n' >&2; exit 1
+fi
+[ ! -d "$fixture/.claude/worktrees/missing-ref" ]
 if printf '{"name":"../escape"}' | bash "$hook" >/dev/null 2>&1; then
   printf 'Unsafe worktree name was accepted\n' >&2; exit 1
 fi
@@ -42,4 +54,4 @@ if printf '{"name":"test"}' | FAIL_SETUP=1 bash "$hook" >/dev/null 2>&1; then
   printf 'Repeated setup failure was hidden\n' >&2; exit 1
 fi
 [ -f "$target/.setup-complete" ]
-printf 'Worktree hook: create, reuse, explicit path, validation, and rollback passed.\n'
+printf 'Worktree hook: create, reuse, base refs, explicit path, validation, and rollback passed.\n'
