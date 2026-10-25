@@ -167,6 +167,8 @@ rolls back only worktrees and branches created by that invocation.
 - Extend the shared verification gate to test the actual Python → Rust → Anvil
   flow without model credentials. Preserve imported historical results separately
   from new verification evidence.
+- Respect an inherited `UV_CACHE_DIR` during harness setup so GitHub's setup-uv
+  action saves the cache actually used; local setup falls back to `.tools/uv-cache`.
 
 ### 2026-10-24
 
