@@ -1,31 +1,122 @@
-# Apart Collusion Sprint
+# Veracity Game API
 
-Rust workspace for the Veracity agent testing environment described in
-[SPEC.md](SPEC.md). The `runner/` package is an empty executable scaffold;
-experiment execution and contracts are not implemented yet.
+A versioned HTTP API for the Veracity dispute game in [SPEC.md](SPEC.md).
+The Rust service connects to a non-upgradeable Solidity contract that enforces
+escrow, timed commit/reveal voting, full-jury majorities, and withdrawal credits.
+An external experiment harness supplies agents, deliberation, coalition
+treatments, private observations, and evaluation metrics.
+
+This repository builds only the game engine and its API. Creating a game does
+not require an experiment or scenario record. There is no model execution,
+experiment scheduler, deliberation controller, or evaluation pipeline here.
+
+Share [the API integration guide](docs/api.md) with the harness team. The running
+service exposes the same guide at `/v1/docs` and OpenAPI 3.1 at `/v1/openapi.json`.
+[Architecture and rule authority](docs/architecture.md) describes the boundaries.
 
 ## Development
 
-Install Rust through rustup, plus Bash, Git, and jq for the agent hooks. The
-repository pins Rust 1.94.0, rustfmt, and Clippy in `rust-toolchain.toml`.
+Install Rust through rustup, Bash, Git, curl, tar, jq, `sha256sum` or `shasum`, and a native C build toolchain
+for bundled SQLite. Rust 1.94.0, rustfmt, and Clippy are pinned in
+`rust-toolchain.toml`; Foundry is pinned in `.foundry-version`. Setup downloads
+checksum-verified Foundry binaries into `.tools/bin`, builds with pinned Solidity
+0.8.28/Cancun, verifies the deployment artifact, and fetches locked Rust dependencies.
 
 ```sh
 bash scripts/setup.sh
+RUST_LOG=info cargo run --locked -p veracity-game-service -- --local
+```
+
+Local mode starts an isolated Anvil instance, deploys the contract, and listens
+on `http://127.0.0.1:8080`. It uses development-only credentials: `dev-operator`,
+`dev-creator`, `dev-challenger`, `dev-juror-1` through `dev-juror-7`, and
+`dev-treasury`. These credentials cannot be used with a non-loopback listener.
+
+```sh
+curl -sS http://127.0.0.1:8080/v1/health
+curl -sS http://127.0.0.1:8080/v1/episodes \
+  -H 'Authorization: Bearer dev-operator' \
+  -H 'Idempotency-Key: trial-001-register' \
+  -H 'Content-Type: application/json' \
+  --data-binary @examples/episode.json
+```
+
+Each local invocation starts a fresh chain and records its private SQLite data
+under `.harness/runs/<run-id>/game.sqlite`. `Ctrl-C` stops the server and its
+node. The chain is ephemeral; use external deployment mode for experiments
+that must resume across server restarts. A supplied `--database` in local mode
+must be new so a fresh chain cannot silently replace an existing experiment.
+
+## API documentation
+
+Start the local service using the Development commands above, then:
+
+1. Open [the OpenAPI 3.1 JSON](http://127.0.0.1:8080/v1/openapi.json)
+   in your browser and copy the entire document.
+2. Open [Swagger Editor](https://editor.swagger.io/) and replace its example
+   specification with the copied JSON. The editor renders the endpoints,
+   request bodies, response schemas, and authentication requirements.
+
+Share the JSON document with teammates so they can open the same API reference
+in an OpenAPI-compatible viewer. For lifecycle examples and local credentials,
+read [the integration guide](docs/api.md), also served at
+[`/v1/docs`](http://127.0.0.1:8080/v1/docs). That endpoint serves Markdown;
+the service does not currently bundle an interactive documentation viewer.
+
+## Persistent deployments
+
+Use [configs/server.example.toml](configs/server.example.toml) as a template.
+Replace its placeholder contract address and expected deployed runtime code
+hash with a verified deployment, then provide the referenced private keys and
+unique bearer credentials through environment variables. The constructor's
+operator must match `operator_id`. Restart with the same chain, configuration,
+signers, and database. Run one active service process per database:
+
+```sh
+cargo run --locked -p veracity-game-service -- \
+  --config configs/server.toml --database .harness/game.sqlite
+```
+
+Only explicitly configured Anvil (31337) and Polygon Amoy (80002) are accepted.
+Startup checks chain identity, runtime code hash, ABI version, operator signer,
+and the database's immutable deployment binding. Recovery retains signed
+transactions and private reveal material instead of issuing another economic
+action. Keep the private database as a recovery backup; public event exports
+intentionally omit private action requests and secrets.
+
+RPC requests have a ten-second timeout and a three-second connection timeout.
+Transient HTTP 429/503 and classified RPC rate-limit responses use at most
+three exponential-backoff retries, with jitter, a two-second delay cap, and
+five seconds of total sleep. Semantic reverts are not retried. Broadcast retries
+reuse the exact persisted signed bytes; signing is outside the retry boundary.
+
+Public Amoy execution requires an operator-managed deployment and funded test
+wallets. Default tests use local Anvil and require no public RPC or model API.
+
+## Verification
+
+```sh
 bash scripts/verify.sh
 ```
 
-Setup checks prerequisites and fetches the committed Cargo dependency graph.
-Verification runs isolated hook tests, rustfmt, Clippy with warnings denied,
-Cargo tests (including doctests), and builds all workspace targets. Use
-`cargo test -p veracity-runner` for focused iteration and `cargo fmt --all` to
-format Rust. Commit `Cargo.lock` whenever dependencies change. No external
-crates are needed for the initial scaffold.
+The gate runs hook regression tests, Solidity formatting/unit/fuzz/invariant
+tests, deployment artifact consistency, Rust formatting, Clippy with warnings
+denied, Rust unit/integration/doctests, and all-target builds. The Rust integration
+tests deploy the real contract on isolated Anvil nodes and drive the actual HTTP
+router, including retries, restart recovery, and reorg evidence. Environments
+that prohibit loopback listeners must grant local network execution for these
+tests; they are never silently skipped.
 
-The implementation starts with modules in `runner/`, as specified in `SPEC.md`.
-Add crates only when a concrete ownership boundary needs them. The planned
-`contracts/` Foundry project, scenarios, configurations, and deployment manifests
-will be added with their owning implementation; Foundry is not required for
-this Rust tooling setup.
+For focused iteration, use `cargo test -p veracity-game-service --test e2e_game` or
+`.tools/bin/forge test --root contracts --match-test <name>`. Format with
+`cargo fmt --all` and `.tools/bin/forge fmt --root contracts`. Deliberate contract
+changes require `forge build --root contracts` followed by
+`bash contracts/check-artifact.sh --write`; commit the resulting artifact.
+
+The workspace stays in one Rust crate with `api`, `game`, `chain`, `store`, and
+configuration modules. The Solidity contract owns financial rules; Rust does
+not independently calculate a competing settlement ledger. See
+[contracts/README.md](contracts/README.md) for the contract's acceptance tests.
 
 ## Agent tooling
 
@@ -52,7 +143,14 @@ rolls back only worktrees and branches created by that invocation.
 
 ### 2026-10-24
 
-- Use one Cargo workspace with the initial `runner/` package to follow the spec's
+- Expose game operations through `/v1` HTTP and generated OpenAPI because the
+  external team owns the experiment harness. Keep the spec's protocol rules
+  authoritative over incompatible direct-vote and floating-point handoff examples.
+- Persist idempotent operations, signed transactions, reveal secrets, and receipt
+  evidence before external side effects; use actual contract state for finance.
+- Name the API crate `veracity-game-service` under `core/` to distinguish
+  the game server from the external experiment harness.
+- Use one Cargo workspace with the initial `core/` package to follow the spec's
   module-first implementation plan without introducing speculative crates.
 - Share one Rust verification gate and one skills directory between Codex and
   Claude so their checks and instructions cannot diverge by copying files.

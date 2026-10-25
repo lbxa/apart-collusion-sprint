@@ -21,6 +21,21 @@ for failure in fmt clippy test build; do
   [ "$(tail -n 1 "$CARGO_CALLS" | cut -d ' ' -f 1)" = "$failure" ]
 done
 
+mkdir -p "$fixture/repo with spaces/contracts"
+cp "$repo_root/contracts/foundry.toml" "$fixture/repo with spaces/contracts/foundry.toml"
+cp "$repo_root/.foundry-version" "$fixture/repo with spaces/.foundry-version"
+cp "$repo_root/scripts/agent-hooks/fixtures/forge.sh" "$fixture/bin/forge"
+chmod +x "$fixture/bin/forge"
+export FORGE_CALLS="$fixture/forge-calls"
+for failure in fmt test; do
+  : > "$CARGO_CALLS"
+  if FORGE_FAIL="$failure" bash "$fixture/repo with spaces/scripts/verify.sh" >"$fixture/output" 2>&1; then
+    printf 'Verification hid a forge %s failure\n' "$failure" >&2
+    exit 1
+  fi
+  [ ! -s "$CARGO_CALLS" ]
+done
+
 mkdir -p "$fixture/repo with spaces/.claude/hooks"
 cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/.claude/hooks/failing.test.sh"
 : > "$CARGO_CALLS"
@@ -29,4 +44,4 @@ if VERIFY_EXIT=1 bash "$fixture/repo with spaces/scripts/verify.sh" >"$fixture/o
   exit 1
 fi
 [ ! -s "$CARGO_CALLS" ]
-printf 'Verification: hook and Cargo failures, gate order, and locked flags passed.\n'
+printf 'Verification: hook, Forge, and Cargo failures, gate order, and locked flags passed.\n'

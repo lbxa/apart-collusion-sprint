@@ -1,0 +1,7 @@
+//! Versioned API and durable chain adapter for the Veracity game.
+
+pub mod api;
+pub mod chain;
+pub mod config;
+pub mod game;
+pub mod store;

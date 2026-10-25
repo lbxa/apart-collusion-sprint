@@ -22,10 +22,10 @@ Focus on execution flow, data flow, timing and async behavior, environment diffe
 **Tooling.** This is a Rust Cargo workspace. Read `AGENTS.md`, `SPEC.md`, the owning `Cargo.toml`, `Cargo.lock`, and `rust-toolchain.toml`. Useful entry points:
 
 - `bash scripts/verify.sh` — hook tests, rustfmt, Clippy, tests, and builds.
-- `cargo test -p veracity-runner <test_name> -- --nocapture` — reproduce a focused failure.
-- `RUST_BACKTRACE=1 cargo test -p veracity-runner <test_name>` — collect a Rust backtrace.
+- `cargo test -p veracity-game-service <test_name> -- --nocapture` — reproduce a focused failure.
+- `RUST_BACKTRACE=1 cargo test -p veracity-game-service <test_name>` — collect a Rust backtrace.
 
-The initial crate is `runner/`. Trace ownership, async task lifetimes, typed errors, chain receipts, and SQLite records where implemented. Use recorded fixtures or local Anvil for deterministic reproductions; public networks and live model calls are not default test dependencies.
+The game API crate is `core/`. Trace ownership, async task lifetimes, typed errors, chain receipts, and SQLite records. Use recorded fixtures or local Anvil for deterministic reproductions; public networks and live model calls are not default test dependencies.
 
 You may reason about temporary instrumentation, but you are in plan mode and hold no write tools — you cannot leave edits behind. If reproducing genuinely requires modifying a file, report that to the parent rather than working around it.
 
