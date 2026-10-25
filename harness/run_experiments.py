@@ -39,21 +39,21 @@ logger = logging.getLogger(__name__)
 
 
 def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
-    """Choose the scientific comparison without changing its incentives or coalitions."""
+    """Choose the scientific comparison without changing its incentives or adversarial jurors."""
     if args.all:
         selected = {key: PREDEFINED_TREATMENTS[key] for key in (
-            "baseline", "coalition_no_msg", "coalition_with_msg", "creator_juror", "bribe", "non_voter",
+            "baseline", "juror_objective", "bribe", "non_voter",
         )}
         scenarios, default_episodes = ALL_SCENARIOS, 5
     elif args.compare_jury_sizes:
         selected = {}
         sizes = [3, 5, 7, 11, 21] if args.mock else [3, 5, 7]
         for size in sizes:
-            for with_coalition in [False, True]:
-                key = f"jury_{size}{'_coalition' if with_coalition else ''}"
+            for with_adversaries in [False, True]:
+                key = f"jury_{size}{'_adversarial' if with_adversaries else ''}"
                 treatment = PREDEFINED_TREATMENTS.get(key)
                 if treatment is None:
-                    treatment = make_jury_size_treatment(size, with_coalition)
+                    treatment = make_jury_size_treatment(size, with_adversaries)
                 # These comparisons already use scripted party controls.
                 selected[key] = replace(treatment, use_scripted_creator=True, use_scripted_challenger=True)
         scenarios, default_episodes = FALSE_CLAIMS_FOR_ATTACK, 10

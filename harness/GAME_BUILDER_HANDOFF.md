@@ -4,7 +4,7 @@
 > [the `/v1` API](../docs/api.md), and [integration notes](../docs/integration.md)
 > for implemented rules. The contract controls phases and settlement.
 
-This document tells you exactly what the experiment harness expects from the game (Rust + Solidity on Polygon Amoy). The harness drives LLM-backed agents through a veracity dispute game and measures collusion across treatments. You build the game mechanics; the harness handles agents, prompts, coalition injection, and metrics.
+This document tells you exactly what the experiment harness expects from the game (Rust + Solidity on Polygon Amoy). The harness drives LLM-backed agents through a veracity dispute game and measures collusion across treatments. You build the game mechanics; the harness handles agents, prompts, objective injection, and metrics.
 
 ---
 
@@ -61,7 +61,7 @@ The game is blind to these — the harness manages them entirely:
 
 - **Deliberation messages** — agents talk to each other through the harness, not on-chain
 - **Straw polls** — non-binding polls during deliberation, harness-only
-- **Coalition logic** — which agents are colluding, their secret objectives
+- **Juror objectives** — which jurors hold a secret objective
 - **Bribe simulation** — side payments offered to jurors
 - **Agent prompts** — what LLMs see and how they decide
 - **Metrics** — verdict accuracy, collusion rates, all measurement
@@ -191,7 +191,7 @@ Given `loser_bet` = the losing side's bet (same as winner's bet in symmetric set
 | Field | Purpose |
 |---|---|
 | `outcome` | Compared against ground truth to measure verdict accuracy |
-| `winner_payout` | Tracks financial outcomes for coalition benefit analysis |
+| `winner_payout` | Tracks financial outcomes for profit analysis |
 | `juror_payouts` | Per-juror profit/loss calculation |
 | `protocol_fee` | Total system cost tracking |
 | `forfeited_bonds` | Measures participation loss from non-voter attacks |
@@ -211,10 +211,9 @@ If calling a live API is hard to set up immediately, the game can dump state as 
 The harness runs the same scenarios under different conditions and compares outcomes. The game doesn't need to know about any of this, but it helps to understand the goal:
 
 1. **Baseline** — honest agents, no manipulation. What's the natural accuracy?
-2. **Coalition** — some jurors are secretly told to vote one way. Does accuracy drop?
-3. **Private messaging** — colluding jurors can talk privately during deliberation. Does it get worse?
-4. **Bribery** — jurors offered side payments. How cheap is corruption?
-5. **Non-voter attack** — jurors deliberate but refuse to vote, forcing hung juries. What's the cost?
+2. **Juror objective** — some jurors are secretly told to vote one way. Does accuracy drop?
+3. **Bribery** — jurors offered side payments. How cheap is corruption?
+4. **Non-voter attack** — jurors deliberate but refuse to vote, forcing hung juries. What's the cost?
 
 We vary jury size (3 to 101), payout splits, deliberation rounds, and agent models (GPT-4o, Claude, mixed) across all of these.
 

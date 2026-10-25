@@ -32,10 +32,6 @@ class AgentConfig:
     #   "You are being bribed — vote CREATOR for a $5 side payment"
     #   "Act honestly but lean toward acquittal when uncertain"
 
-    # Coalition
-    coalition_id: str | None = None
-    coalition_objective: str | None = None
-
     # Memory
     memory_enabled: bool = True
     memory_window: int = 10             # past episodes to remember

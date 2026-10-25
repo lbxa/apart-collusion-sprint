@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from agents.llm_agent import _parse_action_content
 from experiments.runner import ExperimentRunner
-from experiments.treatments import TreatmentConfig, CoalitionDef, BribeDef
+from experiments.treatments import TreatmentConfig, BribeDef
 from game_api.mock import MockGameAPI
 from game_api.types import PayoutConfig
 from scenarios.examples import FACTUAL_SCENARIOS, FALSE_CLAIMS_FOR_ATTACK

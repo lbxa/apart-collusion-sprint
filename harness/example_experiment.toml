@@ -3,7 +3,7 @@
 
 [experiment]
 name = "Collusion Resistance Under Varying Conditions"
-hypothesis = "Coalition communication channels increase false-verdict rates during multi-turn deliberation"
+hypothesis = "Privately assigned juror objectives and bribe offers increase false-verdict rates during multi-turn deliberation"
 seed = 42
 output_dir = "results/collusion_study"
 
@@ -26,17 +26,7 @@ episodes = 20
 deliberation_rounds = 3
 
 [[treatments]]
-id = "coalition_no_msg"
-episodes = 20
-deliberation_rounds = 3
-
-[[treatments]]
-id = "coalition_with_msg"
-episodes = 20
-deliberation_rounds = 3
-
-[[treatments]]
-id = "creator_juror"
+id = "juror_objective"
 episodes = 20
 deliberation_rounds = 3
 

@@ -2,7 +2,7 @@
 
 The external experiment harness calls this HTTP API to create independent game
 episodes, post claims and challenges, commit and reveal votes, settle, and
-withdraw credits. The harness owns agent prompts, deliberation, coalitions,
+withdraw credits. The harness owns agent prompts, deliberation,
 private observations, simulated bribes, and evaluation metrics. The contract
 owns protocol state and money. An API request cannot change a registered rule.
 

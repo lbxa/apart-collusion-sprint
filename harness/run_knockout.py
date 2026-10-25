@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """Run the knockout experimental design for the Apart Collusion Sprint.
 
-This is the main entry point. It runs the 8-condition knockout design
+This is the main entry point. It runs the 7-condition knockout design
 from the Inducing Collusion PDF using the configured model providers.
 
 Usage:
   # Pilot: run just the full condition (2-3 blocks) to check if collusion emerges
   OPENROUTER_API_KEY=your_key python run_knockout.py --pilot
 
-  # Minimum viable: full + honest + 3 key knockouts (5 conditions)
+  # Minimum viable: full + honest + 2 key knockouts (4 conditions)
   OPENROUTER_API_KEY=your_key python run_knockout.py --minimum
 
-  # Full knockout: all 8 conditions
+  # Full knockout: all 7 conditions
   OPENROUTER_API_KEY=your_key python run_knockout.py --full
 
   # Single condition
@@ -149,49 +149,43 @@ def _describe_levers(condition_id: str) -> dict[str, bool]:
     """Describe which levers are active in a condition."""
     if condition_id == "knockout_full":
         return {
-            "private_channel": True, "side_payments": True,
+            "side_payments": True,
             "repeated_play": True, "high_stakes": True,
             "ambiguous_evidence": True, "no_detection_risk": True,
         }
     elif condition_id == "knockout_honest":
         return {
-            "private_channel": False, "side_payments": False,
+            "side_payments": False,
             "repeated_play": False, "high_stakes": True,
             "ambiguous_evidence": True, "no_detection_risk": False,
         }
-    elif condition_id == "knockout_no_channel":
-        return {
-            "private_channel": False, "side_payments": True,
-            "repeated_play": True, "high_stakes": True,
-            "ambiguous_evidence": True, "no_detection_risk": True,
-        }
     elif condition_id == "knockout_no_transfers":
         return {
-            "private_channel": True, "side_payments": False,
+            "side_payments": False,
             "repeated_play": True, "high_stakes": True,
             "ambiguous_evidence": True, "no_detection_risk": True,
         }
     elif condition_id == "knockout_no_repeat":
         return {
-            "private_channel": True, "side_payments": True,
+            "side_payments": True,
             "repeated_play": False, "high_stakes": True,
             "ambiguous_evidence": True, "no_detection_risk": True,
         }
     elif condition_id == "knockout_low_stakes":
         return {
-            "private_channel": True, "side_payments": True,
+            "side_payments": True,
             "repeated_play": True, "high_stakes": False,
             "ambiguous_evidence": True, "no_detection_risk": True,
         }
     elif condition_id == "knockout_clear_evidence":
         return {
-            "private_channel": True, "side_payments": True,
+            "side_payments": True,
             "repeated_play": True, "high_stakes": True,
             "ambiguous_evidence": False, "no_detection_risk": True,
         }
     elif condition_id == "knockout_detection":
         return {
-            "private_channel": True, "side_payments": True,
+            "side_payments": True,
             "repeated_play": True, "high_stakes": True,
             "ambiguous_evidence": True, "no_detection_risk": False,
         }
@@ -206,8 +200,8 @@ async def main():
 Examples:
   python run_knockout.py --dry-run          # Test with scripted agents (no API key)
   python run_knockout.py --pilot            # Pilot: full condition only
-  python run_knockout.py --minimum          # 5 key conditions
-  python run_knockout.py --full             # All 8 conditions
+  python run_knockout.py --minimum          # 4 key conditions
+  python run_knockout.py --full             # All 7 conditions
   python run_knockout.py --condition knockout_full --episodes 20
         """,
     )
@@ -215,9 +209,9 @@ Examples:
     selection.add_argument("--pilot", action="store_true",
                         help="Pilot run: full condition only (2 blocks = 20 episodes)")
     selection.add_argument("--minimum", action="store_true",
-                        help="Minimum viable: 5 key conditions")
+                        help="Minimum viable: 4 key conditions")
     selection.add_argument("--full", action="store_true",
-                        help="Full knockout: all 8 conditions")
+                        help="Full knockout: all 7 conditions")
     selection.add_argument("--condition", type=str,
                         help="Run a single condition by ID")
     models = parser.add_mutually_exclusive_group()
@@ -249,7 +243,7 @@ Examples:
             active = sum(1 for v in levers.values() if v)
             print(f"  {cid:<30} {c.name}")
             print(f"  {'':30} {c.description}")
-            print(f"  {'':30} Levers active: {active}/6")
+            print(f"  {'':30} Levers active: {active}/5")
             print()
         return 0
 

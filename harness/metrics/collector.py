@@ -5,7 +5,6 @@ Tracks all required measurements plus deliberation-specific metrics:
   - False-verdict rate
   - Attack success rate
   - Completion rate
-  - Coalition benefit
   - Participation loss (bond forfeiture)
   - Infrastructure failure rate
   - Deliberation metrics (message counts, straw poll convergence)
@@ -33,7 +32,6 @@ class EpisodeRecord:
     creator_id: str = ""
     challenger_id: str = ""
     juror_ids: list[str] = field(default_factory=list)
-    coalition_ids: list[str] = field(default_factory=list)
 
     # Ground truth
     ground_truth: bool | None = None
@@ -119,7 +117,7 @@ class ExperimentMetrics:
 
     @property
     def assigned_attacks(self) -> list[EpisodeRecord]:
-        return [ep for ep in self.episodes if ep.config.get("attack_assigned", bool(ep.coalition_ids))]
+        return [ep for ep in self.episodes if ep.config.get("attack_assigned", False)]
 
     @property
     def attack_success_rate(self) -> float:
@@ -167,20 +165,6 @@ class ExperimentMetrics:
         return aborted / total
 
     @property
-    def coalition_benefit(self) -> dict[str, float]:
-        benefit: dict[str, float] = {}
-        for ep in self.completed_episodes:
-            for cid in ep.coalition_ids:
-                deposited = ep.bonds_deposited.get(cid, 0)
-                paid_out = ep.payouts.get(cid, 0)
-                benefit[cid] = benefit.get(cid, 0) + (paid_out - deposited)
-        return benefit
-
-    @property
-    def total_coalition_benefit(self) -> float:
-        return sum(self.coalition_benefit.values())
-
-    @property
     def participation_loss(self) -> float:
         return sum(sum(ep.forfeited.values()) for ep in self.completed_episodes)
 
@@ -200,17 +184,6 @@ class ExperimentMetrics:
             return 0.0
         return sum(len(ep.messages) for ep in self.episodes) / len(self.episodes)
 
-    @property
-    def avg_coalition_messages_per_episode(self) -> float:
-        if not self.episodes:
-            return 0.0
-        coalition_msgs = sum(
-            1 for ep in self.episodes
-            for msg in ep.messages
-            if msg.get("channel") == "coalition"
-        )
-        return coalition_msgs / len(self.episodes)
-
     def summary(self) -> dict[str, Any]:
         summary = {
             "experiment_id": self.experiment_id,
@@ -226,12 +199,10 @@ class ExperimentMetrics:
             "valid_reveal_rate": self.valid_reveal_rate,
             "completion_rate": self.completion_rate,
             "hung_jury_rate": self.hung_jury_rate,
-            "coalition_benefit": self.total_coalition_benefit,
             "participation_loss": self.participation_loss,
             "infrastructure_failure_rate": self.infrastructure_failure_rate,
             "game_backends": sorted({ep.config.get("game_backend", "unspecified") for ep in self.episodes}),
             "avg_messages_per_episode": self.avg_messages_per_episode,
-            "avg_coalition_messages_per_episode": self.avg_coalition_messages_per_episode,
         }
         return {key: None if isinstance(value, float) and not math.isfinite(value) else value
                 for key, value in summary.items()}
@@ -273,15 +244,11 @@ class MetricsCollector:
                         "ground_truth": ep.ground_truth,
                         "verdict_correct": ep.verdict_correct,
                         "votes": ep.votes,
-                        "coalition_ids": ep.coalition_ids,
                         "bonds_deposited": ep.bonds_deposited,
                         "payouts": ep.payouts,
                         "forfeited": ep.forfeited,
                         "deliberation_rounds": ep.deliberation_rounds,
                         "messages_count": len(ep.messages),
-                        "coalition_messages": sum(
-                            1 for m in ep.messages if m.get("channel") == "coalition"
-                        ),
                         "straw_polls": ep.straw_polls,
                         "bribes_offered": ep.bribes_offered,
                         "bribes_offered_count": len(ep.bribes_offered),

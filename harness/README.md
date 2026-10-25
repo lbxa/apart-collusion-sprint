@@ -50,7 +50,7 @@ save diagnostic records and exit unsuccessfully; failures do not become verdicts
   Run episodes sequentially on that node; use separate adapters for concurrent
   local runs. This convenience mode does not attach to public deployments.
 - Actual claim text, counter-evidence, and final assessments reach the engine.
-  Deliberation, straw polls, private channels, and simulated bribes stay here.
+  Deliberation, straw polls, and simulated bribes stay here.
   The runner enforces configured channels and keeps ground truth in evaluation.
   Scripted honest baselines receive explicit oracle labels as test doubles;
   their accuracy is plumbing evidence, not evidence about model ability.

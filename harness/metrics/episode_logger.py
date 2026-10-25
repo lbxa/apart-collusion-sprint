@@ -27,7 +27,7 @@ class HandoffEntry:
     role: str
     action: str
     details: str
-    channel: str = "game"   # game | public | coalition | private
+    channel: str = "game"   # game | public | private
     money_in: float = 0.0   # money deposited
     money_out: float = 0.0  # money received
 

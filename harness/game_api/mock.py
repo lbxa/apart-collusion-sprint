@@ -2,7 +2,7 @@
 
 Implements the simple $10/$10 bet with configurable payout splits.
 The game tracks: bets, bonds, votes, and settlement.
-The harness manages: deliberation rounds, agent prompts, coalition logic.
+The harness manages: deliberation rounds, agent prompts.
 """
 
 from __future__ import annotations
