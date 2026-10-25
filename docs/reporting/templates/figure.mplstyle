@@ -1,0 +1,24 @@
+# House defaults. Set final physical width in each script; match the venue font.
+font.family: serif
+font.serif: DejaVu Serif
+font.size: 9
+mathtext.fontset: dejavuserif
+axes.labelsize: 9
+axes.titlesize: 9
+xtick.labelsize: 8
+ytick.labelsize: 8
+legend.fontsize: 8
+axes.linewidth: 0.7
+lines.linewidth: 1.2
+lines.markersize: 5
+axes.spines.top: False
+axes.spines.right: False
+axes.grid: False
+xtick.direction: out
+ytick.direction: out
+image.cmap: viridis
+pdf.fonttype: 42
+ps.fonttype: 42
+savefig.dpi: 300
+savefig.facecolor: white
+figure.facecolor: white
