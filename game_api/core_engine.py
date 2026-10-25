@@ -51,6 +51,8 @@ OPERATOR_TOKEN = "dev-operator"
 
 # Phase durations in seconds for registering episodes
 DEFAULT_PHASE_DURATION = 300  # 5 minutes — we advance Anvil time past these
+COMMIT_PHASE_DURATION = 3600  # Allow time for multi-round LLM deliberation and voting
+REVEAL_PHASE_DURATION = DEFAULT_PHASE_DURATION
 
 
 @dataclass
@@ -252,6 +254,46 @@ class CoreEngineAPI(GameAPI):
         ) as resp:
             await resp.json()
 
+    async def _advance_to_deadline(self, episode_id: str, deadline_name: str) -> None:
+        """Mine just past an episode's absolute deadline without skipping later phases."""
+        async with self._session.get(
+            f"{self._base_url}/v1/episodes/{episode_id}"
+        ) as resp:
+            if resp.status != 200:
+                raise RuntimeError(
+                    f"Could not read episode {episode_id} before advancing time: "
+                    f"HTTP {resp.status}: {(await resp.text())[:300]}"
+                )
+            episode = await resp.json()
+
+        deadline = episode.get(deadline_name)
+        if not isinstance(deadline, int):
+            raise RuntimeError(
+                f"Episode {episode_id} has no valid {deadline_name}: {deadline!r}"
+            )
+        if not self._rpc_url:
+            raise RuntimeError("No Anvil RPC URL — cannot advance to episode deadline")
+
+        async with self._session.post(
+            self._rpc_url,
+            json={
+                "jsonrpc": "2.0",
+                "method": "eth_getBlockByNumber",
+                "params": ["latest", False],
+                "id": 3,
+            },
+        ) as resp:
+            block_response = await resp.json()
+        block = block_response.get("result")
+        if not isinstance(block, dict) or not isinstance(block.get("timestamp"), str):
+            raise RuntimeError(f"Could not read latest Anvil block timestamp: {block_response}")
+        current_timestamp = int(block["timestamp"], 16)
+        seconds_to_deadline = max(0, deadline - current_timestamp + 1)
+        if seconds_to_deadline:
+            await self._advance_time(seconds_to_deadline)
+        else:
+            await self._advance_time(0)
+
         async with self._session.post(
             self._rpc_url,
             json={"jsonrpc": "2.0", "method": "evm_mine", "params": [], "id": 2},
@@ -310,8 +352,8 @@ class CoreEngineAPI(GameAPI):
                 "gamma_bps": self._gamma_bps,
                 "posting_duration_secs": DEFAULT_PHASE_DURATION,
                 "challenge_duration_secs": DEFAULT_PHASE_DURATION,
-                "commit_duration_secs": DEFAULT_PHASE_DURATION,
-                "reveal_duration_secs": DEFAULT_PHASE_DURATION,
+                "commit_duration_secs": COMMIT_PHASE_DURATION,
+                "reveal_duration_secs": REVEAL_PHASE_DURATION,
             },
         }
 
@@ -412,26 +454,24 @@ class CoreEngineAPI(GameAPI):
     async def settle(self, episode_id: str) -> SettlementResult:
         mapping = self._episodes[episode_id]
 
-        # Advance time past commit deadline → enter REVEAL phase
-        await self._advance_time(DEFAULT_PHASE_DURATION + 1)
+        # Advance only to the commit deadline; deliberation may already have
+        # consumed part of the commit window in real time.
+        await self._advance_to_deadline(episode_id, "commit_deadline")
 
         # Reveal all committed votes
         for harness_jid, verdict in mapping.juror_verdicts.items():
             engine_jid = mapping.harness_to_engine[harness_jid]
             token = ENGINE_PARTICIPANTS[engine_jid]
-            try:
-                await self._request(
-                    "POST", f"/v1/episodes/{episode_id}/reveals",
-                    token=token,
-                    body={},
-                    idempotency_key=self._idem_key(episode_id, f"reveal-{engine_jid}"),
-                )
-                logger.info("Episode %s: %s revealed", episode_id, engine_jid)
-            except Exception as e:
-                logger.warning("Episode %s: reveal failed for %s: %s", episode_id, engine_jid, e)
+            await self._request(
+                "POST", f"/v1/episodes/{episode_id}/reveals",
+                token=token,
+                body={},
+                idempotency_key=self._idem_key(episode_id, f"reveal-{engine_jid}"),
+            )
+            logger.info("Episode %s: %s revealed", episode_id, engine_jid)
 
-        # Advance time past reveal deadline
-        await self._advance_time(DEFAULT_PHASE_DURATION + 1)
+        # Advance only to the reveal deadline, preserving the on-chain phase window.
+        await self._advance_to_deadline(episode_id, "reveal_deadline")
 
         # Settle
         try:
