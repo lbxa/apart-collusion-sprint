@@ -14,10 +14,13 @@ The supplied style is not evidence of arXiv acceptance or compliance with a
 conference's current requirements. Its attribution and attachment hashes are
 recorded in [template provenance](../../report/template/README.md).
 
-Build with `make -C report`: pdfLaTeX through `latexmk -pdf`, on US Letter with
-6.5-inch text width and 9-inch text height from the style. The sample uses a
+Build with `make -C report`, or open `report/main.tex` in TeXShop and typeset
+with its selected `pdflatexmk` engine: pdfLaTeX through `latexmk -pdf`, on US
+Letter with 6.5-inch text width and 9-inch text height from the style. The sample uses a
 small keyed `thebibliography` in its own section file, with no external
 bibliography pass. The document date is fixed in `report/preamble.tex`.
+The vector figure is included in `report/figures/`; regenerate it explicitly
+with `make -C report figures` when its source changes.
 The [review record](../../report/review.md) records the tested toolchain and PDF
 inspection. The submission fields below remain open for the actual venue.
 

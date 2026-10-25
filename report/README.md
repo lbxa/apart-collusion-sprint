@@ -21,7 +21,8 @@ the repository documents it uses.
 | [Discussion](sections/discussion.tex) | Interpretation and limitations |
 | [Conclusion](sections/conclusion.tex) | Supported takeaway |
 | [References](sections/references.tex) | Keyed references to inspected local primary documents |
-| [Makefile](Makefile) | Regenerates the figure, then compiles the whole document |
+| [Figure PDF](figures/figure-example.pdf) | Included vector figure for direct editor compilation |
+| [Makefile](Makefile) | Compiles the document; regenerates the figure on request |
 | [Template provenance](template/README.md) | Attachment attribution, hashes, and adaptation decisions |
 | [Review record](review.md) | Build and rendered-PDF checks for this sample |
 
@@ -32,26 +33,53 @@ The figure generator and style remain canonical in
 
 ## Build
 
+### TeXShop on macOS
+
+Open `report/main.tex` in TeXShop and press **Typeset** (Cmd-T). The first-line
+directive selects `pdflatexmk`, which runs pdfLaTeX until citations and
+cross-references stabilize. Each section and `preamble.tex` has a root-file
+directive, so Cmd-T from those files also builds the whole report. The figure
+PDF is included in `figures/`; no Python setup or figure-generation step is
+needed to typeset the report.
+
+TeXShop writes **`report/main.pdf`**, `main.aux`, `main.log`, and SyncTeX data
+beside `main.tex`. These build products are ignored by Git. The `pdflatexmk`
+engine ships with TeXShop; if it is not in the engine menu, move
+`pdflatexmk.engine` from `~/Library/TeXShop/Engines/Inactive/Latexmk/` into
+`~/Library/TeXShop/Engines/` and restart TeXShop. Alternatively, select LaTeX
+and typeset repeatedly until there are no rerun warnings. The tiny keyed
+`thebibliography` needs no BibTeX or Biber pass.
+
+If the console is waiting for another filename after a failed build, press
+**Abort**, then typeset again. LaTeX creates `main.aux`; do not create it by hand
+or trash auxiliary files while typesetting. Use **Trash Aux Files** only after
+stopping a build, then rerun `pdflatexmk` to regenerate them.
+
+### Command line
+
 From the repository root:
 
 ```sh
 make -C report
 ```
 
-Requirements: Make, Python with Matplotlib, `latexmk`, pdfLaTeX, and the standard
+Requirements: Make, `latexmk`, pdfLaTeX, and the standard
 Geometry, Fancyhdr, T1 Times fonts, AMS, Booktabs, graphics, Microtype, TikZ, and
-Hyperref packages. `PYTHON` and `LATEXMK` can select installed executables, for
-example `make -C report PYTHON=/path/to/python`.
+Hyperref packages. `LATEXMK` can select an installed executable.
 
 The PDF is **`report/build/main.pdf`**. The output directory also holds the TeX
-log, figure PDF, figure provenance JSON, and temporary files; it is ignored by
-Git. `make -C report clean` removes LaTeX build products and the report PDF.
-Running `make` again regenerates the figure and rebuilds changed TeX sources.
+log and temporary files; it is ignored by Git. `make -C report clean` removes
+LaTeX build products and report PDFs from both editor and command-line builds,
+preserving the included figure. Run cleanup only when no build is active.
 
-For direct editor compilation, run `make -C report figures` first, then compile
-`main.tex` from this directory with pdfLaTeX until cross-references stabilize.
-The tiny bibliography uses `thebibliography`; it needs no BibTeX pass. A future
-research bibliography can use the selected venue's backend and style.
+### Regenerating the figure
+
+When the illustrative plot changes, run `make -C report figures` with Python
+and Matplotlib installed. `PYTHON` selects the interpreter, for example
+`make -C report figures PYTHON=/path/to/python`. This regenerates the canonical
+plot and its provenance JSON in `build/figures/`, then updates the included
+`figures/figure-example.pdf`. Include that PDF with source changes so editor
+builds remain self-contained. Ordinary builds do not regenerate the figure.
 
 ## Status and conventions
 
@@ -66,3 +94,13 @@ choose actual treatment definitions, and regenerate figures and tables from the
 admitted data. Keep counts and references consistent across abstract, methods,
 results, table, figure, and conclusion. The sample is ready to edit; it is not a
 submission-ready empirical report.
+
+## Changelog
+
+### 2026-10-25
+
+- Include the vector figure with the report so TeXShop and ordinary `make`
+  builds work without a Python environment; regenerate it explicitly with
+  `make figures` when its source changes.
+- Select TeXShop's `pdflatexmk` engine and declare the root in every included
+  TeX file so Cmd-T builds the complete manuscript and resolves references.

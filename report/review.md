@@ -55,6 +55,52 @@ Decision: **ready as an illustrative sample**; not an empirical submission.
   drift checks, Python regressions, and the harness scenario suite passed. Run log:
   `/tmp/veracity-report-merge-verification.log`.
 
+## TeXShop compatibility recheck — 2026-10-25
+
+Source baseline: `641b5c0` plus the report compatibility changes. Scientific
+content and the supplied style are unchanged. The original review above
+records the earlier Linux build; the following checks cover the local Mac.
+
+- **Reproduction.** A fresh copy of the saved sources failed direct pdfLaTeX
+  compilation because `figure-example.pdf` existed only after running the
+  Make figure target. The reported disappearing `main.aux` was not reproduced
+  from those saved sources. The old TeXShop run was stopped at its filename
+  prompt before retesting.
+- **Package fix.** The generated vector figure is now included in `figures/`.
+  Ordinary builds need only TeX; `make figures` explicitly regenerates the
+  included asset and saves provenance in `build/figures/figure-example.json`.
+  `main.tex` selects `pdflatexmk`; all included TeX files declare their root.
+- **Local toolchain.** TeXShop 5.49; pdfTeX
+  3.141592653-2.6-1.40.27 (TeX Live 2025); Latexmk 4.86a. Figure regenerated
+  with Python 3.12.11 and Matplotlib 3.11.2 using
+  `make -C report figures PYTHON=/path/to/python`. The asset remains a
+  3.35-inch vector figure with the same fictional counts and Wilson intervals.
+- **Editor build — pass.** Opened `main.tex` in TeXShop and used Cmd-T. The
+  installed `pdflatexmk` engine completed, recreated `main.aux` and SyncTeX,
+  resolved all references, and displayed the three-page `main.pdf`. The final
+  `main.log` contains no warnings, overfull/underfull boxes, or missing glyphs.
+- **Clean and portable builds — pass.** `make -C report` completed with exit
+  status 0; log: `/tmp/veracity-texshop-make.log`. A fresh report-only copy in
+  a directory containing spaces compiled with the installed TeXShop engine
+  without a figure-generation step; log: `/tmp/veracity-texshop-portable.log`.
+  In that copy, `make clean` removed editor/build outputs and retained the
+  figure, then `make PYTHON=/nonexistent/python` succeeded; logs:
+  `/tmp/veracity-texshop-clean.log` and
+  `/tmp/veracity-texshop-clean-rebuild.log`. The LaTeX compile skill also
+  resolved `sections/results.tex` to `main.tex` and compiled successfully;
+  result: `/tmp/veracity-texshop-section-build.json`.
+- **Rendered pages — pass.** Re-rendered and inspected all three local PDF
+  pages at 90 dpi, including the diagram, equations, table, figure at its
+  retained width, and bibliography. No clipping, overlap, broken references,
+  or unreadable labels found. Page images: `/tmp/veracity-texshop-pages/`.
+- **Repository verification — pass.** `bash scripts/verify.sh` exited 0 after
+  rerunning with local test execution permitted. The sandboxed attempt timed
+  out starting Anvil; no chain tests were skipped. Successful run log:
+  `/tmp/veracity-texshop-repository-verification-unrestricted.log`.
+
+Decision: ready for local TeXShop editing as an illustrative sample. The
+empirical manuscript gaps below remain open.
+
 ## Open work for the empirical manuscript
 
 No real experiment is admitted here. Treatment definitions, run evidence,
