@@ -1,0 +1,3188 @@
+{
+  "components": {
+    "schemas": {
+      "ApiProblem": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "type": "object"
+      },
+      "BalancesView": {
+        "properties": {
+          "entitlements": {
+            "additionalProperties": {
+              "pattern": "^(0|[1-9][0-9]*)$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "withdrawal_credits": {
+            "additionalProperties": {
+              "pattern": "^(0|[1-9][0-9]*)$",
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "episode_id",
+          "entitlements",
+          "withdrawal_credits"
+        ],
+        "type": "object"
+      },
+      "BlockRange": {
+        "additionalProperties": false,
+        "properties": {
+          "from_block": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "to_block": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "from_block",
+          "to_block"
+        ],
+        "type": "object"
+      },
+      "ChallengeRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence"
+        ],
+        "type": "object"
+      },
+      "ChatActorUsage": {
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "created_chats": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "denied_requests": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "messages_returned": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "prohibited_read_requests": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "prohibited_sent_messages": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "read_requests": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sent_messages": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "actor_id",
+          "created_chats",
+          "sent_messages",
+          "read_requests",
+          "messages_returned",
+          "denied_requests",
+          "prohibited_sent_messages",
+          "prohibited_read_requests"
+        ],
+        "type": "object"
+      },
+      "ChatAuditEvent": {
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "actor_is_operator": {
+            "type": "boolean"
+          },
+          "chat_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "communication_prohibited": {
+            "type": "boolean"
+          },
+          "created_at_ms": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ChatAuditKind"
+          },
+          "message_bytes": {
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "message_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "message_sequence": {
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "policy_violation": {
+            "type": "boolean"
+          },
+          "recipient_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "returned_sequences": {
+            "description": "Exact message sequence numbers returned by this read request.",
+            "items": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "sequence": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sequence",
+          "episode_id",
+          "chat_id",
+          "actor_id",
+          "actor_is_operator",
+          "kind",
+          "communication_prohibited",
+          "policy_violation",
+          "recipient_id",
+          "message_sequence",
+          "message_hash",
+          "message_bytes",
+          "returned_sequences",
+          "created_at_ms"
+        ],
+        "type": "object"
+      },
+      "ChatAuditKind": {
+        "enum": [
+          "chat_created",
+          "message_sent",
+          "messages_read",
+          "chats_listed",
+          "transcript_read",
+          "access_denied"
+        ],
+        "type": "string"
+      },
+      "ChatAuditReport": {
+        "properties": {
+          "actors": {
+            "description": "All-time participant totals, independent of event-page pagination.",
+            "items": {
+              "$ref": "#/components/schemas/ChatActorUsage"
+            },
+            "type": "array"
+          },
+          "chat_count": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "chat_used": {
+            "type": "boolean"
+          },
+          "communication_used": {
+            "type": "boolean"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ChatAuditEvent"
+            },
+            "type": "array"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "message_count": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "next_after": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "prohibited_communication_used": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "episode_id",
+          "chat_used",
+          "communication_used",
+          "prohibited_communication_used",
+          "chat_count",
+          "message_count",
+          "actors",
+          "events",
+          "next_after",
+          "has_more"
+        ],
+        "type": "object"
+      },
+      "ChatMessage": {
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "content_hash": {
+            "type": "string"
+          },
+          "created_at_ms": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "message_id": {
+            "type": "string"
+          },
+          "recipient_id": {
+            "type": "string"
+          },
+          "sender_id": {
+            "type": "string"
+          },
+          "sequence": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "message_id",
+          "sequence",
+          "sender_id",
+          "recipient_id",
+          "content",
+          "content_hash",
+          "created_at_ms"
+        ],
+        "type": "object"
+      },
+      "ChatPage": {
+        "properties": {
+          "chats": {
+            "items": {
+              "$ref": "#/components/schemas/ChatView"
+            },
+            "type": "array"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_after": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "chats",
+          "next_after",
+          "has_more"
+        ],
+        "type": "object"
+      },
+      "ChatView": {
+        "properties": {
+          "chat_id": {
+            "type": "string"
+          },
+          "created_at_ms": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "history_enabled": {
+            "type": "boolean"
+          },
+          "participant_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "chat_id",
+          "episode_id",
+          "participant_ids",
+          "history_enabled",
+          "created_at_ms"
+        ],
+        "type": "object"
+      },
+      "ClaimRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "CommitmentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "assessment": {
+            "type": "string"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/Verdict"
+          }
+        },
+        "required": [
+          "verdict",
+          "assessment"
+        ],
+        "type": "object"
+      },
+      "CreateChat": {
+        "additionalProperties": false,
+        "properties": {
+          "communication_prohibited": {
+            "default": true,
+            "description": "Defaults to prohibited. Only the operator may set this to false.",
+            "type": "boolean"
+          },
+          "history_enabled": {
+            "default": false,
+            "type": "boolean"
+          },
+          "participant_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "participant_ids"
+        ],
+        "type": "object"
+      },
+      "DeploymentView": {
+        "properties": {
+          "abi_version": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "chain_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "code_hash": {
+            "type": "string"
+          },
+          "confirmation_depth": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "contract_address": {
+            "type": "string"
+          },
+          "finality_policy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain_id",
+          "contract_address",
+          "code_hash",
+          "abi_version",
+          "confirmation_depth",
+          "finality_policy"
+        ],
+        "type": "object"
+      },
+      "EmptyRequest": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "EpisodeView": {
+        "properties": {
+          "challenge_deadline": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "challenger_votes": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "commit_deadline": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/RegisterEpisode"
+          },
+          "configuration_hash": {
+            "type": "string"
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "creator_votes": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "deployment": {
+            "$ref": "#/components/schemas/DeploymentView"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "juror_bond_wei": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "jurors": {
+            "items": {
+              "$ref": "#/components/schemas/JurorView"
+            },
+            "type": "array"
+          },
+          "locked_liability_wei": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "onchain_episode_id": {
+            "type": "string"
+          },
+          "phase": {
+            "enum": [
+              "REGISTERED",
+              "OPEN",
+              "COMMIT",
+              "REVEAL",
+              "SETTLED_CREATOR",
+              "SETTLED_CHALLENGER",
+              "ABORTED",
+              "EXPIRED_UNCHALLENGED",
+              "EXPIRED_UNFUNDED"
+            ],
+            "type": "string"
+          },
+          "posting_deadline": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "required_votes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "reveal_deadline": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "total_credited_wei": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "total_deposited_wei": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "episode_id",
+          "onchain_episode_id",
+          "configuration_hash",
+          "configuration",
+          "phase",
+          "posting_deadline",
+          "challenge_deadline",
+          "commit_deadline",
+          "reveal_deadline",
+          "content_hash",
+          "evidence_hash",
+          "content",
+          "evidence",
+          "jurors",
+          "creator_votes",
+          "challenger_votes",
+          "required_votes",
+          "juror_bond_wei",
+          "locked_liability_wei",
+          "total_deposited_wei",
+          "total_credited_wei",
+          "deployment"
+        ],
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ApiProblem"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "api_version": {
+            "pattern": "^v1$",
+            "type": "string"
+          },
+          "deployment": {
+            "$ref": "#/components/schemas/DeploymentView"
+          },
+          "status": {
+            "pattern": "^ok$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "api_version",
+          "deployment"
+        ],
+        "type": "object"
+      },
+      "JurorView": {
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "assessment_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "commitment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "revealed": {
+            "type": "boolean"
+          },
+          "verdict": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Verdict",
+                "description": "Absent until a valid reveal is included on-chain."
+              }
+            ]
+          }
+        },
+        "required": [
+          "actor_id",
+          "commitment",
+          "revealed",
+          "verdict",
+          "assessment_hash"
+        ],
+        "type": "object"
+      },
+      "MessagePage": {
+        "properties": {
+          "chat_id": {
+            "type": "string"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "type": "array"
+          },
+          "next_after": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "chat_id",
+          "messages",
+          "next_after",
+          "has_more"
+        ],
+        "type": "object"
+      },
+      "OperationView": {
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "operation_id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "accepted",
+              "prepared",
+              "submitted",
+              "included",
+              "confirmed",
+              "reverted",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "transaction": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TransactionView"
+              }
+            ]
+          }
+        },
+        "required": [
+          "operation_id",
+          "episode_id",
+          "actor_id",
+          "kind",
+          "status",
+          "transaction",
+          "error"
+        ],
+        "type": "object"
+      },
+      "ParticipantView": {
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "actor_id",
+          "address"
+        ],
+        "type": "object"
+      },
+      "ProtocolParameters": {
+        "additionalProperties": false,
+        "properties": {
+          "beta_wei": {
+            "description": "Native currency base units as a canonical decimal integer, never a float.",
+            "pattern": "^[1-9][0-9]*$",
+            "type": "string"
+          },
+          "challenge_duration_secs": {
+            "format": "int64",
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "commit_duration_secs": {
+            "format": "int64",
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "gamma_bps": {
+            "format": "int32",
+            "maximum": 9999,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "juror_bps": {
+            "default": 3000,
+            "format": "int32",
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "posting_duration_secs": {
+            "format": "int64",
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "protocol_bps": {
+            "default": 1000,
+            "format": "int32",
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "reveal_duration_secs": {
+            "format": "int64",
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "winner_bps": {
+            "default": 6000,
+            "format": "int32",
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "beta_wei",
+          "gamma_bps",
+          "posting_duration_secs",
+          "challenge_duration_secs",
+          "commit_duration_secs",
+          "reveal_duration_secs"
+        ],
+        "type": "object"
+      },
+      "ReceiptView": {
+        "properties": {
+          "block_hash": {
+            "type": "string"
+          },
+          "block_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "confirmations": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "effective_gas_price": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "gas_used": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "transaction_hash": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "transaction_hash",
+          "success",
+          "block_number",
+          "block_hash",
+          "gas_used",
+          "effective_gas_price",
+          "confirmations",
+          "confirmed"
+        ],
+        "type": "object"
+      },
+      "RegisterEpisode": {
+        "additionalProperties": false,
+        "properties": {
+          "challenger_id": {
+            "type": "string"
+          },
+          "creator_id": {
+            "type": "string"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "experiment_id": {
+            "default": "",
+            "description": "Optional legacy correlation tag; the engine does not manage experiments.",
+            "type": "string"
+          },
+          "juror_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/ProtocolParameters"
+          },
+          "provenance": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "description": "Optional opaque public metadata; never used for protocol decisions.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "scenario_id": {
+            "default": "",
+            "description": "Optional legacy correlation tag; scenarios are managed by the caller.",
+            "type": "string"
+          },
+          "treasury_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "episode_id",
+          "creator_id",
+          "challenger_id",
+          "juror_ids",
+          "treasury_id",
+          "parameters"
+        ],
+        "type": "object"
+      },
+      "ReplayResponse": {
+        "properties": {
+          "events_recorded": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "from_block": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "to_block": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "from_block",
+          "to_block",
+          "events_recorded"
+        ],
+        "type": "object"
+      },
+      "SendMessage": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "Exact UTF-8, 1\u201316384 bytes and not entirely whitespace.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "SettlementView": {
+        "properties": {
+          "deployment": {
+            "$ref": "#/components/schemas/DeploymentView"
+          },
+          "episode_id": {
+            "type": "string"
+          },
+          "final_votes": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Verdict"
+            },
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "forfeited_bonds": {
+            "additionalProperties": {
+              "pattern": "^(0|[1-9][0-9]*)$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "juror_payouts": {
+            "additionalProperties": {
+              "pattern": "^(0|[1-9][0-9]*)$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "outcome": {
+            "enum": [
+              "REGISTERED",
+              "OPEN",
+              "COMMIT",
+              "REVEAL",
+              "SETTLED_CREATOR",
+              "SETTLED_CHALLENGER",
+              "ABORTED",
+              "EXPIRED_UNCHALLENGED",
+              "EXPIRED_UNFUNDED"
+            ],
+            "type": "string"
+          },
+          "protocol_fee": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "refunds": {
+            "additionalProperties": {
+              "pattern": "^(0|[1-9][0-9]*)$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "total_credited": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "total_deposited": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          },
+          "winner_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "winner_payout": {
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "episode_id",
+          "outcome",
+          "final_votes",
+          "winner_id",
+          "winner_payout",
+          "juror_payouts",
+          "protocol_fee",
+          "forfeited_bonds",
+          "refunds",
+          "total_deposited",
+          "total_credited",
+          "deployment"
+        ],
+        "type": "object"
+      },
+      "TransactionView": {
+        "properties": {
+          "nonce": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "receipt": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReceiptView"
+              }
+            ]
+          },
+          "sender": {
+            "type": "string"
+          },
+          "transaction_hash": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "transaction_hash",
+          "sender",
+          "nonce",
+          "receipt"
+        ],
+        "type": "object"
+      },
+      "Verdict": {
+        "enum": [
+          "CREATOR_SUPPORTED",
+          "CHALLENGER_SUPPORTED"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "opaque role credential",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "The game engine API for SPEC.md v0.2. The Solidity contract owns escrow, immutable chain-time deadlines, commit/reveal voting, and settlement. Amounts are decimal base-unit strings. Operator and participant bearer tokens have distinct authority. Experiments, agent execution, and evaluation belong to the caller's external harness.",
+    "title": "Veracity Game API",
+    "version": "1.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/chain/events": {
+      "get": {
+        "description": "Stored public chain events as JSON Lines for an inclusive range of at most 10,000 blocks. Excludes private commands and reveal material.",
+        "operationId": "events",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from_block",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_block",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "chain evidence"
+        ]
+      }
+    },
+    "/v1/chain/replay": {
+      "post": {
+        "description": "Replay a bounded inclusive block range into the deduplicated event stream. At most 10,000 blocks per request. Naturally idempotent by chain-event identity; no Idempotency-Key is needed, and newly recorded counts may differ on repeat.",
+        "operationId": "replay",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlockRange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReplayResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "chain evidence"
+        ]
+      }
+    },
+    "/v1/chats/{id}/messages": {
+      "get": {
+        "description": "Either member reads chronological history when enabled, otherwise only the latest chat message. after is an exclusive message-sequence cursor. Repeated reads are permitted and individually audited, including exact returned sequence numbers. Operators must use the transcript endpoint.",
+        "operationId": "messages",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "1\u2013100, default 50",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagePage"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "private chat"
+        ]
+      },
+      "post": {
+        "description": "Send exact UTF-8 as the authenticated participant. Prohibited communication is delivered and flagged. A retry reuses the original message and send audit event.",
+        "operationId": "send",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "private chat"
+        ]
+      }
+    },
+    "/v1/chats/{id}/transcript": {
+      "get": {
+        "description": "Operator-only full private transcript regardless of participant history setting. Access is audited and never marks the operator as an agent communicator.",
+        "operationId": "transcript",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "1\u2013100, default 50",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagePage"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "chat audit"
+        ]
+      }
+    },
+    "/v1/docs": {
+      "get": {
+        "operationId": "docs",
+        "responses": {
+          "200": {
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Integration guide"
+          }
+        },
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/v1/episodes": {
+      "post": {
+        "operationId": "register",
+        "parameters": [
+          {
+            "description": "Unique registration command key",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterEpisode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": "Registration confirmed"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": "Registration pending"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "episodes"
+        ]
+      }
+    },
+    "/v1/episodes/{id}": {
+      "get": {
+        "operationId": "episode",
+        "parameters": [
+          {
+            "description": "Caller-chosen episode ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EpisodeView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "episodes"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/balances": {
+      "get": {
+        "operationId": "balances",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalancesView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "episodes"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/challenges": {
+      "post": {
+        "operationId": "challenge",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChallengeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/chat-audit": {
+      "get": {
+        "description": "Operator-only all-time usage flags and per-participant totals, plus a bounded metadata event page. Event after is exclusive; totals are independent of the cursor. Contains no message bodies. Audit-report inspection does not itself append events.",
+        "operationId": "audit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "1\u2013100, default 50",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatAuditReport"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "chat audit"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/chats": {
+      "get": {
+        "description": "List only the caller's chats; the operator sees all episode chats. IDs form an opaque stable lexicographic cursor. Listing is audited.",
+        "operationId": "list",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "1\u2013100, default 50",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatPage"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "private chat"
+        ]
+      },
+      "post": {
+        "description": "Create an immutable two-participant chat. Participants must include themselves and cannot set communication_prohibited=false. The operator may provision permitted controls. History defaults to latest-only; private operator audit always retains all messages.",
+        "operationId": "create",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChat"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "private chat"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/claims": {
+      "post": {
+        "operationId": "claim",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/commitments": {
+      "post": {
+        "description": "Selected juror commits a verdict and assessment and deposits the juror bond. The server generates and persists the secret salt; it is never returned.",
+        "operationId": "commitment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/expire": {
+      "post": {
+        "operationId": "expire",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/reveals": {
+      "post": {
+        "description": "The same juror reveals previously persisted material during the chain-derived reveal window.",
+        "operationId": "reveal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/settle": {
+      "post": {
+        "description": "After the reveal deadline, accrue contract-enforced credits exactly once. No external transfers are made by settlement.",
+        "operationId": "settle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/settlement": {
+      "get": {
+        "operationId": "settlement",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "episodes"
+        ]
+      }
+    },
+    "/v1/episodes/{id}/withdrawals": {
+      "post": {
+        "description": "Withdraw only the authenticated participant's entire global credit, which may contain entitlements from multiple episodes.",
+        "operationId": "withdraw",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Liveness and configured chain identity"
+          }
+        },
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/v1/openapi.json": {
+      "get": {
+        "operationId": "openapi_document",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OpenAPI 3.1 contract"
+          }
+        },
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/v1/operations/{id}": {
+      "get": {
+        "operationId": "operation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "operations"
+        ]
+      }
+    },
+    "/v1/operations/{id}/reconcile": {
+      "post": {
+        "description": "Inspect a saved transaction hash/nonce and, when necessary, rebroadcast its exact signed bytes. This never creates a new economic action.",
+        "operationId": "reconcile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationView"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "operations"
+        ]
+      }
+    },
+    "/v1/participants": {
+      "get": {
+        "operationId": "participants",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ParticipantView"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Configured actor IDs and public addresses"
+          }
+        },
+        "tags": [
+          "discovery"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "API contract and public deployment identity",
+      "name": "discovery"
+    },
+    {
+      "description": "Immutable game registration and chain-backed queries",
+      "name": "episodes"
+    },
+    {
+      "description": "Role-bound protocol actions with durable idempotency",
+      "name": "actions"
+    },
+    {
+      "description": "Transaction evidence and safe recovery",
+      "name": "operations"
+    },
+    {
+      "description": "Bounded replay and public chain-event exports",
+      "name": "chain evidence"
+    },
+    {
+      "description": "Experimental two-participant communication; prohibited use remains available and audited",
+      "name": "private chat"
+    },
+    {
+      "description": "Privileged usage flags, metadata events, and retained transcripts",
+      "name": "chat audit"
+    }
+  ]
+}

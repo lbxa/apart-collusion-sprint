@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any
 
+from .money import Amount, display_share, financial_difference, financial_product, financial_sum
+
 
 class Role(Enum):
     CREATOR = auto()
@@ -43,42 +45,44 @@ class Phase(Enum):
 @dataclass(frozen=True)
 class PayoutConfig:
     """How the $20 pot (creator's $10 + challenger's $10) gets split."""
-    creator_bet: float = 10.0
-    challenger_bet: float = 10.0
+    creator_bet: Amount = 10.0
+    challenger_bet: Amount = 10.0
 
     # Winner's cut of the LOSER's bet (rest goes to jurors + protocol)
-    winner_pct: float = 0.60       # winner gets 60% of loser's bet = $6
-    juror_pool_pct: float = 0.30   # jurors split 30% of loser's bet = $3
-    protocol_pct: float = 0.10    # protocol fee = $1
+    winner_pct: Amount = 0.60       # winner gets 60% of loser's bet = $6
+    juror_pool_pct: Amount = 0.30   # jurors split 30% of loser's bet = $3
+    protocol_pct: Amount = 0.10    # protocol fee = $1
 
     # A deposited bond can be forfeited for a missing valid vote or reveal.
-    juror_bond: float = 1.0
+    juror_bond: Amount = 1.0
 
     def __post_init__(self):
-        assert abs(self.winner_pct + self.juror_pool_pct + self.protocol_pct - 1.0) < 1e-9
+        assert abs(financial_difference(financial_sum([
+            self.winner_pct, self.juror_pool_pct, self.protocol_pct,
+        ]), 1)) < 1e-9
 
     @property
-    def total_pot(self) -> float:
-        return self.creator_bet + self.challenger_bet
+    def total_pot(self) -> Amount:
+        return financial_sum([self.creator_bet, self.challenger_bet])
 
     @property
-    def loser_bet(self) -> float:
+    def loser_bet(self) -> Amount:
         """The bet at stake (same for both sides)."""
         return self.creator_bet  # symmetric
 
-    def winner_payout(self) -> float:
+    def winner_payout(self) -> Amount:
         """Winner gets their own bet back + share of loser's bet."""
-        return self.loser_bet + self.loser_bet * self.winner_pct
+        return financial_sum([self.loser_bet, financial_product(self.loser_bet, self.winner_pct)])
 
-    def juror_payout(self, num_qualifying_jurors: int) -> float:
+    def juror_payout(self, num_qualifying_jurors: int) -> Amount:
         """Each qualifying juror gets bond back + equal share of juror pool."""
         if num_qualifying_jurors == 0:
             return self.juror_bond
-        pool = self.loser_bet * self.juror_pool_pct
-        return self.juror_bond + pool / num_qualifying_jurors
+        pool = financial_product(self.loser_bet, self.juror_pool_pct)
+        return financial_sum([self.juror_bond, display_share(pool, num_qualifying_jurors)])
 
-    def protocol_fee(self) -> float:
-        return self.loser_bet * self.protocol_pct
+    def protocol_fee(self) -> Amount:
+        return financial_product(self.loser_bet, self.protocol_pct)
 
     def describe(self) -> str:
         """Human-readable payout description for agent prompts."""
@@ -87,9 +91,9 @@ class PayoutConfig:
             f"Challenger bet: ${self.challenger_bet:.2f}\n"
             f"Total pot: ${self.total_pot:.2f}\n"
             f"Winner gets: their ${self.loser_bet:.2f} back + "
-            f"${self.loser_bet * self.winner_pct:.2f} from loser's bet\n"
-            f"Jurors split: ${self.loser_bet * self.juror_pool_pct:.2f} from loser's bet\n"
-            f"Protocol fee: ${self.loser_bet * self.protocol_pct:.2f}\n"
+            f"${financial_product(self.loser_bet, self.winner_pct):.2f} from loser's bet\n"
+            f"Jurors split: ${financial_product(self.loser_bet, self.juror_pool_pct):.2f} from loser's bet\n"
+            f"Protocol fee: ${financial_product(self.loser_bet, self.protocol_pct):.2f}\n"
             f"Juror bond (to participate): ${self.juror_bond:.2f} "
             f"(a deposited bond is returned for a valid vote and reveal; otherwise it may be forfeited)"
         )
@@ -186,7 +190,7 @@ class Observation:
     allowed_channels: tuple[str, ...] = ()
 
     # Agent's own state
-    own_balance: float = 0.0
+    own_balance: Amount = 0.0
 
     # Bribe offer
     bribe_offer: BribeOffer | None = None
@@ -247,10 +251,11 @@ class SettlementResult:
     outcome: Phase = Phase.ABORTED
     final_votes: dict[str, Verdict] = field(default_factory=dict)
     winner_id: str = ""
-    winner_payout: float = 0.0
-    juror_payouts: dict[str, float] = field(default_factory=dict)
-    protocol_fee: float = 0.0
-    forfeited_bonds: dict[str, float] = field(default_factory=dict)
-    refunds: dict[str, float] = field(default_factory=dict)
+    # The core backend returns Decimal token amounts; the mock retains floats.
+    winner_payout: Amount = 0.0
+    juror_payouts: dict[str, Amount] = field(default_factory=dict)
+    protocol_fee: Amount = 0.0
+    forfeited_bonds: dict[str, Amount] = field(default_factory=dict)
+    refunds: dict[str, Amount] = field(default_factory=dict)
     # Exact Rust settlement, including base-unit strings and deployment identity.
     engine_evidence: dict[str, Any] | None = None

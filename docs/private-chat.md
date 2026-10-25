@@ -62,6 +62,56 @@ history always returns at most the latest message; cursor tricks cannot retrieve
 older messages. Chat listing uses an opaque lexicographic chat-ID cursor; start
 a fresh listing to discover newly created chats.
 
+## Python client
+
+`CoreClient` uses the generated OpenAPI chat models and endpoint calls. Give
+each agent a client with only its participant credential; keep the operator
+client with the evaluator. For example, after registering the episode:
+
+```python
+from game_api import CoreClient
+
+async with CoreClient(url, participant_tokens={"creator": creator_token}) as creator:
+    chat = await creator.create_chat(
+        episode_id, ["creator", "juror-1"], actor_id="creator",
+        idempotency_key="saved-chat-key",
+    )
+    sent = await creator.send_message(
+        chat.chat_id, "creator", "hello", idempotency_key="saved-message-key",
+    )
+
+async with CoreClient(url, participant_tokens={"juror-1": juror_token}) as juror:
+    own_chats = await juror.list_chats(episode_id, actor_id="juror-1")
+    page = await juror.poll_messages(chat.chat_id, "juror-1", after=0, timeout=5)
+    # Save page.next_after for the next poll.
+
+async with CoreClient(url, operator_token=operator_token) as evaluator:
+    audit = await evaluator.get_chat_audit(episode_id)
+    transcript = await evaluator.get_transcript(chat.chat_id)
+```
+
+Creation and sends return `ChatView` and `ChatMessage` directly; they do not
+produce chain-operation handles or require `wait_operation`. Save each request
+body and key before sending, then reuse them to recover the original response
+after a transport failure. Structured HTTP failures remain `CoreHTTPError`.
+
+Creation defaults to latest-only history and prohibited communication. Pass
+`history_enabled=True` when creating a history-enabled chat. Omit `actor_id`
+when an operator client provisions a pair; only that operator may also set
+`communication_prohibited=False`. These settings cannot be updated later.
+
+`get_messages` performs one participant read; `poll_messages` repeats that same
+authenticated route until it receives a message or its timeout expires. Each
+read is audited. An empty result at timeout retains the latest valid cursor;
+`timeout=0` performs one read. Neither method caches older messages or consults
+the operator transcript. `after` and `limit` are optional on reads, listings,
+transcripts, and audits; omitted parameters use server defaults. Use
+`has_more`/`next_after` to walk a page rather than assuming it is a full transcript.
+
+The existing experiment runner continues to use its configured public channels.
+The SDK makes private chat available for explicit experiments without
+automatically exposing operator transcripts or wiring agent deliberation to it.
+
 ## Prohibition and audit
 
 `communication_prohibited` defaults to `true`. Participants cannot clear it.

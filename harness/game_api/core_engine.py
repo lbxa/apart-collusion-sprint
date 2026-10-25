@@ -1,40 +1,27 @@
-"""GameAPI backed by an owned Rust /v1 server and its isolated local Anvil.
+"""Experiment adapter around CoreClient and the owned LocalEngine helper.
 
-The contract is the only settlement authority. Harness tokens use 100 integer
-base units each; floats exist only in the legacy prompt/metrics presentation.
+Use CoreClient directly for remote deployments and explicit protocol actions.
+This adapter retains the older experiment lifecycle, including local time jumps.
 """
 
 from __future__ import annotations
 
-import asyncio
-import hashlib
-import ipaddress
-import json
-import logging
-import os
-import signal
-from collections import deque
-from dataclasses import dataclass, field
-from decimal import Decimal, InvalidOperation
+from dataclasses import dataclass
+from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
-from urllib.parse import quote, urlsplit
 
-import aiohttp
-from pydantic import BaseModel, ValidationError
-
-from .core_types import Balances, Episode, Health, Operation, Settlement, Startup
+from .client import CoreClient, CoreClientError
+from .core_types import Registration
 from .interface import GameAPI
+from .local_engine import LocalEngine
+from .money import base_units_to_tokens, integer_units
 from .types import EpisodeConfig, Phase, SettlementResult, Verdict
 
-logger = logging.getLogger(__name__)
 UNITS_PER_TOKEN = 100
 DEFAULT_PHASE_DURATION = 300
 COMMIT_PHASE_DURATION = 3600
-
-
-class CoreEngineError(RuntimeError):
-    """An engine operation or response cannot be used as a confirmed result."""
+CoreEngineError = CoreClientError
 
 
 @dataclass(frozen=True)
@@ -42,189 +29,46 @@ class _EpisodeMapping:
     config: EpisodeConfig
     harness_to_engine: dict[str, str]
     engine_to_harness: dict[str, str]
-    committed: set[str] = field(default_factory=set)
-
-
-def _validated[T: BaseModel](model: type[T], data: object) -> T:
-    try:
-        return model.model_validate(data)
-    except ValidationError:
-        # Never put artifacts, ballots, credentials, or response bodies in errors.
-        raise CoreEngineError(f"Invalid /v1 {model.__name__} response") from None
-
-
-def _integer_units(value: float, scale: int, label: str) -> int:
-    try:
-        units = Decimal(str(value)) * scale
-        if not units.is_finite() or units < 0 or units != units.to_integral_value():
-            raise ValueError
-        return int(units)
-    except (InvalidOperation, ValueError, TypeError):
-        raise ValueError(f"{label} must be nonnegative and exactly representable at scale {scale}") from None
 
 
 class CoreEngineAPI(GameAPI):
-    """Own a local game process; submit confirmed, idempotent protocol actions."""
+    """Harness compatibility: cast_vote commits; settle runs local orchestration."""
 
     backend = "core"
 
     def __init__(self, core_engine_dir: str | Path | None = None,
                  bind: str = "127.0.0.1:0", *, startup_timeout: float = 20,
                  operation_timeout: float = 30):
-        self._engine_dir = Path(core_engine_dir or os.environ.get(
-            "CORE_ENGINE_DIR", Path(__file__).resolve().parents[2])).resolve()
-        self._bind = bind
-        self._startup_timeout = startup_timeout
-        self._operation_timeout = operation_timeout
-        self._process: asyncio.subprocess.Process | None = None
-        self._session: aiohttp.ClientSession | None = None
-        self._stderr_task: asyncio.Task | None = None
-        self._stderr_tail: deque[bytes] = deque(maxlen=16)
+        self.local = LocalEngine(core_engine_dir, bind,
+            startup_timeout=startup_timeout, operation_timeout=operation_timeout)
         self._episodes: dict[str, _EpisodeMapping] = {}
-        self._base_url: str | None = None
-        self._rpc_url: str | None = None
         self._deployment: dict | None = None
-        self._started = False
+
+    @property
+    def client(self) -> CoreClient:
+        if self.local.client is None:
+            raise CoreEngineError("Core engine is not started")
+        return self.local.client
 
     @property
     def api_url(self) -> str | None:
-        return self._base_url
+        return self.local.client.api_url if self.local.client else None
 
     @property
     def rpc_url(self) -> str | None:
-        return self._rpc_url
+        return self.local.rpc_url
 
     @property
     def deployment(self):
         return MappingProxyType(self._deployment or {})
 
-    async def _drain_stderr(self, stream: asyncio.StreamReader):
-        while chunk := await stream.read(4096):
-            self._stderr_tail.append(chunk)
-
     async def start(self):
-        if self._started:
-            return
-        binary = self._engine_dir / "target/debug/veracity-game-service"
-        if not binary.is_file():
-            raise FileNotFoundError(f"Build the Rust engine first: cargo build --workspace --locked (in {self._engine_dir})")
-        logger.info("core.starting bind=%s", self._bind)
-        try:
-            self._process = await asyncio.create_subprocess_exec(
-                str(binary), "--local", "--bind", self._bind,
-                cwd=self._engine_dir, stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE, start_new_session=True,
-            )
-            self._stderr_task = asyncio.create_task(self._drain_stderr(self._process.stderr))
-            line = await asyncio.wait_for(self._process.stdout.readline(), self._startup_timeout)
-            try:
-                startup = _validated(Startup, json.loads(line))
-            except (ValueError, UnicodeError):
-                raise CoreEngineError("Engine exited without valid local startup metadata") from None
-            for endpoint in (startup.api_url, startup.rpc_url):
-                url = urlsplit(endpoint)
-                if (url.scheme != "http" or not url.hostname
-                        or not (url.hostname == "localhost" or ipaddress.ip_address(url.hostname).is_loopback)
-                        or not url.port or url.username or url.password):
-                    raise CoreEngineError("Local startup endpoints must be explicit loopback HTTP listeners")
-            if startup.deployment.chain_id != 31337:
-                raise CoreEngineError("Clock control requires the owned local Anvil chain")
-            self._base_url, self._rpc_url = startup.api_url, startup.rpc_url
-            self._deployment = startup.deployment.model_dump()
-            self._session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15))
-            health = _validated(Health, await self._request("GET", "/v1/health"))
-            if health.deployment != startup.deployment:
-                raise CoreEngineError("Startup and HTTP deployment identities differ")
-            self._started = True
-            logger.info("core.ready chain_id=31337 contract=%s", startup.deployment.contract_address)
-        except BaseException:
-            await self.stop()
-            raise
+        await self.local.start()
+        self._deployment = self.local.deployment.model_dump()
 
     async def stop(self):
-        if self._session:
-            await self._session.close()
-            self._session = None
-        process = self._process
-        if process:
-            # The owned process group includes Anvil, even if startup failed.
-            if process.returncode is None:
-                try:
-                    os.killpg(process.pid, signal.SIGINT)
-                    await asyncio.wait_for(process.wait(), 5)
-                except (TimeoutError, ProcessLookupError):
-                    pass
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            await process.wait()
-            self._process = None
-        if self._stderr_task:
-            await self._stderr_task
-            self._stderr_task = None
-        self._started = False
+        await self.local.stop()
         self._episodes.clear()
-        logger.info("core.stopped")
-
-    async def _request(self, method: str, path: str, token: str | None = None,
-                       body: dict | None = None, idempotency_key: str | None = None) -> dict:
-        if not self._session:
-            raise CoreEngineError("Core engine is not started")
-        headers = {}
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-        if idempotency_key:
-            headers["Idempotency-Key"] = idempotency_key
-        try:
-            async with self._session.request(method, f"{self._base_url}{path}",
-                                             json=body, headers=headers,
-                                             allow_redirects=False) as response:
-                if not 200 <= response.status < 300:
-                    raise CoreEngineError(f"Engine HTTP {response.status} on {path}")
-                try:
-                    data = await response.json()
-                except (ValueError, aiohttp.ContentTypeError):
-                    raise CoreEngineError(f"Invalid JSON response on {path}") from None
-        except (aiohttp.ClientError, TimeoutError):
-            raise CoreEngineError(f"Engine transport failed on {path}; reconcile the existing operation before retrying") from None
-        if not isinstance(data, dict):
-            raise CoreEngineError(f"Expected a JSON object on {path}")
-        if method == "POST":
-            operation = _validated(Operation, data)
-            operation = await self._wait_operation(operation)
-            return operation.model_dump()
-        return data
-
-    async def _wait_operation(self, operation: Operation) -> Operation:
-        async with asyncio.timeout(self._operation_timeout):
-            while True:
-                if operation.status in {"failed", "reverted"}:
-                    raise CoreEngineError(f"Operation {operation.operation_id} {operation.status}")
-                if operation.status == "confirmed":
-                    if (not operation.transaction or not operation.transaction.receipt
-                            or not operation.transaction.receipt.success
-                            or not operation.transaction.receipt.confirmed):
-                        raise CoreEngineError("Confirmed operation is missing a successful confirmed receipt")
-                    logger.info("core.operation.confirmed id=%s kind=%s", operation.operation_id, operation.kind)
-                    return operation
-                # Reconciliation resumes the durable Rust operation; it never
-                # creates a new action or a new Python idempotency identity.
-                await asyncio.sleep(0.1)
-                path = f"/v1/operations/{quote(operation.operation_id, safe='')}/reconcile"
-                async with self._session.request("POST", f"{self._base_url}{path}",
-                        json={}, headers={
-                            "Authorization": "Bearer dev-operator",
-                            "Idempotency-Key": self._idem_key(operation.episode_id, f"reconcile-{operation.operation_id}"),
-                        },
-                        allow_redirects=False) as response:
-                    if response.status not in {200, 202}:
-                        raise CoreEngineError(f"Reconciliation HTTP {response.status}")
-                    previous = operation
-                    operation = _validated(Operation, await response.json())
-                    if (operation.operation_id, operation.episode_id, operation.actor_id, operation.kind) != (
-                            previous.operation_id, previous.episode_id, previous.actor_id, previous.kind):
-                        raise CoreEngineError("Operation identity changed during reconciliation")
 
     @staticmethod
     def validate_config(config: EpisodeConfig) -> dict[str, int | str]:
@@ -233,15 +77,15 @@ class CoreEngineAPI(GameAPI):
         if config.allow_vote_change:
             raise ValueError("Binding commitments cannot change verdict")
         payout = config.payout
-        beta = _integer_units(payout.creator_bet, UNITS_PER_TOKEN, "creator bet")
-        other_beta = _integer_units(payout.challenger_bet, UNITS_PER_TOKEN, "challenger bet")
-        bond = _integer_units(payout.juror_bond, UNITS_PER_TOKEN, "juror bond")
+        beta = integer_units(payout.creator_bet, UNITS_PER_TOKEN, "creator bet")
+        other_beta = integer_units(payout.challenger_bet, UNITS_PER_TOKEN, "challenger bet")
+        bond = integer_units(payout.juror_bond, UNITS_PER_TOKEN, "juror bond")
         if not 0 < beta == other_beta or beta >= 2**128 or not 0 < bond < beta:
             raise ValueError("Core requires equal positive bounded party bets and a smaller positive juror bond")
         gamma, remainder = divmod(bond * 10000, beta)
         if remainder or not 0 < gamma < 10000:
             raise ValueError("Juror bond must be exactly representable in basis points of the party bet")
-        shares = [_integer_units(value, 10000, "payout share") for value in (
+        shares = [integer_units(value, 10000, "payout share") for value in (
             payout.winner_pct, payout.juror_pool_pct, payout.protocol_pct)]
         if sum(shares) != 10000:
             raise ValueError("Payout shares must sum to exactly 10000 basis points")
@@ -252,13 +96,7 @@ class CoreEngineAPI(GameAPI):
                 "commit_duration_secs": COMMIT_PHASE_DURATION,
                 "reveal_duration_secs": DEFAULT_PHASE_DURATION}
 
-    @staticmethod
-    def _path(episode_id: str) -> str:
-        return f"/v1/episodes/{quote(episode_id, safe='')}"
-
-    @staticmethod
-    def _idem_key(episode_id: str, action: str) -> str:
-        return hashlib.sha256(f"{episode_id}\0{action}".encode()).hexdigest()
+    _idem_key = staticmethod(LocalEngine.command_key)
 
     def _actor(self, episode_id: str, actor_id: str, role: str) -> str:
         engine_id = self._episodes[episode_id].harness_to_engine.get(actor_id)
@@ -273,34 +111,36 @@ class CoreEngineAPI(GameAPI):
         if (len(juror_ids) != config.jury_size or len(set(actors)) != len(actors)
                 or any(not actor for actor in actors)):
             raise ValueError("Registered roles must be distinct and match the jury size")
-        mapping = _EpisodeMapping(config,
-            dict(zip(actors, ["creator", "challenger", *[
-                f"juror-{i + 1}" for i in range(config.jury_size)], "treasury"])), {})
-        mapping.engine_to_harness.update({v: k for k, v in mapping.harness_to_engine.items()})
+        roles = ["creator", "challenger", *[f"juror-{i + 1}" for i in range(config.jury_size)], "treasury"]
+        mapping = _EpisodeMapping(config, dict(zip(actors, roles)), dict(zip(roles, actors)))
         existing = self._episodes.get(config.episode_id)
-        if existing and (existing.config != config or existing.harness_to_engine != mapping.harness_to_engine):
+        if existing and existing != mapping:
             raise ValueError("An episode's registered configuration and roles are immutable")
-        if not self._started:
+        if self.local.client is None:
             await self.start()
-        await self._request("POST", "/v1/episodes", token="dev-operator", body={
+        registration = Registration.model_validate({
             "episode_id": config.episode_id, "creator_id": "creator", "challenger_id": "challenger",
             "juror_ids": [f"juror-{i + 1}" for i in range(config.jury_size)], "treasury_id": "treasury",
             "parameters": parameters,
-            "provenance": {"game_backend": self.backend, "base_units_per_token": str(UNITS_PER_TOKEN)},
-        }, idempotency_key=self._idem_key(config.episode_id, "register"))
+            "provenance": {"game_backend": self.backend, "base_units_per_token": str(UNITS_PER_TOKEN)}})
+        operation = await self.client.register_episode(registration,
+            idempotency_key=self._idem_key(config.episode_id, "register"))
+        await self.client.wait_operation(operation)
         self._episodes[config.episode_id] = existing or mapping
         return config.episode_id
 
     async def post_claim(self, episode_id: str, creator_id: str, content: str = "Claim text.") -> bool:
         role = self._actor(episode_id, creator_id, "creator")
-        await self._request("POST", self._path(episode_id) + "/claims", token=f"dev-{role}",
-                            body={"content": content}, idempotency_key=self._idem_key(episode_id, "claim"))
+        operation = await self.client.post_claim(episode_id, role, content,
+            idempotency_key=self._idem_key(episode_id, "claim"))
+        await self.client.wait_operation(operation)
         return True
 
     async def challenge(self, episode_id: str, challenger_id: str, evidence: str = "Counter-evidence.") -> bool:
         role = self._actor(episode_id, challenger_id, "challenger")
-        await self._request("POST", self._path(episode_id) + "/challenges", token=f"dev-{role}",
-                            body={"evidence": evidence}, idempotency_key=self._idem_key(episode_id, "challenge"))
+        operation = await self.client.challenge(episode_id, role, evidence,
+            idempotency_key=self._idem_key(episode_id, "challenge"))
+        await self.client.wait_operation(operation)
         return True
 
     async def post_juror_bond(self, episode_id: str, juror_id: str) -> bool:
@@ -318,88 +158,50 @@ class CoreEngineAPI(GameAPI):
         role = self._actor(episode_id, juror_id, "juror")
         if not isinstance(verdict, Verdict):
             raise ValueError("Invalid juror verdict")
-        await self._request("POST", self._path(episode_id) + "/commitments", token=f"dev-{role}",
-                            body={"verdict": verdict.name, "assessment": assessment},
-                            idempotency_key=self._idem_key(episode_id, f"commit-{role}"))
-        self._episodes[episode_id].committed.add(juror_id)
+        operation = await self.client.commit(episode_id, role, verdict.name, assessment,
+            idempotency_key=self._idem_key(episode_id, f"commit-{role}"))
+        await self.client.wait_operation(operation)
         return True
-
-    async def _rpc(self, method: str, params: list):
-        if not self._started or not self._rpc_url or not self._session:
-            raise CoreEngineError("No owned local Anvil RPC session")
-        async with self._session.request("POST", self._rpc_url,
-                json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
-                allow_redirects=False) as response:
-            if response.status != 200:
-                raise CoreEngineError(f"Local RPC HTTP {response.status}")
-            payload = await response.json()
-            if not isinstance(payload, dict) or "error" in payload or "result" not in payload:
-                raise CoreEngineError(f"Local RPC rejected {method}")
-            return payload["result"]
-
-    async def _advance_to_deadline(self, episode_id: str, deadline_name: str):
-        episode = _validated(Episode, await self._request("GET", self._path(episode_id)))
-        deadline = getattr(episode, deadline_name)
-        block = await self._rpc("eth_getBlockByNumber", ["latest", False])
-        if not isinstance(block, dict) or not isinstance(block.get("timestamp"), str):
-            raise CoreEngineError("Local RPC returned no block timestamp")
-        current = int(block["timestamp"], 16)
-        if current < deadline:
-            await self._rpc("evm_setNextBlockTimestamp", [deadline])
-        await self._rpc("evm_mine", [])
 
     async def settle(self, episode_id: str, *, withhold_reveals: frozenset[str] = frozenset()) -> SettlementResult:
         mapping = self._episodes[episode_id]
-        if not withhold_reveals.issubset(mapping.committed):
-            raise ValueError("Only committed jurors can withhold a reveal")
-        state = await self.get_state(episode_id)
-        if state not in {Phase.SETTLED_CREATOR, Phase.SETTLED_CHALLENGER, Phase.ABORTED}:
-            await self._advance_to_deadline(episode_id, "commit_deadline")
-            for juror in sorted(mapping.committed - withhold_reveals):
-                role = mapping.harness_to_engine[juror]
-                await self._request("POST", self._path(episode_id) + "/reveals", token=f"dev-{role}",
-                                    body={}, idempotency_key=self._idem_key(episode_id, f"reveal-{role}"))
-            await self._advance_to_deadline(episode_id, "reveal_deadline")
-            await self._request("POST", self._path(episode_id) + "/settle", token="dev-operator",
-                                body={}, idempotency_key=self._idem_key(episode_id, "settle"))
+        try:
+            actors = frozenset(mapping.harness_to_engine[juror] for juror in withhold_reveals)
+        except KeyError:
+            raise ValueError("Only committed jurors can withhold a reveal") from None
+        await self.local.finish_voting(episode_id, withhold_reveals=actors)
         return await self._settlement(episode_id)
 
     async def expire(self, episode_id: str) -> SettlementResult:
-        state = await self.get_state(episode_id)
-        if state != Phase.EXPIRED:
-            deadline = "posting_deadline" if state == Phase.SETUP else "challenge_deadline"
-            if state not in {Phase.SETUP, Phase.CLAIM_POSTED}:
-                raise CoreEngineError("Only an unfunded or unchallenged game can expire")
-            await self._advance_to_deadline(episode_id, deadline)
-            await self._request("POST", self._path(episode_id) + "/expire", token="dev-operator",
-                                body={}, idempotency_key=self._idem_key(episode_id, "expire"))
+        await self.local.expire_episode(episode_id)
         return await self._settlement(episode_id)
 
     async def get_state(self, episode_id: str) -> Phase:
-        episode = _validated(Episode, await self._request("GET", self._path(episode_id)))
-        return self._map_phase(episode.phase)
+        return self._map_phase((await self.client.get_episode(episode_id)).phase)
 
-    async def get_balances(self, episode_id: str) -> dict[str, float]:
-        balances = _validated(Balances, await self._request("GET", self._path(episode_id) + "/balances"))
+    async def get_balances(self, episode_id: str) -> dict[str, Decimal]:
+        balances = await self.client.get_balances(episode_id)
         mapping = self._episodes[episode_id]
-        return {mapping.engine_to_harness[k]: int(v) / UNITS_PER_TOKEN
+        if balances.episode_id != episode_id:
+            raise CoreEngineError("Balance identity does not match the requested game")
+        return {mapping.engine_to_harness[k]: base_units_to_tokens(v)
                 for k, v in balances.entitlements.items()}
 
     async def _settlement(self, episode_id: str) -> SettlementResult:
-        data = _validated(Settlement, await self._request("GET", self._path(episode_id) + "/settlement"))
+        data = await self.client.get_settlement(episode_id)
         outcome = self._map_phase(data.outcome)
         if outcome not in {Phase.SETTLED_CREATOR, Phase.SETTLED_CHALLENGER, Phase.ABORTED, Phase.EXPIRED}:
             raise CoreEngineError("Settlement response is not terminal")
         if data.episode_id != episode_id or data.deployment.model_dump() != self._deployment:
             raise CoreEngineError("Settlement identity does not match the owned game")
         mapping = self._episodes[episode_id]
-        def amounts(values: dict[str, str]) -> dict[str, float]:
-            return {mapping.engine_to_harness[k]: int(v) / UNITS_PER_TOKEN for k, v in values.items()}
+        def amounts(values: dict[str, str]) -> dict[str, Decimal]:
+            return {mapping.engine_to_harness[k]: base_units_to_tokens(v) for k, v in values.items()}
         return SettlementResult(episode_id=episode_id, outcome=outcome,
             final_votes={mapping.engine_to_harness[k]: Verdict[v] for k, v in data.final_votes.items()},
             winner_id=mapping.engine_to_harness[data.winner_id] if data.winner_id else "",
-            winner_payout=int(data.winner_payout) / UNITS_PER_TOKEN,
-            juror_payouts=amounts(data.juror_payouts), protocol_fee=int(data.protocol_fee) / UNITS_PER_TOKEN,
+            winner_payout=base_units_to_tokens(data.winner_payout),
+            juror_payouts=amounts(data.juror_payouts), protocol_fee=base_units_to_tokens(data.protocol_fee),
             forfeited_bonds=amounts(data.forfeited_bonds), refunds=amounts(data.refunds),
             engine_evidence=data.model_dump())
 

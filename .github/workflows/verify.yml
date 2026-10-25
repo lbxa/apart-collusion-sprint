@@ -20,5 +20,7 @@ jobs:
           python-version: '3.12'
       - name: Install pinned tools and dependencies
         run: bash scripts/setup.sh
+      - name: Check Python client regeneration from Rust OpenAPI
+        run: harness/.venv/bin/python scripts/generate-core-client.py --check
       - name: Verify protocol and actual harness integration
         run: bash scripts/verify.sh

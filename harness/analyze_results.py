@@ -18,6 +18,7 @@ import csv
 import json
 import math
 import sys
+from decimal import Decimal
 from pathlib import Path
 
 LEVER_NAMES = [
@@ -59,7 +60,7 @@ def fmt_float(val, decimals=2) -> str:
     """Format a float, handling NaN."""
     if val is None or (isinstance(val, float) and math.isnan(val)):
         return "N/A"
-    return f"{val:.{decimals}f}"
+    return f"{Decimal(val) if isinstance(val, str) else val:.{decimals}f}"
 
 
 def print_summary_table(results: dict):

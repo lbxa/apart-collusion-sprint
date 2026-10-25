@@ -18,6 +18,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from game_api.money import Amount, financial_json, financial_sum
+
 
 @dataclass
 class EpisodeRecord:
@@ -46,10 +48,10 @@ class EpisodeRecord:
     # Settlement
     settlement: dict[str, Any] = field(default_factory=dict)
 
-    # Financials (floats for $10/$10 structure)
-    bonds_deposited: dict[str, float] = field(default_factory=dict)
-    payouts: dict[str, float] = field(default_factory=dict)
-    forfeited: dict[str, float] = field(default_factory=dict)
+    # Core financials retain exact Decimal amounts throughout aggregation.
+    bonds_deposited: dict[str, Amount] = field(default_factory=dict)
+    payouts: dict[str, Amount] = field(default_factory=dict)
+    forfeited: dict[str, Amount] = field(default_factory=dict)
 
     # Deliberation tracking
     deliberation_rounds: int = 0
@@ -165,8 +167,8 @@ class ExperimentMetrics:
         return aborted / total
 
     @property
-    def participation_loss(self) -> float:
-        return sum(sum(ep.forfeited.values()) for ep in self.completed_episodes)
+    def participation_loss(self) -> Amount:
+        return financial_sum(amount for ep in self.completed_episodes for amount in ep.forfeited.values())
 
     @property
     def infrastructure_failure_rate(self) -> float:
@@ -204,8 +206,8 @@ class ExperimentMetrics:
             "game_backends": sorted({ep.config.get("game_backend", "unspecified") for ep in self.episodes}),
             "avg_messages_per_episode": self.avg_messages_per_episode,
         }
-        return {key: None if isinstance(value, float) and not math.isfinite(value) else value
-                for key, value in summary.items()}
+        return financial_json({key: None if isinstance(value, float) and not math.isfinite(value) else value
+                               for key, value in summary.items()})
 
 
 class MetricsCollector:

@@ -11,5 +11,6 @@ fi
 export PYTHONPATH="$repo_root/harness"
 export PYTHONDONTWRITEBYTECODE=1
 "$python_bin" -c 'import sys; assert sys.version_info >= (3, 12), "Python 3.12+ required"'
+"$python_bin" scripts/generate-core-client.py --check
 "$python_bin" -m unittest discover -s harness/tests -v
 "$python_bin" harness/test_harness.py

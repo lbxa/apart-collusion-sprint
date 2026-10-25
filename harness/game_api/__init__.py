@@ -1,3 +1,11 @@
-# Game API interface — the game itself is built separately.
-# This module defines the abstract contract the harness expects,
-# plus a local mock for testing without the real game.
+"""HTTP SDK and experiment interfaces for the separately deployed game engine."""
+
+from .client import (
+    CoreClient, CoreClientError, CoreHTTPError, CoreOperationError,
+    CoreOperationTimeout, CoreTransportError,
+)
+
+__all__ = [
+    "CoreClient", "CoreClientError", "CoreHTTPError", "CoreOperationError",
+    "CoreOperationTimeout", "CoreTransportError",
+]

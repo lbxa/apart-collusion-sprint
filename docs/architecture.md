@@ -40,8 +40,10 @@ Integration documentation must explain these differences explicitly.
   bounded messages, and audit use cases. SQLite work runs outside the chain
   mutex and off the async runtime; messages never become contract events.
 - `harness/`: Python agent execution, observations, treatments, and metrics.
-  Its `CoreEngineAPI` adapter owns local process lifecycle and validated `/v1`
-  transport. See [the integration contract](integration.md).
+  `CoreClient` owns HTTP sessions and operation recovery over generated, validated
+  `/v1` calls. `LocalEngine` owns development processes and Anvil time control;
+  `CoreEngineAPI` adapts these to the experiment interface. See
+  [the integration contract](integration.md).
 
 Keep one crate and one process. Create modules for these real ownership
 boundaries; do not introduce generic repository or service hierarchies.

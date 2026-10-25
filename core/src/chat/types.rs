@@ -10,11 +10,14 @@ pub enum ChatPrincipal {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct CreateChat {
+    #[schema(min_items = 2, max_items = 2)]
     pub participant_ids: [String; 2],
     #[serde(default)]
+    #[schema(default = false)]
     pub history_enabled: bool,
     /// Defaults to prohibited. Only the operator may set this to false.
     #[serde(default = "prohibited")]
+    #[schema(default = true)]
     pub communication_prohibited: bool,
 }
 
@@ -33,6 +36,7 @@ pub struct SendMessage {
 pub struct ChatView {
     pub chat_id: String,
     pub episode_id: String,
+    #[schema(min_items = 2, max_items = 2)]
     pub participant_ids: [String; 2],
     pub history_enabled: bool,
     pub created_at_ms: u64,
@@ -60,6 +64,7 @@ pub struct MessagePage {
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct ChatPage {
     pub chats: Vec<ChatView>,
+    #[schema(required = true)]
     pub next_after: Option<String>,
     pub has_more: bool,
 }
@@ -114,15 +119,20 @@ impl ChatAuditKind {
 pub struct ChatAuditEvent {
     pub sequence: u64,
     pub episode_id: String,
+    #[schema(required = true)]
     pub chat_id: Option<String>,
     pub actor_id: String,
     pub actor_is_operator: bool,
     pub kind: ChatAuditKind,
     pub communication_prohibited: bool,
     pub policy_violation: bool,
+    #[schema(required = true)]
     pub recipient_id: Option<String>,
+    #[schema(required = true)]
     pub message_sequence: Option<u64>,
+    #[schema(required = true)]
     pub message_hash: Option<String>,
+    #[schema(required = true)]
     pub message_bytes: Option<u64>,
     /// Exact message sequence numbers returned by this read request.
     pub returned_sequences: Vec<u64>,

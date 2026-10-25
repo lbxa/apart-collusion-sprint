@@ -30,7 +30,9 @@ pub(super) struct AppState {
 
 #[derive(Serialize, ToSchema)]
 pub struct HealthResponse {
+    #[schema(pattern = "^ok$")]
     pub status: &'static str,
+    #[schema(pattern = "^v1$")]
     pub api_version: &'static str,
     pub deployment: DeploymentView,
 }

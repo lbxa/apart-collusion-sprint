@@ -105,6 +105,10 @@ mod tests {
             "/v1/operations/{id}/reconcile",
             "/v1/chain/replay",
             "/v1/chain/events",
+            "/v1/episodes/{id}/chats",
+            "/v1/chats/{id}/messages",
+            "/v1/chats/{id}/transcript",
+            "/v1/episodes/{id}/chat-audit",
         ] {
             assert!(document["paths"].get(path).is_some(), "missing {path}");
         }
@@ -115,6 +119,17 @@ mod tests {
         assert_eq!(
             document["components"]["schemas"]["ProtocolParameters"]["properties"]["beta_wei"]["type"],
             "string"
+        );
+        assert_eq!(
+            document["components"]["schemas"]["SettlementView"]["properties"]["winner_payout"]["pattern"],
+            "^(0|[1-9][0-9]*)$"
+        );
+        assert!(
+            document["components"]["schemas"]["OperationView"]["properties"]["status"]["enum"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|value| value == "confirmed")
         );
         assert_eq!(
             document["components"]["schemas"]["ProtocolParameters"]["additionalProperties"],
@@ -143,5 +158,31 @@ mod tests {
                 .any(|parameter| parameter["name"] == "Idempotency-Key")),
             "Evidence replay is naturally idempotent and must not advertise a command key."
         );
+        assert_eq!(
+            document["components"]["schemas"]["CreateChat"]["properties"]["history_enabled"]["default"],
+            false
+        );
+        assert_eq!(
+            document["components"]["schemas"]["CreateChat"]["properties"]["communication_prohibited"]
+                ["default"],
+            true
+        );
+        assert!(
+            document["components"]["schemas"]["ChatPage"]["required"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|value| value == "next_after")
+        );
+        for path in [
+            "/v1/episodes/{id}/chats",
+            "/v1/chats/{id}/messages",
+            "/v1/chats/{id}/transcript",
+            "/v1/episodes/{id}/chat-audit",
+        ] {
+            for operation in document["paths"][path].as_object().unwrap().values() {
+                assert!(!operation["security"].as_array().unwrap().is_empty());
+            }
+        }
     }
 }

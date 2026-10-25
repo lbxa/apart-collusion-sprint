@@ -19,6 +19,7 @@ import aiohttp
 from experiments.runner import ExperimentRunner
 from experiments.treatments import TreatmentConfig
 from game_api.core_engine import CoreEngineAPI
+from game_api.money import base_units_to_tokens
 from game_api.types import EpisodeConfig, PayoutConfig, Phase, Scenario, Verdict
 
 
@@ -105,8 +106,8 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
             + sum(map(int, raw["refunds"].values()))
         )
         self.assertEqual(distributed, int(raw["total_deposited"]))
-        self.assertAlmostEqual(result.winner_payout, int(raw["winner_payout"]) / 100)
-        self.assertAlmostEqual(result.protocol_fee, int(raw["protocol_fee"]) / 100)
+        self.assertEqual(result.winner_payout, base_units_to_tokens(raw["winner_payout"]))
+        self.assertEqual(result.protocol_fee, base_units_to_tokens(raw["protocol_fee"]))
         return raw
 
     async def test_00_autodetects_integrated_repository_and_cleans_up_both_processes(self):
@@ -164,11 +165,11 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
                         self.assertEqual(raw["protocol_fee"], str(protocol_units))
                         self.assertEqual(set(result.juror_payouts), set(jurors))
                         for amount in result.juror_payouts.values():
-                            self.assertAlmostEqual(amount, juror_units / 100)
+                            self.assertEqual(amount, base_units_to_tokens(juror_units))
                         self.assertFalse(result.forfeited_bonds)
                         balances = await api.get_balances(episode)
-                        self.assertAlmostEqual(balances[winner], 16)
-                        self.assertAlmostEqual(balances[treasury], protocol_units / 100)
+                        self.assertEqual(balances[winner], 16)
+                        self.assertEqual(balances[treasury], base_units_to_tokens(protocol_units))
 
     async def test_configuration_controls_low_stakes_bonds_and_custom_payout_shares(self):
         cases = [
@@ -294,6 +295,19 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(RuntimeError):
                 await api.get_balances("missing-episode")
 
+    async def test_local_recovery_after_reveal_deadline_settles_actual_forfeitures(self):
+        async with CoreEngineAPI() as api:
+            episode, creator, challenger, jurors, _ = await self._open(api)
+            await api.cast_vote(episode, jurors[0], Verdict.CREATOR_SUPPORTED,
+                                assessment="An interrupted run did not reveal.\n")
+            await api.local.advance_to_deadline(episode, "reveal_deadline")
+            result = await api.settle(episode)
+            await self._assert_authoritative(api, result)
+            self.assertEqual(result.outcome, Phase.ABORTED)
+            self.assertEqual(result.final_votes, {})
+            self.assertEqual(result.forfeited_bonds, {jurors[0]: 1})
+            self.assertEqual(result.refunds, {creator: 10, challenger: 10})
+
     async def test_a_reverted_commit_receipt_is_not_reported_as_a_successful_vote(self):
         async with CoreEngineAPI() as api:
             episode, _, _, jurors, _ = await self._open(api)
@@ -366,7 +380,7 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
                     await api.cast_vote(episode, juror, Verdict.CREATOR_SUPPORTED, assessment="The claim is supported.\n")
                 await self._assert_authoritative(api, await api.settle(episode))
                 balances = await api.get_balances(episode)
-                self.assertAlmostEqual(balances[creator], stake * 1.6)
+                self.assertEqual(balances[creator], base_units_to_tokens(round(stake * 160)))
                 snapshots.append((episode, balances))
             for episode, expected in snapshots:
                 self.assertEqual(await api.get_balances(episode), expected)

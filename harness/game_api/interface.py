@@ -5,6 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from .types import EpisodeConfig, Phase, SettlementResult, Verdict
+from .money import Amount
 
 
 class GameAPI(ABC):
@@ -46,4 +47,4 @@ class GameAPI(ABC):
     async def get_state(self, episode_id: str) -> Phase: ...
 
     @abstractmethod
-    async def get_balances(self, episode_id: str) -> dict[str, float]: ...
+    async def get_balances(self, episode_id: str) -> dict[str, Amount]: ...

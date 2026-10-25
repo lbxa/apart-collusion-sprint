@@ -62,14 +62,33 @@ See [the API guide](../docs/api.md) and [integration contract](../docs/integrati
 
 ## Structure and results
 
-`game_api/` owns the adapter and validated wire types; `agents/` owns decisions
+`game_api/client.py` provides `CoreClient` for existing deployments, configured
+with an HTTP(S) URL and role credentials. Its `commit`, `reveal`, and `settle`
+methods each submit one protocol action and return an operation handle;
+`wait_operation` verifies a successful confirmed receipt. It owns no processes
+or clock. See the [Python client guide](../docs/api.md#python-client).
+
+The client also supports [private chat](../docs/private-chat.md): participants
+can create/list their chats and send/read messages; operators can provision
+controls, inspect retained transcripts, and read usage audits. These methods
+return typed chat data directly. The experiment runner retains its public-channel
+configuration; private-chat endpoints are available for explicit SDK experiments.
+
+`game_api/local_engine.py` owns subprocesses, local credentials, and time control.
+The existing `CoreEngineAPI` experiment adapter composes these components;
+its `cast_vote` still commits and its `settle` still completes local voting.
+
+`game_api/` owns the adapter and generated validated wire types; `agents/` owns decisions
 and prompts; `experiments/` owns treatments and execution; `metrics/` owns
 evaluation and exports; `scenarios/` holds examples. `example_experiment.toml`
 is a reference configuration, not an alternative game engine contract.
 
 Each run writes `episodes.jsonl`, `summary.json`, and transcripts. Records
 identify `config.game_backend`. Real settlements retain `engine_evidence` with
-exact integer amounts and deployment identity. Episode exports are scoped to
+exact integer amounts and deployment identity. Core balances and settlements use
+exact `Decimal` token amounts in memory; JSON financial quantities are decimal strings. Statistical
+rates remain JSON numbers. Consumers of older numeric financial exports should
+parse the new strings with `Decimal`, avoiding `float`. Episode exports are scoped to
 their experiment. Verdict accuracy excludes failed runs; attack success uses
 the declared target and all assigned attack trials, with abort/failure counts
 reported separately. Undefined rates are JSON `null`. `simulated_utility` and

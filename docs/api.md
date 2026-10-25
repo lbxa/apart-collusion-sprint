@@ -108,6 +108,106 @@ Reaching the reveal deadline does not itself settle or move funds: the phase
 remains `REVEAL` until a settlement transaction is included. Likewise, expiry
 requires an explicit transaction. No API credential can extend a deadline.
 
+## Python client
+
+With `harness/` on `PYTHONPATH` and its locked dependencies installed, connect
+to an existing service without starting a process or accessing its chain RPC:
+
+```python
+import os
+from game_api import CoreClient
+from game_api.generated import ProtocolParameters, RegisterEpisode
+
+async def register_game():
+    async with CoreClient(
+        os.environ["GAME_URL"],
+        operator_token=os.environ["OPERATOR_TOKEN"],
+        participant_tokens={"creator": os.environ["CREATOR_TOKEN"]},
+    ) as client:
+        registration = RegisterEpisode(
+            episode_id="trial-001", creator_id="creator", challenger_id="challenger",
+            juror_ids=["juror-1", "juror-2", "juror-3"], treasury_id="treasury",
+            parameters=ProtocolParameters(
+                beta_wei="1000", gamma_bps=1000, posting_duration_secs=300,
+                challenge_duration_secs=300, commit_duration_secs=300,
+                reveal_duration_secs=300,
+            ),
+        )
+        # Save the command body and key before sending. Save the returned ID too.
+        operation = await client.register_episode(
+            registration, idempotency_key="trial-001-register")
+        confirmed = await client.wait_operation(operation)
+        return confirmed.operation_id
+```
+
+Participant credential keys are deployment actor IDs, with no required local
+names or Python registration mappings. Supply only the credentials needed by
+the caller. Public reads require none; a participant-only client's
+`wait_operation` polls evidence, while an operator client can also reconcile.
+The operation lookup route remains public under this version of the API.
+
+Game protocol actions are explicit and return validated operation handles immediately:
+
+```python
+commit = await client.commit(episode_id, juror_id, "CREATOR_SUPPORTED", assessment,
+                             idempotency_key=saved_commit_key)
+await client.wait_operation(commit)
+# After the chain enters REVEAL:
+reveal = await client.reveal(episode_id, juror_id, idempotency_key=saved_reveal_key)
+await client.wait_operation(reveal)
+# After the reveal deadline, using operator credentials:
+settlement = await client.settle(episode_id, idempotency_key=saved_settle_key)
+await client.wait_operation(settlement)
+payouts = await client.get_settlement(episode_id)
+```
+
+These methods never advance time or perform other protocol actions. Rust stores
+the ballot and salt for reveal. A new Python client needs only the same service,
+credentials, episode/actor IDs, and saved command keys; it need not restore a set
+of committed jurors. Inspect `get_episode` to discover commitments and reveals.
+
+After a lost submission response, resend the identical action with its saved key
+to retrieve the existing operation. After a wait timeout or interrupted Python
+run, use `get_operation(saved_id)`, `reconcile_operation(saved_id)`, or
+`wait_operation(saved_id)` on a fresh client. Waiting returns only a successful
+confirmed receipt. `CoreHTTPError` retains validated `problem.code` and
+`problem.message` when available; `CoreTransportError` retains the command key
+and any known operation, and `CoreOperationTimeout` retains the latest operation.
+Exception messages omit request/response bodies and credentials; inspect structured
+details deliberately, since the server's message may contain application data.
+
+Wire amounts remain validated decimal integer strings, so `int(payouts.winner_payout)`
+is exact. `CoreEngineAPI` retains its legacy experiment interface using exact
+`Decimal` token amounts (100 base units per token), including in metrics and
+decimal-string financial exports. Explicit `MockGameAPI` behavior retains floats.
+
+For local experiments, `LocalEngine` owns the Rust process, development credentials,
+and Anvil clock. Its `advance_to_deadline`, `finish_voting`, and `expire_episode`
+are explicit local conveniences. `CoreEngineAPI` composes that helper to preserve
+existing experiments: `cast_vote` commits, and `settle` reveals eligible recorded
+commitments before settlement. The reusable `CoreClient` has no such side effects.
+
+### Regeneration
+
+```sh
+python scripts/generate-core-client.py
+python scripts/generate-core-client.py --check
+```
+
+The Rust `export_openapi` example builds the same document served at
+`/v1/openapi.json`, without starting a server or chain. Generation commits both
+`docs/openapi.json` and `harness/game_api/generated.py`; CI checks both against
+fresh Rust output. Generated calls cover JSON and text endpoints and validate
+responses through strict Pydantic models. `core_types.py` retains compatibility
+names, with only local startup metadata defined outside the HTTP schema.
+
+The small generator supports this API's schema subset and rejects unsupported
+schema features. `openapi-python-client` 0.29.1 was tested against the real
+document; its attrs models did not preserve strict runtime field/pattern
+validation, and its NDJSON response generation was incomplete. The checked-in
+generator therefore uses the existing Pydantic dependency without adding a new
+client runtime. Extend it explicitly when the API introduces new schema features.
+
 ## Local lifecycle example
 
 Start the documented local service, then set its URL and role credentials in
@@ -330,3 +430,8 @@ The core also exposes authenticated two-participant chats. See
 [the private-chat guide](private-chat.md) for create/send/read examples,
 latest-only versus full history, operator audit flags, and retained transcripts.
 These off-chain endpoints leave voting, escrow, and settlement unchanged.
+`CoreClient` exposes participant-bound chat methods and separate operator audit
+methods using the same generated, validated contract. Chat creation and sends
+return chat/message models directly; do not pass these responses to
+`wait_operation`. Their idempotency keys recover the original response after
+an uncertain send without broadcasting a chain transaction.

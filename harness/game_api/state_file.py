@@ -67,6 +67,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from .money import restore_amount
+
 from .types import (
     EpisodeConfig,
     PayoutConfig,
@@ -276,10 +278,10 @@ def state_to_settlement(state: dict[str, Any], *, withhold_reveals: frozenset[st
         outcome=outcome,
         final_votes=final_votes,
         winner_id=winner_id,
-        winner_payout=settlement.get("winner_payout", payouts.get(winner_id, 0.0)),
-        juror_payouts=dict(juror_payouts),
-        protocol_fee=settlement.get("protocol_fee", payouts.get(participants.get("treasury"), 0.0)),
-        forfeited_bonds=dict(settlement.get("forfeited_bonds", {})),
-        refunds=dict(settlement.get("refunds", {})),
+        winner_payout=restore_amount(settlement.get("winner_payout", payouts.get(winner_id, 0.0))),
+        juror_payouts={actor: restore_amount(amount) for actor, amount in juror_payouts.items()},
+        protocol_fee=restore_amount(settlement.get("protocol_fee", payouts.get(participants.get("treasury"), 0.0))),
+        forfeited_bonds={actor: restore_amount(amount) for actor, amount in settlement.get("forfeited_bonds", {}).items()},
+        refunds={actor: restore_amount(amount) for actor, amount in settlement.get("refunds", {}).items()},
         engine_evidence=deepcopy(settlement.get("engine_evidence")),
     )

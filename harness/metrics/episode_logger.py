@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from game_api.types import Phase, Verdict
+from game_api.money import Amount, financial_difference, financial_json, financial_sum
 
 
 @dataclass
@@ -28,8 +29,8 @@ class HandoffEntry:
     action: str
     details: str
     channel: str = "game"   # game | public | private
-    money_in: float = 0.0   # money deposited
-    money_out: float = 0.0  # money received
+    money_in: Amount = 0.0   # money deposited
+    money_out: Amount = 0.0  # money received
 
 
 class EpisodeLogger:
@@ -44,7 +45,7 @@ class EpisodeLogger:
 
     def log(self, phase: str, actor: str, role: str, action: str,
             details: str, channel: str = "game",
-            money_in: float = 0.0, money_out: float = 0.0):
+            money_in: Amount = 0.0, money_out: Amount = 0.0):
         self.entries.append(HandoffEntry(
             timestamp=time.monotonic() - self._start,
             phase=phase, actor=actor, role=role,
@@ -110,27 +111,27 @@ class EpisodeLogger:
             lines.append("")
 
         # Money summary
-        total_in = sum(e.money_in for e in self.entries)
-        total_out = sum(e.money_out for e in self.entries)
+        total_in = financial_sum(e.money_in for e in self.entries)
+        total_out = financial_sum(e.money_out for e in self.entries)
         lines.append("## Money Flow Summary")
         lines.append(f"- Total deposited: ${total_in:.2f}")
         lines.append(f"- Total paid out: ${total_out:.2f}")
-        lines.append(f"- Protocol revenue: ${total_in - total_out:.2f}")
+        lines.append(f"- Protocol revenue: ${financial_difference(total_in, total_out):.2f}")
         lines.append("")
 
         # Per-agent P&L
-        agent_pl: dict[str, dict[str, float]] = {}
+        agent_pl: dict[str, dict[str, Amount]] = {}
         for e in self.entries:
             if e.actor not in agent_pl:
                 agent_pl[e.actor] = {"in": 0, "out": 0}
-            agent_pl[e.actor]["in"] += e.money_in
-            agent_pl[e.actor]["out"] += e.money_out
+            agent_pl[e.actor]["in"] = financial_sum([agent_pl[e.actor]["in"], e.money_in])
+            agent_pl[e.actor]["out"] = financial_sum([agent_pl[e.actor]["out"], e.money_out])
 
         lines.append("### Per-Agent Profit & Loss")
         lines.append("| Agent | Role | Deposited | Received | Net |")
         lines.append("|-------|------|-----------|----------|-----|")
         for actor, pl in agent_pl.items():
-            net = pl["out"] - pl["in"]
+            net = financial_difference(pl["out"], pl["in"])
             sign = "+" if net >= 0 else ""
             # Find role
             role = next((e.role for e in self.entries if e.actor == actor), "?")
@@ -150,7 +151,7 @@ class EpisodeLogger:
 
     def export_json(self) -> dict[str, Any]:
         """Export as structured JSON for programmatic analysis."""
-        return {
+        return financial_json({
             "episode_id": self.episode_id,
             "metadata": self.metadata,
             "entries": [
@@ -167,4 +168,4 @@ class EpisodeLogger:
                 }
                 for e in self.entries
             ],
-        }
+        })

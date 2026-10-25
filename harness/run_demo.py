@@ -181,10 +181,10 @@ async def run_demo(treatment: TreatmentConfig, output_dir: Path):
 
         # Money summary
         print(f"\n  💰 Money Flow:")
-        print(f"    Bonds deposited: {json.dumps(ep.bonds_deposited, indent=6)}")
-        print(f"    Payouts: {json.dumps(ep.payouts, indent=6)}")
+        print(f"    Bonds deposited: {json.dumps(ep.bonds_deposited, indent=6, default=str)}")
+        print(f"    Payouts: {json.dumps(ep.payouts, indent=6, default=str)}")
         if ep.forfeited:
-            print(f"    Forfeited bonds: {json.dumps(ep.forfeited, indent=6)}")
+            print(f"    Forfeited bonds: {json.dumps(ep.forfeited, indent=6, default=str)}")
         if ep.bribes_accepted:
             print(f"    ⚠️  Bribes accepted by: {ep.bribes_accepted}")
 
