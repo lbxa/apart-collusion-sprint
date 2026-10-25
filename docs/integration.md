@@ -18,9 +18,13 @@
 - **Ports and use cases:** `GameAPI` connects the experiment runner to either the
   Rust adapter or an explicitly selected mock. Register, post, challenge,
   commit/reveal, settle, expire, and read balances use documented `/v1` routes.
-  Deliberation messages, straw polls, and simulated bribes remain harness records.
+  Public deliberation messages are posted to the episode's core forum and read
+  back with each participant's credentials before deliberation and final voting.
+  Round scheduling, straw polls, and simulated bribes remain harness records.
   `CoreClient` also exposes the separate, authenticated private-chat API; the
-  experiment runner does not automatically route deliberation through it.
+  experiment runner uses it for agent private messages when `private_chat` is
+  enabled. Public deliberation and private messages retain separate reads,
+  visibility rules, and audit records.
 - **Lifecycle:** local runs own one Rust process and its isolated Anvil node.
   Startup uses machine-readable discovery with a fresh loopback listener;
   cleanup closes HTTP and reaps the process on success, failure, and cancellation.
@@ -40,6 +44,14 @@
   retained transcripts and usage audits require explicit operator methods.
   Prohibited communication is delivered and flagged. Membership remains enforced,
   and chat bodies stay out of public game state, ordinary logs, and audit metadata.
+- **Public forum:** one append-only, episode-scoped forum is available to all
+  assigned participants. Sends return message models directly and persist
+  atomically with idempotency responses and audit events. Authenticated reads
+  record the exact returned sequences. Separate operator transcript/audit
+  methods expose communication volume, senders, rounds, and read patterns.
+  `public_messaging=False` disables runner sends/reads, not server authorization.
+  Forum failures propagate; observations never substitute a local message cache.
+  See [the forum guide](public-forum.md) for audit interpretation and pagination.
 - **Precision and contract drift:** generated amounts remain integer strings;
   the experiment adapter exposes exact Decimal token amounts. Financial exports
   encode Decimal quantities as strings. Regenerate the OpenAPI snapshot and Python

@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from .types import EpisodeConfig, Phase, SettlementResult, Verdict
+from .types import EpisodeConfig, Message, Phase, SettlementResult, Verdict
 from .money import Amount
 
 
@@ -31,6 +31,18 @@ class GameAPI(ABC):
 
     @abstractmethod
     async def start_deliberation(self, episode_id: str) -> bool: ...
+
+    @abstractmethod
+    async def send_forum_message(self, episode_id: str, sender_id: str,
+                                 content: str, round_num: int) -> Message: ...
+
+    @abstractmethod
+    async def get_forum_messages(self, episode_id: str, participant_id: str) -> list[Message]: ...
+
+    @abstractmethod
+    async def get_forum_audit(self, episode_id: str) -> dict:
+        """Return evaluator-only metadata, including every audit page."""
+        ...
 
     @abstractmethod
     async def start_voting(self, episode_id: str) -> bool: ...

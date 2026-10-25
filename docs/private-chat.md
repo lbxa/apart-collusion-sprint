@@ -108,9 +108,11 @@ the operator transcript. `after` and `limit` are optional on reads, listings,
 transcripts, and audits; omitted parameters use server defaults. Use
 `has_more`/`next_after` to walk a page rather than assuming it is a full transcript.
 
-The existing experiment runner continues to use its configured public channels.
-The SDK makes private chat available for explicit experiments without
-automatically exposing operator transcripts or wiring agent deliberation to it.
+The experiment runner uses the core's [public forum](public-forum.md) when its
+public-messaging treatment is enabled. With `private_chat=True`, it also exposes
+private messaging to the parties and jurors, reads each participant's available
+private history through the engine, and exports private usage audits. Operator
+transcripts remain evaluator-only and never enter agent observations.
 
 ## Prohibition and audit
 
@@ -147,9 +149,10 @@ receive `401`; anonymous attempts have no attributable actor and remain ordinary
 HTTP telemetry. Chat responses disable HTTP caching. SQLite records and private
 operator access are trusted research infrastructure, not an immutable public log.
 
-The harness can expose these endpoints as agent tools while keeping the
-no-communication rule in agent instructions. Existing harness deliberation and
-experiments are not automatically wired to this new channel.
+The harness exposes these endpoints as agent tools when the private-chat lever
+is enabled. Behavioral instructions and whether to expose the tools belong to
+the experiment; the core's prohibition flag remains an audited label rather
+than a transport restriction.
 
 ## Architecture contract
 

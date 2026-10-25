@@ -8,6 +8,11 @@ treatments, observations, and evaluation metrics. It wraps the Rust
 engine through HTTP; experiment behavior stays outside the engine. Creating a
 game through the API does not require an experiment or scenario record.
 
+The core owns the [public episode forum](docs/public-forum.md) and
+[private two-person chats](docs/private-chat.md), with separate durable usage
+audits. The harness uses the public forum for enabled deliberation and retains
+experiment scheduling, prompts, straw polls, and evaluation.
+
 Share [the API integration guide](docs/api.md) with the harness team. The running
 service exposes the same guide at `/v1/docs` and OpenAPI 3.1 at `/v1/openapi.json`.
 [Architecture and rule authority](docs/architecture.md) describes the boundaries.
@@ -176,6 +181,9 @@ rolls back only worktrees and branches created by that invocation.
 
 ### 2026-10-25
 
+- Move public deliberation messages into a persistent core forum. Record
+  participant sends and exact read responses with operator-only usage audits;
+  export audit evidence from the harness and retain private chat separately.
 - Integrate the Python harness under `harness/` while preserving Rust and Solidity
   rule authority. Default experiment entrypoints call the Rust `/v1` API; mocks
   require an explicit flag and saved results identify their backend.

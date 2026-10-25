@@ -73,7 +73,7 @@ fn version_one_game_records_survive_upgrade_and_future_versions_are_rejected() {
     let version: u32 = connection
         .pragma_query_value(None, "user_version", |row| row.get(0))
         .unwrap();
-    assert_eq!(version, 2);
+    assert_eq!(version, 3);
     let content: String = connection
         .query_row(
             "SELECT utf8 FROM artifacts WHERE hash='existing'",
@@ -82,13 +82,13 @@ fn version_one_game_records_survive_upgrade_and_future_versions_are_rejected() {
         )
         .unwrap();
     assert_eq!(content, "preserve exactly");
-    connection.pragma_update(None, "user_version", 3).unwrap();
+    connection.pragma_update(None, "user_version", 4).unwrap();
     assert!(Store::open(&path).is_err());
     assert_eq!(
         connection
             .pragma_query_value::<u32, _>(None, "user_version", |row| row.get(0))
             .unwrap(),
-        3
+        4
     );
 }
 

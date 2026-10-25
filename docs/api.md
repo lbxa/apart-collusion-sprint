@@ -409,7 +409,7 @@ The historical `harness/GAME_BUILDER_HANDOFF.md` cannot be used unchanged:
 | `register_episode` | `POST /v1/episodes`; use integer strings and odd jury 3–7 |
 | `post_claim`, `challenge` | Submit artifact text to the corresponding endpoint |
 | `post_juror_bond`, then `cast_vote` | Replace with commitment including verdict/assessment, then later reveal |
-| `start_deliberation` | Harness-only discussion, with no game state override |
+| `start_deliberation` | Harness schedules rounds over core forum messages; no game state override |
 | `start_voting` | Read/wait for chain-derived deadlines; no operator transition |
 | `settle`, `expire` | Request a terminal transaction, then read settlement |
 | `get_state`, `get_balances` | Read the episode and balance endpoints |
@@ -435,3 +435,14 @@ methods using the same generated, validated contract. Chat creation and sends
 return chat/message models directly; do not pass these responses to
 `wait_operation`. Their idempotency keys recover the original response after
 an uncertain send without broadcasting a chain transaction.
+
+## Public episode forum
+
+The core owns one append-only public forum per episode. Assigned participants
+post and read through `POST`/`GET /v1/episodes/{id}/forum/messages`; operator
+transcript and usage-audit reads use `/v1/episodes/{id}/forum/transcript` and
+`/v1/episodes/{id}/forum-audit`. Sends require an idempotency key and return a
+message directly. All reads are bounded and cursor-paginated. Metadata audits
+record senders, rounds, UTF-8 bytes, timing, and exact returned message sequences
+without including message bodies. See [the public-forum guide](public-forum.md)
+for credentials, examples, harness integration, and interpretation limits.

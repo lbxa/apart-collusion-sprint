@@ -128,7 +128,7 @@ Reuse scenario and role assignments across cells so comparisons are paired (SPEC
   failure rate).
 - **Factor-specific records:** `bribes_offered` and `bribes_accepted` (every offer,
   seeded or agent-initiated), `transfers_rejected`, `pay_bonuses`, `simulated_utility`,
-  and chat audit counts per actor once the chat integration lands.
+  private chat audit counts per actor, and public forum send/read metadata.
 - Report unknown-truth and failed episodes separately, and report uncertainty across
   blocks, not a single run (SPEC 11.1).
 
@@ -136,7 +136,7 @@ Reuse scenario and role assignments across cells so comparisons are paired (SPEC
 
 | Experiment | Cell                | Description                                  | Status                                           |
 | ---------- | ------------------- | -------------------------------------------- | ------------------------------------------------ |
-| 1          | `M1-C1-T1-R1-S1-E1` | Every lever on: the maximal-opportunity cell | Blocked on the runner's private-chat integration |
+| 1          | `M1-C1-T1-R1-S1-E1` | Every lever on: the maximal-opportunity cell | Runner supports private chat and the core public forum |
 
 Add a row when a new cell is approved. Use the cell ID, not a free-form name.
 
@@ -151,9 +151,8 @@ python run_experiments.py --cell M1-C0-T1-R1-S1-E1 --scripted --mock    # dry ru
 ```
 
 `--blocks` sets the number of fresh-memory blocks (default 2); `--episodes` overrides
-the block length (default 10). A cell with `C1` fails at startup with "Private chat is
-not integrated into the experiment runner yet" until that integration lands, so
-Experiment 1 cannot run before then.
+the block length (default 10). Cells with `C1` expose private messaging through
+the core chat API. Every cell uses the core public forum for public deliberation.
 
 ## Implementation status
 
@@ -163,7 +162,7 @@ Experiment 1 cannot run before then.
 | Evidence               | Built: both sets hold 10 scenarios, 5 true and 5 false.                                                                                                                                                                                                      |
 | Pay multiplier         | Built: `TreatmentConfig.pay_multiplier`, a prompt block, and `pay_bonuses`. Checked against the real engine with exact `Decimal` amounts.                                                                                                                    |
 | Transfers              | Built: `transfers_enabled`, agent-initiated offers from either party to jurors or the other party, limits, party responses, and settlement. Seeded `BribeDef` offers still work and share the one-offer rule.                                                |
-| Channel                | Not built in the runner. The core chat API and the SDK client exist. `TreatmentConfig.private_chat` is refused at run time. The runner must expose chat tools to agents and write chat activity into episode records so `private_channel_abuse` can read it. |
+| Channel                | Built: the runner exposes core private chat when enabled and writes its activity into episode records. Public deliberation uses the core forum, with per-participant reads and separate operator audit evidence. |
 | `attack_assigned` flag | Built: true when transfers are enabled, in addition to the earlier triggers (seeded bribes, juror motivations, withheld reveals, adversarial scripted jurors).                                                                                               |
 | Cell definitions       | Built: `experiments/design.py` and `run_experiments.py --cell`.                                                                                                                                                                                              |
 | Collusion metric       | In progress. Experiments consume it through `analyze_episode`.                                                                                                                                                                                               |

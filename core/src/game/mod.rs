@@ -17,6 +17,7 @@ pub struct GameService {
     inner: Arc<Mutex<GameInner>>,
     operator_id: String,
     chats: crate::chat::ChatService,
+    forum: crate::forum::ForumService,
 }
 
 struct GameInner {
@@ -39,10 +40,12 @@ impl GameService {
         store.bind_deployment(&identity)?;
         let store = Arc::new(store);
         let chats = crate::chat::ChatService::new(store.clone(), operator_id.clone());
+        let forum = crate::forum::ForumService::new(store.clone(), operator_id.clone());
         Ok(Self {
             inner: Arc::new(Mutex::new(GameInner { chain, store })),
             operator_id,
             chats,
+            forum,
         })
     }
     pub fn operator_id(&self) -> &str {
@@ -50,6 +53,9 @@ impl GameService {
     }
     pub fn chats(&self) -> &crate::chat::ChatService {
         &self.chats
+    }
+    pub fn forum(&self) -> &crate::forum::ForumService {
+        &self.forum
     }
     pub async fn identity(&self) -> DeploymentView {
         reads::deployment_view(self.inner.lock().await.chain.identity())

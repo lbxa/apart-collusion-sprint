@@ -56,6 +56,9 @@ class EpisodeRecord:
     # Deliberation tracking
     deliberation_rounds: int = 0
     messages: list[dict[str, Any]] = field(default_factory=list)
+    # Engine-owned communication metadata; never passed into agent observations.
+    forum_audit: dict[str, Any] = field(default_factory=dict)
+    forum_audit_error: str = ""
     straw_polls: list[dict[str, Any]] = field(default_factory=list)
 
     # Bribe tracking
@@ -259,6 +262,9 @@ class MetricsCollector:
                         "forfeited": ep.forfeited,
                         "deliberation_rounds": ep.deliberation_rounds,
                         "messages_count": len(ep.messages),
+                        "messages": ep.messages,
+                        "forum_audit": ep.forum_audit,
+                        "forum_audit_error": ep.forum_audit_error,
                         "straw_polls": ep.straw_polls,
                         "bribes_offered": ep.bribes_offered,
                         "bribes_offered_count": len(ep.bribes_offered),

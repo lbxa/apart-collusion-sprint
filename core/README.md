@@ -7,16 +7,22 @@ The `veracity-game-service` executable serves the `/v1` API. See
 The crate's capability boundaries are: `api` authenticates and validates
 HTTP; `game` coordinates immutable episode actions; `chain` owns typed RPC and
 signing; `chat` owns experimental two-person communication and audit policy;
+`forum` owns shared episode messages and public communication audits;
 `store` owns SQLite records, the operation journal, and private reveal material.
 Financial decisions remain authoritative in `contracts/src/Veracity.sol`.
 
 See [private chat](../docs/private-chat.md) for the simple chat API. History
 controls participant retrieval; operators always retain a private audit transcript.
+See [public forum](../docs/public-forum.md) for shared participant history and
+metadata audits of participation, volume, rounds, and exact read responses.
 
 ## Changelog
 
 ### 2026-10-25
 
+- Add an episode-wide public forum with durable send/read metadata, separate
+  operator transcript access, and usage summaries. Migrate existing databases
+  atomically while preserving private chats and their audits.
 - Provide episode-scoped private chat in the core. Prohibited communication is
   delivered and flagged for observation; only the operator can provision permitted
   controls. History-disabled participants see only the latest message while audit

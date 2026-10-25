@@ -79,6 +79,7 @@ pub(super) struct ReplayResponse {
 pub fn router(service: GameService, auth: AuthConfig) -> Router {
     Router::new()
         .merge(super::chat::router())
+        .merge(super::forum::router())
         .route("/v1/health", get(health))
         .route("/v1/openapi.json", get(openapi_document))
         .route("/v1/docs", get(docs))

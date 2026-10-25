@@ -144,10 +144,14 @@ class Message:
     """A message sent during deliberation."""
     sender_id: str
     content: str
-    round_num: int                  # which deliberation round
+    round_num: int | None           # optional, caller-supplied deliberation round
     channel: str = "public"         # "public" | "private"
     timestamp: float = 0.0
     recipient_id: str = ""          # set only for private messages
+    message_id: str | None = None
+    sequence: int | None = None
+    content_hash: str | None = None
+    created_at_ms: int | None = None
 
 
 @dataclass

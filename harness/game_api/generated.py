@@ -17,6 +17,9 @@ class WireModel(BaseModel):
 ChatAuditKind = Literal['chat_created', 'message_sent', 'messages_read', 'chats_listed', 'transcript_read', 'access_denied']
 
 
+ForumAuditKind = Literal['message_sent', 'messages_read', 'transcript_read', 'access_denied']
+
+
 Verdict = Literal['CREATOR_SUPPORTED', 'CHALLENGER_SUPPORTED']
 
 
@@ -162,6 +165,66 @@ class ErrorResponse(WireModel):
     error: ApiProblem
 
 
+class ForumActorUsage(WireModel):
+    actor_id: str
+    denied_requests: Annotated[int, Field(ge=0)]
+    messages_returned: Annotated[int, Field(ge=0)]
+    read_requests: Annotated[int, Field(ge=0)]
+    sent_bytes: Annotated[int, Field(ge=0)]
+    sent_messages: Annotated[int, Field(ge=0)]
+
+
+class ForumAuditEvent(WireModel):
+    actor_id: str
+    actor_is_operator: bool
+    created_at_ms: Annotated[int, Field(ge=0)]
+    episode_id: str
+    kind: ForumAuditKind
+    message_bytes: Annotated[int, Field(ge=0)] | None
+    message_hash: str | None
+    message_sequence: Annotated[int, Field(ge=0)] | None
+    returned_sequences: list[Annotated[int, Field(ge=0)]]
+    round_num: Annotated[int, Field(ge=0)] | None
+    sequence: Annotated[int, Field(ge=0)]
+
+
+class ForumAuditReport(WireModel):
+    active_sender_count: Annotated[int, Field(ge=0)]
+    actors: list[ForumActorUsage]
+    communication_used: bool
+    episode_id: str
+    events: list[ForumAuditEvent]
+    first_message_at_ms: Annotated[int, Field(ge=0)] | None
+    forum_used: bool
+    has_more: bool
+    last_message_at_ms: Annotated[int, Field(ge=0)] | None
+    message_count: Annotated[int, Field(ge=0)]
+    next_after: Annotated[int, Field(ge=0)]
+    total_message_bytes: Annotated[int, Field(ge=0)]
+
+
+class ForumMessage(WireModel):
+    content: str
+    content_hash: str
+    created_at_ms: Annotated[int, Field(ge=0)]
+    message_id: str
+    round_num: Annotated[int, Field(ge=0)] | None
+    sender_id: str
+    sequence: Annotated[int, Field(ge=0)]
+
+
+class ForumMessagePage(WireModel):
+    episode_id: str
+    has_more: bool
+    messages: list[ForumMessage]
+    next_after: Annotated[int, Field(ge=0)]
+
+
+class ForumSendMessage(WireModel):
+    content: str
+    round_num: Annotated[int, Field(ge=1)] | None = None
+
+
 class HealthResponse(WireModel):
     api_version: Annotated[str, Field(pattern='^v1$')]
     deployment: DeploymentView
@@ -283,6 +346,12 @@ DeploymentView.model_rebuild()
 EmptyRequest.model_rebuild()
 EpisodeView.model_rebuild()
 ErrorResponse.model_rebuild()
+ForumActorUsage.model_rebuild()
+ForumAuditEvent.model_rebuild()
+ForumAuditReport.model_rebuild()
+ForumMessage.model_rebuild()
+ForumMessagePage.model_rebuild()
+ForumSendMessage.model_rebuild()
 HealthResponse.model_rebuild()
 JurorView.model_rebuild()
 MessagePage.model_rebuild()
@@ -405,6 +474,36 @@ class GeneratedAPI:
         body = EmptyRequest.model_validate(body)
         data = await self._request('POST', path, token=token, body=body.model_dump(), idempotency_key=idempotency_key)
         return TypeAdapter(OperationView).validate_python(data, strict=True)
+
+    async def get_forum_audit(self, id: str, *, after: Annotated[int, Field(ge=0)] | None = None, limit: Annotated[int, Field(ge=0)] | None = None, token: str | None = None) -> ForumAuditReport:
+        path = '/v1/episodes/{id}/forum-audit'.replace('{id}', quote(id, safe=''))
+        query = {key: value for key, value in {'after': after, 'limit': limit}.items() if value is not None}
+        if query:
+            path += '?' + urlencode(query)
+        data = await self._request('GET', path, token=token)
+        return TypeAdapter(ForumAuditReport).validate_python(data, strict=True)
+
+    async def get_forum_messages(self, id: str, *, after: Annotated[int, Field(ge=0)] | None = None, limit: Annotated[int, Field(ge=0)] | None = None, token: str | None = None) -> ForumMessagePage:
+        path = '/v1/episodes/{id}/forum/messages'.replace('{id}', quote(id, safe=''))
+        query = {key: value for key, value in {'after': after, 'limit': limit}.items() if value is not None}
+        if query:
+            path += '?' + urlencode(query)
+        data = await self._request('GET', path, token=token)
+        return TypeAdapter(ForumMessagePage).validate_python(data, strict=True)
+
+    async def send_forum_message(self, id: str, body: ForumSendMessage, *, token: str | None = None, idempotency_key: str) -> ForumMessage:
+        path = '/v1/episodes/{id}/forum/messages'.replace('{id}', quote(id, safe=''))
+        body = ForumSendMessage.model_validate(body)
+        data = await self._request('POST', path, token=token, body=body.model_dump(), idempotency_key=idempotency_key)
+        return TypeAdapter(ForumMessage).validate_python(data, strict=True)
+
+    async def get_forum_transcript(self, id: str, *, after: Annotated[int, Field(ge=0)] | None = None, limit: Annotated[int, Field(ge=0)] | None = None, token: str | None = None) -> ForumMessagePage:
+        path = '/v1/episodes/{id}/forum/transcript'.replace('{id}', quote(id, safe=''))
+        query = {key: value for key, value in {'after': after, 'limit': limit}.items() if value is not None}
+        if query:
+            path += '?' + urlencode(query)
+        data = await self._request('GET', path, token=token)
+        return TypeAdapter(ForumMessagePage).validate_python(data, strict=True)
 
     async def reveal(self, id: str, body: EmptyRequest, *, token: str | None = None, idempotency_key: str) -> OperationView:
         path = '/v1/episodes/{id}/reveals'.replace('{id}', quote(id, safe=''))

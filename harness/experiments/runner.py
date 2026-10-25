@@ -176,6 +176,7 @@ class ExperimentRunner:
 
         # Episode logger for MD handoff trail
         ep_logger = EpisodeLogger(episode_id, run.output_dir / "transcripts")
+        registered = False
 
         try:
             ep_config = EpisodeConfig(
@@ -235,6 +236,7 @@ class ExperimentRunner:
             await run.game_api.register_episode(
                 ep_config, creator_id, challenger_id, juror_ids, treasury_id
             )
+            registered = True
 
             messages: list[Message] = []
             straw_polls: list[StrawPoll] = []
@@ -338,6 +340,8 @@ class ExperimentRunner:
 
                 if treatment.private_chat:
                     for party in (creator_id, challenger_id):
+                        messages = (await run.game_api.get_forum_messages(episode_id, party)
+                                    if treatment.public_messaging else [])
                         party_obs = self._make_observation(
                             agents[party].role, episode_id, scenario, Phase.DELIBERATION,
                             ep_config, messages, straw_polls, party, treatment,
@@ -350,6 +354,9 @@ class ExperimentRunner:
 
                 for j_idx, jid in enumerate(juror_ids):
                     bribe = bribe_offers.get(jid)
+
+                    messages = (await run.game_api.get_forum_messages(episode_id, jid)
+                                if treatment.public_messaging else [])
 
                     juror_obs = self._make_observation(
                         Role.JUROR, episode_id, scenario, Phase.DELIBERATION,
@@ -366,24 +373,22 @@ class ExperimentRunner:
                                                          round_num, delib_action.private_messages)
 
                     # Only accepted communication enters other agents' observations.
-                    msg = Message(
-                        sender_id=jid,
-                        content=delib_action.message,
-                        round_num=round_num,
-                        channel=delib_action.channel,
-                        timestamp=time.monotonic(),
-                    )
                     if delib_action.channel in self._allowed_channels(treatment):
-                        messages.append(msg)
+                        msg = await run.game_api.send_forum_message(
+                            episode_id, jid, delib_action.message, round_num)
                         record.messages.append({
-                            "sender": jid,
-                            "round": round_num,
-                            "content": delib_action.message,
-                            "channel": delib_action.channel,
+                            "sender": msg.sender_id,
+                            "round": msg.round_num,
+                            "content": msg.content,
+                            "channel": msg.channel,
+                            "message_id": msg.message_id,
+                            "sequence": msg.sequence,
+                            "content_hash": msg.content_hash,
+                            "created_at_ms": msg.created_at_ms,
                         })
                         ep_logger.log(
                             f"DELIBERATION_R{round_num}", jid, "JUROR", "message",
-                            delib_action.message[:200], channel=delib_action.channel,
+                            msg.content[:200], channel=msg.channel,
                         )
                     else:
                         ep_logger.log(f"DELIBERATION_R{round_num}", jid, "JUROR", "message_blocked",
@@ -418,6 +423,9 @@ class ExperimentRunner:
                     continue
 
                 bribe = bribe_offers.get(jid)
+
+                messages = (await run.game_api.get_forum_messages(episode_id, jid)
+                            if treatment.public_messaging else [])
 
                 juror_obs = self._make_observation(
                     Role.JUROR, episode_id, scenario, Phase.VOTING,
@@ -551,6 +559,8 @@ class ExperimentRunner:
                 elif result.outcome == Phase.SETTLED_CHALLENGER:
                     record.verdict_correct = scenario.ground_truth is False
 
+            record.forum_audit = copy.deepcopy(await run.game_api.get_forum_audit(episode_id))
+
             # Run collusion detection
             collusion_report = analyze_episode(record)
             record.metadata = record.metadata if hasattr(record, 'metadata') else {}
@@ -589,6 +599,12 @@ class ExperimentRunner:
             record.verdict_correct = None
             record.failure_reason = str(e)
             record.status = "failed"
+            if registered:
+                try:
+                    record.forum_audit = copy.deepcopy(await run.game_api.get_forum_audit(episode_id))
+                except Exception:
+                    record.forum_audit_error = "Forum audit could not be collected after episode failure"
+                    logger.warning("Episode %s: forum audit could not be collected after failure", episode_id)
             ep_logger.log("ERROR", "system", "SYSTEM", "failure", str(e))
             ep_logger.save()
 

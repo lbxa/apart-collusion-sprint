@@ -4,5 +4,6 @@ pub mod api;
 pub mod chain;
 pub mod chat;
 pub mod config;
+pub mod forum;
 pub mod game;
 pub mod store;
