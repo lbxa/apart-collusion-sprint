@@ -1,0 +1,42 @@
+\section{Research environment}
+\label{sec:system}
+
+The reduced Veracity mechanism has one creator, one designated challenger, and
+a fixed jury of three, five, or seven participants. The creator posts a claim
+with a bond; a challenge requires a matching party bond. Jurors commit their
+votes and subsequently reveal them. The contract applies the configured voting,
+deadline, and settlement rules~\cite{project-spec}. Recording a verdict does
+not itself establish whether the claim is factually correct.
+
+Figure~\ref{fig:architecture} shows the request path through the integrated
+environment. The Python harness owns agent execution, treatment configuration,
+permitted observations, deliberation, and evaluation metrics. It calls the Rust
+service through the versioned HTTP API. The Solidity contract owns escrow and
+financial settlement; the service records operations and reads their chain
+evidence~\cite{project-integration}. The core also offers pairwise private chat
+with operator audit transcripts. Prohibited messages are delivered and flagged;
+membership is enforced. Agents need explicit tool access to use this
+channel~\cite{project-chat}.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=12mm]
+    \node[component] (harness) {Python harness\\Agents and metrics};
+    \node[component,right=of harness] (api) {Rust API\\Game and chat};
+    \node[component,right=of api] (contract) {Solidity contract\\Financial rules};
+    \draw[dataflow] (harness) -- node[above,font=\small] {HTTP} (api);
+    \draw[dataflow] (api) -- node[above,font=\small] {Chain} (contract);
+  \end{tikzpicture}
+  \caption{Conceptual request path in the integrated environment. Arrows
+  indicate submitted game operations. Financial authority remains in the
+  contract; chat auditing remains off-chain in the core. The diagram
+  describes the architecture, not evidence of a particular deployment.}
+  \label{fig:architecture}
+\end{figure}
+
+These boundaries matter for interpretation. Simulated side payments in harness
+records are separate from contract payouts. A mock backend represents a different
+protocol, and scripted oracle agents exercise the integration rather than
+measure a model's ability. Historical results retained from before integration
+fixes require separate scrutiny~\cite{project-harness}. None of those results
+supplies the fictional comparison below.

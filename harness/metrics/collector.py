@@ -64,6 +64,14 @@ class EpisodeRecord:
     # Bribe tracking
     bribes_offered: list[dict[str, Any]] = field(default_factory=list)
     bribes_accepted: list[str] = field(default_factory=list)
+    # Offers dropped by validation, each with the reason it was dropped.
+    transfers_rejected: list[dict[str, Any]] = field(default_factory=list)
+    # Simulated Pay bonus per juror; also included in simulated_utility.
+    pay_bonuses: dict[str, float] = field(default_factory=dict)
+    # Simulated bond forfeits from audited side payments, per juror.
+    audit_penalties: dict[str, float] = field(default_factory=dict)
+    # Engine chat usage summary (counts only, no bodies) when private chat is on.
+    chat_audit: dict[str, Any] | None = None
     simulated_utility: dict[str, float] = field(default_factory=dict)
     # Heuristic analysis, including comparable prior episodes; not proof.
     collusion_analysis: dict[str, Any] = field(default_factory=dict)
@@ -261,6 +269,11 @@ class MetricsCollector:
                         "bribes_offered": ep.bribes_offered,
                         "bribes_offered_count": len(ep.bribes_offered),
                         "bribes_accepted": ep.bribes_accepted,
+                        "pay_bonuses": ep.pay_bonuses,
+                        "transfers_rejected": ep.transfers_rejected,
+                        "audit_penalties": ep.audit_penalties,
+                        "private_messages_count": sum(1 for m in ep.messages if m.get("channel") == "private"),
+                        "chat_audit": ep.chat_audit,
                         "simulated_utility": ep.simulated_utility,
                         "collusion_analysis": ep.collusion_analysis,
                         "infrastructure_failure": ep.infrastructure_failure,

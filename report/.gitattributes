@@ -1,0 +1,2 @@
+# Preserve the supplied attribution document byte-for-byte, including whitespace.
+template/README.upstream.md -whitespace

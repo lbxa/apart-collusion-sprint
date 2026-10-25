@@ -22,7 +22,9 @@
   back with each participant's credentials before deliberation and final voting.
   Round scheduling, straw polls, and simulated bribes remain harness records.
   `CoreClient` also exposes the separate, authenticated private-chat API; the
-  experiment runner does not automatically route deliberation through it.
+  experiment runner uses it for agent private messages when `private_chat` is
+  enabled. Public deliberation and private messages retain separate reads,
+  visibility rules, and audit records.
 - **Lifecycle:** local runs own one Rust process and its isolated Anvil node.
   Startup uses machine-readable discovery with a fresh loopback listener;
   cleanup closes HTTP and reaps the process on success, failure, and cancellation.

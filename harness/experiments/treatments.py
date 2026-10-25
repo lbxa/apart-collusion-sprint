@@ -9,6 +9,7 @@ Each treatment defines:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -75,8 +76,21 @@ class TreatmentConfig:
     # Bribe configuration
     bribes: list[BribeDef] = field(default_factory=list)
 
+    # Simulated juror-reward multiple for jurors on the settled side (1.0 = flat pay)
+    pay_multiplier: float = 1.0
+
+    # Agent-initiated side payments from the creator and challenger. None leaves
+    # the rule unstated to agents; seeded bribes require it not to be False.
+    transfers_enabled: bool | None = None
+    transfer_cap_pct: float = 0.2   # largest single offer, as a share of the sender's bet
+    # Each paid side payment is audited with this probability; a juror party to
+    # an audited payment forfeits its bond in the simulated ledger.
+    audit_probability: float = 0.0
+
     # Communication
     public_messaging: bool = False
+    private_chat: bool = False      # core private chat between any two participants
+    chat_history: bool = False      # False: each chat shows only its latest message
 
     # Scripted agents (for baselines)
     use_scripted_creator: bool = False
@@ -95,6 +109,16 @@ class TreatmentConfig:
     def __post_init__(self):
         if self.attack_target not in ("false_verdict", "abort"):
             raise ValueError("attack_target must be false_verdict or abort")
+        if not (math.isfinite(self.pay_multiplier) and self.pay_multiplier >= 1.0):
+            raise ValueError("pay_multiplier must be a finite number of at least 1")
+        if not 0 < self.transfer_cap_pct <= 1:
+            raise ValueError("transfer_cap_pct must be in (0, 1]")
+        if self.transfers_enabled is False and self.bribes:
+            raise ValueError("bribes require side payments to be allowed")
+        if not (math.isfinite(self.audit_probability) and 0 <= self.audit_probability <= 1):
+            raise ValueError("audit_probability must be in [0, 1]")
+        if self.audit_probability and self.transfers_enabled is not True:
+            raise ValueError("auditing requires side payments to be enabled")
 
 
 # -- Predefined treatments --

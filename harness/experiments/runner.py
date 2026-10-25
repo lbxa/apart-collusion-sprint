@@ -5,9 +5,10 @@ Core loop per episode:
   2. Creator posts claim + bet
   3. Challenger decides to challenge or abstain
   4. Jurors post bonds
-  5. DELIBERATION: N rounds of discussion (messages, straw polls)
+  5. DELIBERATION: N rounds of discussion (messages, straw polls); with
+     private chat, the parties get a chat turn before the jurors each round
   6. VOTING: jurors cast final binding votes
-  7. Settlement: payout distribution
+  7. Settlement: payout distribution, simulated side payments and audits
 """
 
 from __future__ import annotations
@@ -16,9 +17,11 @@ import copy
 import hashlib
 import logging
 import math
+import random
 import time
 import uuid
 from dataclasses import dataclass, field, replace
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +35,7 @@ from agents.scripted import (
     RandomAgent,
 )
 from experiments.treatments import TreatmentConfig
+from game_api.money import financial_difference, financial_product, financial_sum
 from game_api.interface import GameAPI
 from game_api.types import (
     BribeOffer,
@@ -41,9 +45,11 @@ from game_api.types import (
     Observation,
     Phase,
     PostClaimAction,
+    PrivateMessage,
     Role,
     Scenario,
     StrawPoll,
+    TransferProposal,
     Verdict,
 )
 from metrics.collector import EpisodeRecord, ExperimentMetrics, MetricsCollector
@@ -63,6 +69,7 @@ class ExperimentRun:
     metrics: MetricsCollector
     output_dir: Path
     agents: dict[str, BaseAgent] = field(default_factory=dict)
+    audit_rng: random.Random = field(default_factory=random.Random)
 
 
 class ExperimentRunner:
@@ -97,6 +104,7 @@ class ExperimentRunner:
             game_api=self.game_api,
             metrics=self.metrics,
             output_dir=self.output_dir / experiment_id,
+            audit_rng=random.Random(f"{treatment.seed}:{experiment_id}:audit"),
         )
         run.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -147,10 +155,16 @@ class ExperimentRunner:
                 "seed": treatment.seed,
                 "game_backend": run.game_api.backend,
                 "public_messaging": treatment.public_messaging,
+                "private_chat": treatment.private_chat,
+                "chat_history": treatment.chat_history,
+                "audit_probability": treatment.audit_probability,
+                "pay_multiplier": treatment.pay_multiplier,
+                "transfers_enabled": treatment.transfers_enabled,
                 "memory_enabled": treatment.memory_enabled,
                 "memory_window": treatment.memory_window,
                 "attack_target": treatment.attack_target,
                 "attack_assigned": bool(any("motivation" in override for override in treatment.juror_overrides.values())
+                                        or treatment.transfers_enabled is True
                                         or treatment.bribes or treatment.withhold_reveal_indices
                                         or (treatment.scripted_juror_indices
                                             and treatment.scripted_juror_type in ("adversarial", "non_voting"))),
@@ -170,6 +184,11 @@ class ExperimentRunner:
                 payout=payout,
                 jury_size=treatment.jury_size,
                 deliberation_rounds=treatment.deliberation_rounds,
+                pay_multiplier=treatment.pay_multiplier,
+                transfers_enabled=treatment.transfers_enabled,
+                private_chat=treatment.private_chat,
+                chat_history=treatment.chat_history,
+                audit_probability=treatment.audit_probability,
             )
 
             creator_id = f"creator_{episode_id}"
@@ -298,6 +317,11 @@ class ExperimentRunner:
             bribe_offers = self._create_bribe_offers(
                 treatment, creator_id, challenger_id, juror_ids
             )
+            if treatment.transfers_enabled:
+                await self._run_transfer_stage(
+                    treatment, scenario, ep_config, agents, creator_id, challenger_id,
+                    juror_ids, bribe_offers, record, ep_logger,
+                )
             record.bribes_offered = [{
                 "offer_id": f"{episode_id}:bribe:{index}",
                 "offered_by": offer.offered_by,
@@ -310,8 +334,23 @@ class ExperimentRunner:
             } for index, (recipient, offer) in enumerate(bribe_offers.items())]
             record.deliberation_rounds = treatment.deliberation_rounds
 
+            participants = (creator_id, challenger_id, *juror_ids)
             for round_num in range(1, treatment.deliberation_rounds + 1):
                 round_poll = StrawPoll(round_num=round_num)
+
+                if treatment.private_chat:
+                    for party in (creator_id, challenger_id):
+                        messages = (await run.game_api.get_forum_messages(episode_id, party)
+                                    if treatment.public_messaging else [])
+                        party_obs = self._make_observation(
+                            agents[party].role, episode_id, scenario, Phase.DELIBERATION,
+                            ep_config, messages, straw_polls, party, treatment,
+                            current_round=round_num,
+                            **await self._chat_view(run, episode_id, party, participants),
+                        )
+                        chat_action = await agents[party].chat(party_obs)
+                        await self._deliver_private_messages(run, record, ep_logger, party, participants,
+                                                             round_num, chat_action.private_messages)
 
                 for j_idx, jid in enumerate(juror_ids):
                     bribe = bribe_offers.get(jid)
@@ -326,9 +365,12 @@ class ExperimentRunner:
                         straw_polls, jid, treatment,
                         bribe_offer=bribe,
                         current_round=round_num,
+                        **await self._chat_view(run, episode_id, jid, participants),
                     )
 
                     delib_action = await agents[jid].deliberate(juror_obs)
+                    await self._deliver_private_messages(run, record, ep_logger, jid, participants,
+                                                         round_num, delib_action.private_messages)
 
                     # Only accepted communication enters other agents' observations.
                     if delib_action.channel in self._allowed_channels(treatment):
@@ -391,6 +433,7 @@ class ExperimentRunner:
                     messages,
                     straw_polls, jid, treatment,
                     bribe_offer=bribe,
+                    **await self._chat_view(run, episode_id, jid, participants),
                 )
 
                 vote_action = await agent.final_vote(juror_obs)
@@ -434,14 +477,46 @@ class ExperimentRunner:
                 record.settlement["engine_evidence"] = copy.deepcopy(result.engine_evidence)
             # Simulated side rewards are an experiment ledger, never native
             # contract entitlements. Only valid revealed votes meet a condition.
+            settled_verdict = {
+                Phase.SETTLED_CREATOR: Verdict.CREATOR_SUPPORTED,
+                Phase.SETTLED_CHALLENGER: Verdict.CHALLENGER_SUPPORTED,
+            }.get(result.outcome)
             for offer in record.bribes_offered:
                 recipient = offer["recipient_id"]
                 offer["accepted"] = recipient in record.bribes_accepted
-                if offer["accepted"] and record.votes.get(recipient) == offer["required_verdict"]:
+                # A juror meets the condition by voting; a party by the jury settling.
+                delivered = (settled_verdict is not None and settled_verdict.name == offer["required_verdict"]
+                             if recipient in (creator_id, challenger_id)
+                             else record.votes.get(recipient) == offer["required_verdict"])
+                if offer["accepted"] and delivered:
                     amount = offer["simulated_payout"] = offer["amount"]
                     sender = offer["offered_by"]
                     record.simulated_utility[sender] = record.simulated_utility.get(sender, 0.0) - amount
                     record.simulated_utility[recipient] = record.simulated_utility.get(recipient, 0.0) + amount
+                    if treatment.audit_probability > 0:
+                        offer["audited"] = run.audit_rng.random() < treatment.audit_probability
+                        if offer["audited"] and recipient in juror_ids:
+                            # Simulated like the payment itself; the contract never sees it.
+                            record.audit_penalties[recipient] = payout.juror_bond
+                            record.simulated_utility[recipient] = financial_difference(
+                                record.simulated_utility[recipient], payout.juror_bond)
+                            ep_logger.log("SETTLEMENT", recipient, "JUROR", "audit_bond_forfeited",
+                                          f"Audited side payment from {sender}; bond ${payout.juror_bond:.2f} "
+                                          "forfeited (simulated)")
+            # The Pay bonus is simulated: the contract pays every qualifying juror equally.
+            if treatment.pay_multiplier > 1 and settled_verdict is not None:
+                for juror, vote in record.votes.items():
+                    if vote == settled_verdict.name and juror in result.juror_payouts:
+                        share = financial_difference(result.juror_payouts[juror], payout.juror_bond)
+                        extra = (financial_difference(Decimal(str(treatment.pay_multiplier)), 1)
+                                 if isinstance(share, Decimal) else treatment.pay_multiplier - 1)
+                        bonus = financial_product(extra, share)
+                        if bonus > 0:
+                            record.pay_bonuses[juror] = bonus
+                            record.simulated_utility[juror] = financial_sum(
+                                [record.simulated_utility.get(juror, 0.0), bonus])
+            if treatment.private_chat:
+                record.chat_audit = await run.game_api.private_chat_audit(episode_id)
             record.payouts.update(result.juror_payouts)
             record.payouts.update(result.refunds)
             record.forfeited.update(result.forfeited_bonds)
@@ -639,6 +714,11 @@ class ExperimentRunner:
         treatment: TreatmentConfig,
         bribe_offer: BribeOffer | None = None,
         current_round: int = 0,
+        transfer_stage: str | None = None,
+        transfer_recipients: tuple[str, ...] = (),
+        transfer_cap: float = 0.0,
+        chat_participants: tuple[str, ...] = (),
+        private_messages: list[Message] | None = None,
     ) -> Observation:
         return Observation(
             role=role,
@@ -653,10 +733,145 @@ class ExperimentRunner:
             straw_polls=copy.deepcopy(straw_polls) if treatment.public_messaging else [],
             allowed_channels=self._allowed_channels(treatment),
             bribe_offer=copy.deepcopy(bribe_offer),
+            transfer_stage=transfer_stage,
+            transfer_recipients=transfer_recipients,
+            transfer_cap=transfer_cap,
+            chat_participants=chat_participants,
+            private_messages=private_messages or [],
         )
+
+    async def _chat_view(self, run: ExperimentRun, episode_id: str, agent_id: str,
+                         participants: tuple[str, ...]) -> dict[str, Any]:
+        """Chat recipients and the messages the game returns to this agent, under its history rule."""
+        if not run.treatment.private_chat:
+            return {}
+        visible = await run.game_api.read_private_messages(episode_id, agent_id)
+        return {
+            "chat_participants": tuple(actor for actor in participants if actor != agent_id),
+            "private_messages": [Message(sender, content, 0, "private", recipient_id=recipient)
+                                 for sender, recipient, content in visible],
+        }
+
+    async def _deliver_private_messages(
+        self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger, sender_id: str,
+        participants: tuple[str, ...], round_num: int, private_messages: list[PrivateMessage],
+    ) -> None:
+        """Send permitted private messages; agent mistakes are logged, never fatal."""
+        treatment = run.treatment
+        role = run.agents[sender_id].role.name
+        for item in private_messages:
+            if not treatment.private_chat or item.recipient_id == sender_id or item.recipient_id not in participants:
+                ep_logger.log(f"DELIBERATION_R{round_num}", sender_id, role, "private_message_blocked",
+                              f"To {item.recipient_id!r}: private chat is off or the recipient is invalid")
+                continue
+            await run.game_api.send_private_message(
+                record.episode_id, sender_id, item.recipient_id, item.content,
+                history_enabled=treatment.chat_history, prohibited=True)
+            record.messages.append({"sender": sender_id, "recipient": item.recipient_id, "round": round_num,
+                                    "content": item.content, "channel": "private"})
+            ep_logger.log(f"DELIBERATION_R{round_num}", sender_id, role, "private_message",
+                          f"-> {item.recipient_id}: {item.content[:200]}", channel="private")
 
     def _allowed_channels(self, treatment: TreatmentConfig) -> tuple[str, ...]:
         return ("public",) if treatment.public_messaging else ()
+
+    async def _run_transfer_stage(
+        self,
+        treatment: TreatmentConfig,
+        scenario: Scenario,
+        ep_config: EpisodeConfig,
+        agents: dict[str, BaseAgent],
+        creator_id: str,
+        challenger_id: str,
+        juror_ids: list[str],
+        offers: dict[str, BribeOffer],
+        record: EpisodeRecord,
+        ep_logger: EpisodeLogger,
+    ) -> None:
+        """Collect party offers, validate them, then let party recipients answer."""
+        payout = treatment.payout
+        bets = {creator_id: payout.creator_bet, challenger_id: payout.challenger_bet}
+        roles = {creator_id: Role.CREATOR, challenger_id: Role.CHALLENGER}
+        other_party = {creator_id: challenger_id, challenger_id: creator_id}
+        committed = dict.fromkeys(bets, 0.0)
+
+        for sender in (creator_id, challenger_id):
+            cap = treatment.transfer_cap_pct * bets[sender]
+            recipients = (*juror_ids, other_party[sender])
+            observation = self._make_observation(
+                roles[sender], ep_config.episode_id, scenario, Phase.DELIBERATION, ep_config,
+                [], [], sender, treatment,
+                transfer_stage="offer", transfer_recipients=recipients, transfer_cap=cap,
+            )
+            action = await agents[sender].offer_transfers(observation)
+            for proposal in action.offers:
+                reason = self._transfer_rejection(
+                    proposal, sender, recipients, cap, bets[sender] - committed[sender], offers,
+                )
+                if reason is not None:
+                    amount = proposal.amount
+                    usable = isinstance(amount, (int, float)) and not isinstance(amount, bool) and math.isfinite(amount)
+                    record.transfers_rejected.append({
+                        "offered_by": sender, "recipient_id": proposal.recipient_id,
+                        "amount": amount if usable else None, "reason": reason,
+                    })
+                    ep_logger.log("TRANSFERS", sender, roles[sender].name, "offer_rejected",
+                                  f"Offer to {proposal.recipient_id} dropped: {reason}")
+                    continue
+                recipient_is_party = proposal.recipient_id in bets
+                condition = proposal.condition.strip() or (
+                    f"the jury settles on {proposal.required_verdict.name}" if recipient_is_party
+                    else f"vote {proposal.required_verdict.name}")
+                offers[proposal.recipient_id] = BribeOffer(
+                    offered_by=sender, amount=proposal.amount, condition=condition,
+                    required_verdict=proposal.required_verdict,
+                )
+                committed[sender] += proposal.amount
+                ep_logger.log("TRANSFERS", sender, roles[sender].name, "offer",
+                              f"${proposal.amount:.2f} to {proposal.recipient_id}: {condition}",
+                              channel="private")
+
+        for party in (creator_id, challenger_id):
+            if party not in offers:
+                continue
+            observation = self._make_observation(
+                roles[party], ep_config.episode_id, scenario, Phase.DELIBERATION, ep_config,
+                [], [], party, treatment, bribe_offer=offers[party], transfer_stage="respond",
+            )
+            await agents[party].respond_to_offer(observation)
+            if observation.bribe_offer.accepted:
+                offers[party].accepted = True
+                record.bribes_accepted.append(party)
+                ep_logger.log("TRANSFERS", party, roles[party].name, "offer_accepted",
+                              f"Accepted ${offers[party].amount:.2f} from {offers[party].offered_by}",
+                              channel="private")
+
+    @staticmethod
+    def _transfer_rejection(
+        proposal: TransferProposal,
+        sender: str,
+        recipients: tuple[str, ...],
+        cap: float,
+        remaining: float,
+        offers: dict[str, BribeOffer],
+    ) -> str | None:
+        """Why a party's offer is invalid, or None. Agent mistakes never end an episode."""
+        if proposal.recipient_id == sender:
+            return "recipient is the sender"
+        if proposal.recipient_id not in recipients:
+            return "recipient is not a registered participant"
+        if not isinstance(proposal.required_verdict, Verdict):
+            return "required verdict is invalid"
+        amount = proposal.amount
+        if isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount <= 0:
+            return "amount must be a positive finite number"
+        if amount > cap + 1e-9:
+            return "amount exceeds the per-offer cap"
+        if amount > remaining + 1e-9:
+            return "amount exceeds the sender's remaining budget"
+        if proposal.recipient_id in offers:
+            return "recipient already has an offer"
+        return None
 
     def _create_bribe_offers(
         self,

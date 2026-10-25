@@ -1,0 +1,33 @@
+% The supplied style owns geometry and page headers. Keep its source unchanged.
+\usepackage{arxiv}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% Use a vector monospace font for repository paths in the references.
+\renewcommand{\ttdefault}{pcr}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage[hidelinks]{hyperref}
+
+% The uploaded style prints \today directly; \date alone cannot set that text.
+\renewcommand{\today}{October 25, 2026}
+\rhead{\scshape Veracity --- illustrative sample}
+\hypersetup{
+  pdftitle={Measuring Target-Verdict Rates in the Veracity Game: An Illustrative Research Report},
+  pdfauthor={Sample manuscript},
+  pdfsubject={Illustrative report with fictional counts; no empirical project findings}
+}
+\graphicspath{{build/figures/}}
+\listfiles
+
+\newcommand{\assignedrate}{\widehat{p}}
+\newcommand{\ratecontrast}{\widehat{\Delta}}
+\tikzset{
+  component/.style={draw,rounded corners,align=center,minimum height=10mm,
+                    text width=30mm,font=\small},
+  dataflow/.style={-{Stealth},thick}
+}

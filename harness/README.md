@@ -24,7 +24,9 @@ Do not start a second server manually for these commands.
 
 Use `--list` to inspect conditions. `--pilot`, `--minimum`, and `--full` select
 knockout suites. `run_experiments.py` provides the original treatment catalog
-and comparisons. Both entrypoints default to the real engine; `--mock` explicitly
+and comparisons, and `--cell` runs one cell of the factorial design in
+[`docs/experiment-design.md`](../docs/experiment-design.md), by cell ID or named
+condition (`--cell K2`). `smoke_llm.py --cell F` is a one-round live-model check. Both entrypoints default to the real engine; `--mock` explicitly
 selects a harness-only simulation. `run_demo.py` is a mock-only illustration.
 `--core-engine-dir` or `CORE_ENGINE_DIR` optionally selects another built checkout.
 
@@ -72,8 +74,9 @@ or clock. See the [Python client guide](../docs/api.md#python-client).
 The client also supports [private chat](../docs/private-chat.md): participants
 can create/list their chats and send/read messages; operators can provision
 controls, inspect retained transcripts, and read usage audits. These methods
-return typed chat data directly. The experiment runner retains its public-channel
-configuration; private-chat endpoints are available for explicit SDK experiments.
+return typed chat data directly. The experiment runner exposes private messaging
+when `private_chat=True`, with participant-specific history and separate usage
+audits. Its public-channel configuration controls the core forum independently.
 
 The [public forum](../docs/public-forum.md) is engine-backed. Each juror reads
 shared history with their own credentials before deliberation and final voting;

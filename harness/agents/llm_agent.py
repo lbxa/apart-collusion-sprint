@@ -14,11 +14,15 @@ from game_api.types import (
     AbstainAction,
     AgentAction,
     ChallengeAction,
+    ChatAction,
     DeliberateAction,
     FinalVoteAction,
     Observation,
+    OfferTransfersAction,
     PostClaimAction,
+    PrivateMessage,
     Role,
+    TransferProposal,
     Verdict,
 )
 
@@ -159,7 +163,56 @@ class LLMAgent(BaseAgent):
             message=message,
             channel=channel,
             straw_vote=None if straw_vote is None else self._verdict(straw_vote),
+            private_messages=self._private_messages(action),
         )
+
+    def _private_messages(self, action: dict[str, Any]) -> list[PrivateMessage]:
+        """Parse optional private messages; the runner checks recipients and the lever."""
+        raw_messages = action.get("private_messages") or []
+        if not isinstance(raw_messages, list):
+            raise ValueError("private_messages must be a list")
+        messages = []
+        for raw in raw_messages:
+            if (not isinstance(raw, dict) or not isinstance(raw.get("recipient_id"), str)
+                    or not isinstance(raw.get("content"), str) or not raw["content"].strip()):
+                raise ValueError("A private message needs a string recipient_id and non-empty content")
+            messages.append(PrivateMessage(recipient_id=raw["recipient_id"], content=raw["content"]))
+        return messages
+
+    async def chat(self, observation: Observation) -> ChatAction:
+        action = await self._request_action(observation)
+        if action.get("action") != "chat":
+            raise ValueError(f"Invalid chat action from agent {self.agent_id}: {action.get('action')!r}")
+        return ChatAction(agent_id=self.agent_id, episode_id=observation.episode_id,
+                          private_messages=self._private_messages(action))
+
+    async def offer_transfers(self, observation: Observation) -> OfferTransfersAction:
+        action = await self._request_action(observation)
+        if action.get("action") != "offer_transfers":
+            raise ValueError(f"Invalid transfer action from agent {self.agent_id}: {action.get('action')!r}")
+        raw_offers = action.get("offers", [])
+        if not isinstance(raw_offers, list):
+            raise ValueError("A transfer action must provide offers as a list")
+        offers = []
+        for raw in raw_offers:
+            if not isinstance(raw, dict):
+                raise ValueError("Each transfer offer must be an object")
+            recipient_id, amount = raw.get("recipient_id"), raw.get("amount")
+            if not isinstance(recipient_id, str) or isinstance(amount, bool) or not isinstance(amount, (int, float)):
+                raise ValueError("A transfer offer needs a string recipient_id and a numeric amount")
+            offers.append(TransferProposal(
+                recipient_id=recipient_id,
+                amount=float(amount),
+                required_verdict=self._verdict(raw.get("required_verdict")),
+                condition=str(raw.get("condition", "")),
+            ))
+        return OfferTransfersAction(
+            agent_id=self.agent_id, episode_id=observation.episode_id, offers=offers,
+        )
+
+    async def respond_to_offer(self, observation: Observation) -> None:
+        action = await self._request_action(observation)
+        self._apply_bribe_decision(observation, action)
 
     async def final_vote(self, observation: Observation) -> FinalVoteAction:
         action = await self._request_action(observation)

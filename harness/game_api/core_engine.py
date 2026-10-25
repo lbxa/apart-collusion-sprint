@@ -6,7 +6,7 @@ This adapter retains the older experiment lifecycle, including local time jumps.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
@@ -29,6 +29,9 @@ class _EpisodeMapping:
     config: EpisodeConfig
     harness_to_engine: dict[str, str]
     engine_to_harness: dict[str, str]
+    # Engine chat id per participant pair, and the chat id of each sent message.
+    chats: dict[frozenset[str], str] = field(default_factory=dict, compare=False)
+    private_sent: list[str] = field(default_factory=list, compare=False)
 
 
 class CoreEngineAPI(GameAPI):
@@ -215,6 +218,52 @@ class CoreEngineAPI(GameAPI):
             idempotency_key=self._idem_key(episode_id, f"commit-{role}"))
         await self.client.wait_operation(operation)
         return True
+
+    async def send_private_message(self, episode_id: str, sender_id: str, recipient_id: str,
+                                   content: str, *, history_enabled: bool = False,
+                                   prohibited: bool = True) -> None:
+        mapping = self._episodes[episode_id]
+        sender = mapping.harness_to_engine.get(sender_id)
+        recipient = mapping.harness_to_engine.get(recipient_id)
+        if not sender or not recipient or sender == recipient or "treasury" in (sender, recipient):
+            raise ValueError("Private chat requires two distinct registered participants")
+        pair = frozenset((sender, recipient))
+        if pair not in mapping.chats:
+            # Participants open prohibited chats themselves; only the operator
+            # may provision a permitted control chat.
+            members = sorted(pair)
+            chat = await self.client.create_chat(
+                episode_id, members, actor_id=sender if prohibited else None,
+                history_enabled=history_enabled, communication_prohibited=prohibited,
+                idempotency_key=self._idem_key(episode_id, f"chat-{members[0]}-{members[1]}"))
+            mapping.chats[pair] = chat.chat_id
+        mapping.private_sent.append(mapping.chats[pair])
+        await self.client.send_message(mapping.chats[pair], sender, content,
+            idempotency_key=self._idem_key(episode_id, f"private-{len(mapping.private_sent)}"))
+
+    async def read_private_messages(self, episode_id: str, reader_id: str) -> list[tuple[str, str, str]]:
+        mapping = self._episodes[episode_id]
+        reader = mapping.harness_to_engine.get(reader_id)
+        visible = []
+        for pair, chat_id in mapping.chats.items():
+            if reader in pair:
+                page = await self.client.get_messages(chat_id, reader)
+                visible.extend((mapping.engine_to_harness[m.sender_id], mapping.engine_to_harness[m.recipient_id],
+                                m.content) for m in page.messages)
+        return visible
+
+    async def private_chat_audit(self, episode_id: str) -> dict:
+        report = await self.client.get_chat_audit(episode_id, limit=1)
+        mapping = self._episodes[episode_id]
+        return {
+            "communication_used": report.communication_used,
+            "prohibited_communication_used": report.prohibited_communication_used,
+            "chat_count": report.chat_count,
+            "message_count": report.message_count,
+            "actors": {mapping.engine_to_harness.get(actor.actor_id, actor.actor_id): {
+                "sent_messages": actor.sent_messages, "read_requests": actor.read_requests,
+            } for actor in report.actors},
+        }
 
     async def settle(self, episode_id: str, *, withhold_reveals: frozenset[str] = frozenset()) -> SettlementResult:
         mapping = self._episodes[episode_id]
