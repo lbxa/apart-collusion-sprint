@@ -45,8 +45,8 @@ class TreatmentConfig:
     withhold_reveal_indices: tuple[int, ...] = ()
 
     # Agent configuration overrides — default model via OpenRouter
-    # Free: nvidia/nemotron-3-ultra-550b-a55b (550B, free on OpenRouter)
-    # Paid: qwen/qwen3-235b-a22b (~$0.20/run, needs OpenRouter credits)
+    # The free route has an account-wide daily quota. Select a paid route
+    # explicitly with --model; never substitute models silently after a failure.
     creator_model: str = "nvidia/nemotron-3-ultra-550b-a55b:free"
     creator_provider: str = "openrouter"
     creator_persona: str = ""

@@ -16,6 +16,30 @@ from run_knockout import run_conditions
 
 
 class ResearchExportTests(unittest.IsolatedAsyncioTestCase):
+    async def test_episode_export_includes_jury_measurements_with_prior_history(self):
+        treatment = TreatmentConfig(
+            "jury_export", "Jury export", "Independent opposite-truth episodes",
+            jury_size=3, num_episodes=2, deliberation_rounds=1,
+            use_scripted_creator=True, use_scripted_challenger=True,
+            scripted_juror_indices=[0, 1, 2], memory_enabled=False,
+        )
+        scenarios = [
+            Scenario("true", "True claim", "For", "Against", True),
+            Scenario("false", "False claim", "For", "Against", False),
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            await ExperimentRunner(MockGameAPI(), directory).run_experiment(
+                treatment, scenarios, "jury_export")
+            records = [json.loads(line) for line in
+                       (Path(directory) / "jury_export/episodes.jsonl").read_text().splitlines()]
+        self.assertIn("jury_metrics", records[0])
+        self.assertIn("jury_metrics", records[1])
+        self.assertEqual(records[0]["jury_metrics"]["voting_alignment"], 1.0)
+        self.assertIsNone(records[0]["jury_metrics"]["cross_episode_consistency"])
+        self.assertEqual(records[1]["jury_metrics"]["cross_episode_comparison_count"], 3)
+        self.assertEqual(records[1]["jury_metrics"]["cross_episode_consistency"], 0.0)
+        self.assertEqual(records[1]["jury_metrics"]["cross_episode_truth_consistency"], 1.0)
+
     async def test_exported_history_analysis_compares_stable_role_slots(self):
         treatment = TreatmentConfig("history", "History", "Two distinct episodes",
             jury_size=3, num_episodes=2, deliberation_rounds=1,

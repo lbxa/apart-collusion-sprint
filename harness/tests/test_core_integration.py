@@ -271,6 +271,7 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual((audit["chat_count"], audit["message_count"]), (2, 4))
             self.assertTrue(audit["prohibited_communication_used"])
             self.assertEqual(audit["actors"][creator]["sent_messages"], 2)
+            self.assertEqual(audit["actors"][creator]["prohibited_sent_messages"], 2)
             raw = await self._get(api, f"/v1/episodes/{episode}")
             self.assertNotIn("Offer", json.dumps(raw), "chat bodies stay out of public game state")
 

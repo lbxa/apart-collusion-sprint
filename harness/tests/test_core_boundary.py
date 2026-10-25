@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 from game_api.core_engine import CoreEngineAPI
+from game_api.generated import ChatAuditReport
 from game_api.local_engine import LocalEngine
 from game_api.types import EpisodeConfig, PayoutConfig
 
@@ -49,6 +50,27 @@ class CoreBoundaryTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(asyncio.CancelledError):
                 await local.start()
         cleanup.assert_awaited_once()
+
+    async def test_private_chat_audit_preserves_prohibited_messages_per_actor(self):
+        api = CoreEngineAPI(core_engine_dir=".")
+        api.local.client = SimpleNamespace(
+            register_episode=AsyncMock(), wait_operation=AsyncMock())
+        await api.register_episode(EpisodeConfig("ep", jury_size=3),
+                                   "creator", "challenger", ["juror_a", "juror_b", "juror_c"], "treasury")
+        api.client.get_chat_audit = AsyncMock(return_value=ChatAuditReport.model_validate({
+            "episode_id": "ep", "chat_used": True, "communication_used": True,
+            "prohibited_communication_used": True, "chat_count": 1, "message_count": 2,
+            "actors": [{
+                "actor_id": "creator", "created_chats": 1, "denied_requests": 0,
+                "messages_returned": 0, "prohibited_read_requests": 0,
+                "prohibited_sent_messages": 2, "read_requests": 0, "sent_messages": 2,
+            }],
+            "events": [], "next_after": 0, "has_more": False,
+        }))
+
+        audit = await api.private_chat_audit("ep")
+
+        self.assertEqual(audit["actors"]["creator"]["prohibited_sent_messages"], 2)
 
     def test_local_metadata_rejects_nonlocal_and_invalid_listeners(self):
         for endpoint in ("https://127.0.0.1:1", "http://example.com:1", "http://127.0.0.1:1/path",

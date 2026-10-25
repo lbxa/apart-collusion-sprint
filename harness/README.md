@@ -34,6 +34,61 @@ To use model agents, omit `--dry-run` and supply the provider credentials throug
 environment variables. Never commit them. Runs with infrastructure failures
 save diagnostic records and exit unsuccessfully; failures do not become verdicts.
 
+## Weights & Biases
+
+`run_experiments.py --wandb` creates one online W&B run per treatment block.
+All blocks in one invocation share a unique group; `--wandb-group` can supply
+a deliberate group name. Cell runs record the total block count and one-based
+block index; treatment comparisons leave both fields null because their runs
+are distinct conditions. `--wandb-project` and `--wandb-entity` override
+`WANDB_PROJECT` and `WANDB_ENTITY`; otherwise the project is `apart-collusion-sprint`
+under the account's default entity. Set project privacy in W&B before running.
+The harness preserves the project's existing access settings.
+
+The CLI loads the repository `.env` with `python-dotenv`, preserving values
+already in the process environment. `--env-file` selects another file.
+Put `OPENROUTER_API_KEY` and `WANDB_API_KEY` there and keep it untracked.
+For the first jury plumbing check, keep all six factors off and use two clear
+scenarios (one true, one false):
+
+```sh
+harness/.venv/bin/python harness/run_experiments.py \
+  --cell M0-C0-T0-R0-S0-E0 --blocks 1 --episodes 2 \
+  --wandb --wandb-project apart-collusion-sprint --run-purpose smoke \
+  --output .harness/experiments/jury-baseline-smoke
+```
+
+This preserves seven jurors and three public deliberation rounds. It uses live
+models and the real Rust/Anvil engine. The short run verifies integration;
+the design's first pass uses two fresh blocks of ten episodes each. The explicit
+all-off cell differs from the older named condition `A`, which retains majority
+pay (`M1`). Use the full cell ID for this baseline.
+
+`--model PROVIDER/MODEL` explicitly selects the same model for the creator,
+challenger, and all LLM jurors, including juror overrides. Providers and treatment
+factors stay unchanged; omitting it preserves the configured model defaults.
+Use a fresh output directory and W&B group when retrying with another model,
+and keep quota failures visible as failed runs. W&B records the selected model
+for each role so runs using different models can be compared separately.
+
+W&B receives an allowlist of scientific configuration, code revision and dirty
+flag, scenario order, model settings, protocol rates, per-episode jury metrics,
+weighted block summaries, and an episode table. `jury/*` contains episode
+measurements; `block/*` contains pooled counts and rates with their denominators.
+Undefined rates remain null. With private channels disabled, message counts
+are zero and abuse rates are unavailable. Cross-episode consistency under
+`R0` is descriptive because agents have no memory. Agreement alone does not
+establish collusion; see the [measurement definitions and permutation
+procedure](../docs/experiment-design.md), including the evidence-set confound.
+
+Credentials, prompts, message bodies, transcripts, private observations, raw
+failure payloads, source code, git diffs, console capture, and system metadata
+are excluded. Detailed evidence stays in local experiment exports. The SDK's
+working files live below the selected output directory, and `wandb_runs.jsonl`
+records the dashboard links before model execution. Initialization or upload
+errors fail the command; recorded infrastructure failures mark the W&B run
+failed. Omitting `--wandb` makes no W&B calls.
+
 ## Protocol and units
 
 - Supported real juries have 3, 5, or 7 distinct members. Rules and rosters freeze
@@ -125,6 +180,19 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Keep jury measurement denominators in local exports and W&B: valid reveals
+  from completed aborted games still count toward vote alignment, while verdict
+  accuracy requires settlement. Preserve per-actor prohibited-message audit
+  counts through both adapters so enabled-channel abuse rates use engine evidence.
+- Treat OpenRouter free-route exhaustion as an infrastructure failure, even when
+  paid credits remain. Retry with an explicit recorded `--model`; keep failed
+  attempts separate, and retain only provider/category/status in ordinary errors.
+- Track experiment blocks in W&B only with `--wandb`, using a scientific metadata
+  allowlist while keeping model/private-chat content and credentials local.
+  Label short integration runs `smoke` so they cannot be confused with research
+  batches; use the explicit `M0-C0-T0-R0-S0-E0` cell because legacy `A` has `M1`.
+- Select fallback models explicitly with `run_experiments.py --model`; provider
+  quotas must not silently substitute another model or change treatment factors.
 - Publish enabled public deliberation to the core forum and fetch each agent's
   observations through authenticated reads. Export full forum audit evidence,
   including partial communication after failures, separately from agent context.

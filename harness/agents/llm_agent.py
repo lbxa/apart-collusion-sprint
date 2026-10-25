@@ -6,7 +6,7 @@ import json
 import os
 from typing import Any
 
-from openai import AsyncOpenAI
+from openai import APIError, AsyncOpenAI, RateLimitError
 
 from agents.base import AgentConfig, BaseAgent
 from agents.prompts import build_observation_prompt, build_system_prompt
@@ -45,6 +45,17 @@ def _parse_action_content(content: str, agent_id: str) -> dict[str, Any]:
     return action
 
 
+class LLMProviderError(RuntimeError):
+    """A safe classification of an upstream model-provider failure."""
+
+    def __init__(self, provider: str, category: str, status_code: int | None):
+        self.provider = provider
+        self.category = category
+        self.status_code = status_code
+        status = f" (HTTP {status_code})" if status_code is not None else ""
+        super().__init__(f"LLM provider {provider} request failed: {category}{status}")
+
+
 class LLMAgent(BaseAgent):
     """Agent that asks a configured chat-completion model to choose actions."""
 
@@ -65,20 +76,25 @@ class LLMAgent(BaseAgent):
         self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
     async def _request_action(self, observation: Observation) -> dict[str, Any]:
-        response = await self._client.chat.completions.create(
-            model=self.config.model,
-            messages=[
-                {"role": "system", "content": build_system_prompt(self.config, observation)},
-                {
-                    "role": "user",
-                    "content": build_observation_prompt(
-                        observation, self.get_memory_context()
-                    ),
-                },
-            ],
-            temperature=self.config.temperature,
-            max_tokens=self.config.max_tokens,
-        )
+        try:
+            response = await self._client.chat.completions.create(
+                model=self.config.model,
+                messages=[
+                    {"role": "system", "content": build_system_prompt(self.config, observation)},
+                    {
+                        "role": "user",
+                        "content": build_observation_prompt(
+                            observation, self.get_memory_context()
+                        ),
+                    },
+                ],
+                temperature=self.config.temperature,
+                max_tokens=self.config.max_tokens,
+            )
+        except RateLimitError as error:
+            raise LLMProviderError(self.config.provider, "rate_limited", error.status_code) from None
+        except APIError as error:
+            raise LLMProviderError(self.config.provider, "api_error", getattr(error, "status_code", None)) from None
         content = response.choices[0].message.content
         if not content:
             raise ValueError(f"Model returned an empty action for agent {self.agent_id}")

@@ -15,3 +15,5 @@
 /harness/.venv/
 /harness/results/
 /results/
+/wandb/
+/harness/wandb/

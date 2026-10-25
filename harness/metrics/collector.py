@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from game_api.money import Amount, financial_json, financial_sum
+from metrics.jury import aggregate_jury_metrics, episode_jury_metrics
 
 
 @dataclass
@@ -216,6 +217,7 @@ class ExperimentMetrics:
             "infrastructure_failure_rate": self.infrastructure_failure_rate,
             "game_backends": sorted({ep.config.get("game_backend", "unspecified") for ep in self.episodes}),
             "avg_messages_per_episode": self.avg_messages_per_episode,
+            "jury_metrics": aggregate_jury_metrics(self.episodes),
         }
         return financial_json({key: None if isinstance(value, float) and not math.isfinite(value) else value
                                for key, value in summary.items()})
@@ -245,6 +247,7 @@ class MetricsCollector:
         metrics_pool = [experiment] if experiment is not None else self._experiments.values()
         with open(path, "w") as f:
             for metrics in metrics_pool:
+                history = []
                 for ep in metrics.episodes:
                     line = {
                         "experiment_id": ep.experiment_id,
@@ -276,12 +279,14 @@ class MetricsCollector:
                         "chat_audit": ep.chat_audit,
                         "simulated_utility": ep.simulated_utility,
                         "collusion_analysis": ep.collusion_analysis,
+                        "jury_metrics": episode_jury_metrics(ep, history),
                         "infrastructure_failure": ep.infrastructure_failure,
                         "failure_reason": ep.failure_reason,
                         "duration_secs": ep.end_time - ep.start_time,
                         "status": ep.status,
                     }
                     f.write(json.dumps(line, default=str, allow_nan=False) + "\n")
+                    history.append(ep)
 
     def export_summary(self, path: Path, experiment: ExperimentMetrics | None = None):
         with open(path, "w") as f:

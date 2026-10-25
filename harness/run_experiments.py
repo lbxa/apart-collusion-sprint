@@ -14,16 +14,20 @@ unchanged; unsupported real-protocol configurations fail before engine startup.
 
 import argparse
 import asyncio
+from contextlib import nullcontext
 from dataclasses import replace
 import json
 import logging
+import os
 from pathlib import Path
 import sys
+import uuid
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 from experiments.design import resolve_cell, scenarios_for, treatment_for
 from experiments.runner import ExperimentRunner
+from experiments.tracking import WandbTracker
 from experiments.treatments import (
     PREDEFINED_TREATMENTS,
     TreatmentConfig,
@@ -87,6 +91,13 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
     prepared = {}
     for key, treatment in selected.items():
         treatment = replace(treatment, num_episodes=episodes, seed=args.seed)
+        if args.model is not None:
+            treatment = replace(
+                treatment, creator_model=args.model, challenger_model=args.model,
+                juror_model=args.model,
+                juror_overrides={index: {**override, "model": args.model}
+                                 for index, override in treatment.juror_overrides.items()},
+            )
         if args.scripted:
             treatment = replace(
                 treatment, use_scripted_creator=True, use_scripted_challenger=True,
@@ -101,7 +112,9 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
     return prepared, scenarios
 
 
-async def run_treatments(treatments, scenarios, *, output_dir, mock=False, core_engine_dir=None):
+async def run_treatments(treatments, scenarios, *, output_dir, mock=False, core_engine_dir=None,
+                         wandb_project=None, wandb_entity=None, wandb_group=None,
+                         run_purpose="exploratory", block_count=None):
     """Own the game process for the complete experiment batch, including failures."""
     output_dir.mkdir(parents=True, exist_ok=True)
     game_api = MockGameAPI() if mock else CoreEngineAPI(core_engine_dir=core_engine_dir)
@@ -111,9 +124,23 @@ async def run_treatments(treatments, scenarios, *, output_dir, mock=False, core_
             await game_api.start()
         runner = ExperimentRunner(game_api, output_dir=output_dir)
         results = {}
-        for key, treatment in treatments.items():
+        group = wandb_group or f"jury-{uuid.uuid4().hex[:12]}"
+        for index, (key, treatment) in enumerate(treatments.items(), start=1):
             logger.info("Running treatment: %s", key)
-            metrics = await runner.run_experiment(treatment, scenarios)
+            tracking = WandbTracker(
+                treatment=treatment, name=key, group=group, project=wandb_project,
+                entity=wandb_entity, backend="mock" if mock else "core",
+                purpose=run_purpose, blocks=block_count,
+                block_index=index if block_count is not None else None, output_dir=output_dir,
+                scenario_ids=[scenarios[episode_index % len(scenarios)].scenario_id
+                              for episode_index in range(treatment.num_episodes)],
+            ) if wandb_project else nullcontext()
+            with tracking as tracker:
+                if tracker:
+                    logger.info("W&B run: %s", tracker.run.url)
+                metrics = await runner.run_experiment(treatment, scenarios)
+                if tracker:
+                    tracker.record_results(metrics)
             results[key] = metrics.summary()
         print("\nEXPERIMENT RESULTS")
         print(json.dumps(results, indent=2, default=str, allow_nan=False))
@@ -148,6 +175,15 @@ async def main():
     backend.add_argument("--mock", action="store_true", help="Explicitly use the in-memory game instead of Rust and Anvil")
     parser.add_argument("--core-engine-dir", help="Optional core engine repository root override")
     parser.add_argument("--seed", type=int, default=42, help="Random assignment seed")
+    parser.add_argument("--model", help="Use this model for creator, challenger, and every LLM juror; preserve providers and factors")
+    parser.add_argument("--env-file", type=Path, default=Path(__file__).resolve().parents[1] / ".env",
+                        help="Optional dotenv file (default: repository .env); existing environment wins")
+    parser.add_argument("--wandb", action="store_true", help="Upload scientific metrics to Weights & Biases")
+    parser.add_argument("--wandb-project", help="W&B project (default: WANDB_PROJECT or apart-collusion-sprint)")
+    parser.add_argument("--wandb-entity", help="W&B user/team (default: WANDB_ENTITY or account default)")
+    parser.add_argument("--wandb-group", help="Shared group for this invocation's blocks (default: unique ID)")
+    parser.add_argument("--run-purpose", choices=("smoke", "exploratory", "first-pass"), default="exploratory",
+                        help="Label infrastructure checks separately from research batches")
     args = parser.parse_args()
 
     if args.list:
@@ -159,6 +195,10 @@ async def main():
         parser.error("--episodes must be positive")
     if args.blocks < 1:
         parser.error("--blocks must be positive")
+    if args.model is not None:
+        args.model = args.model.strip()
+        if not args.model:
+            parser.error("--model must not be blank")
     if args.mock and args.core_engine_dir:
         parser.error("--core-engine-dir cannot be used with --mock")
     if not (args.all or args.compare_jury_sizes or args.compare_incentives or args.treatment or args.cell or args.scripted):
@@ -166,10 +206,17 @@ async def main():
         return 0
 
     try:
+        from dotenv import load_dotenv
+        load_dotenv(args.env_file, override=False)
         treatments, scenarios = select_treatments(args)
         results = await run_treatments(
             treatments, scenarios, output_dir=Path(args.output), mock=args.mock,
             core_engine_dir=args.core_engine_dir,
+            wandb_project=(args.wandb_project or os.environ.get("WANDB_PROJECT") or "apart-collusion-sprint") if args.wandb else None,
+            wandb_entity=args.wandb_entity or os.environ.get("WANDB_ENTITY"),
+            wandb_group=args.wandb_group,
+            run_purpose=args.run_purpose,
+            block_count=args.blocks if args.cell else None,
         )
     except Exception as error:
         logger.error("Experiment run failed: %s", error)

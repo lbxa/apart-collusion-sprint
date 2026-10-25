@@ -81,6 +81,71 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(treatment.use_scripted_creator)
         self.assertEqual(treatment.scripted_juror_indices, list(range(treatment.jury_size)))
 
+    async def test_wandb_is_opt_in_and_cell_blocks_share_one_group(self):
+        tracker = Mock()
+        context = Mock(__enter__=Mock(return_value=tracker), __exit__=Mock(return_value=False))
+        with patch.object(run_experiments, "WandbTracker", return_value=context) as factory:
+            local = await self.invoke(run_experiments, ["--cell", "M0-C0-T0-R0-S0-E0", "--blocks", "1", "--scripted"])
+            self.assertEqual(local.result, 0)
+            factory.assert_not_called()
+            remote = await self.invoke(run_experiments, [
+                "--cell", "M0-C0-T0-R0-S0-E0", "--blocks", "2", "--episodes", "2", "--scripted",
+                "--wandb", "--wandb-project", "test-project", "--run-purpose", "smoke",
+            ])
+            self.assertEqual(remote.result, 0)
+            self.assertEqual(factory.call_count, 2)
+            calls = [call.kwargs for call in factory.call_args_list]
+            self.assertEqual(calls[0]["group"], calls[1]["group"])
+            self.assertEqual(calls[0]["project"], "test-project")
+            self.assertEqual(calls[0]["purpose"], "smoke")
+            self.assertEqual(calls[0]["backend"], "core")
+            self.assertEqual([call["blocks"] for call in calls], [2, 2])
+            self.assertEqual([call["block_index"] for call in calls], [1, 2])
+            self.assertEqual(len(calls[0]["scenario_ids"]), 2)
+            self.assertEqual(tracker.record_results.call_count, 2)
+
+    async def test_wandb_treatment_comparisons_are_not_labeled_as_blocks(self):
+        context = Mock(__enter__=Mock(return_value=Mock()), __exit__=Mock(return_value=False))
+        with patch.object(run_experiments, "WandbTracker", return_value=context) as factory:
+            remote = await self.invoke(run_experiments, [
+                "--all", "--episodes", "2", "--scripted", "--wandb",
+                "--wandb-project", "test-project",
+            ])
+            self.assertEqual(remote.result, 0)
+            self.assertEqual(factory.call_count, 4)
+            for call in factory.call_args_list:
+                self.assertIsNone(call.kwargs["blocks"])
+                self.assertIsNone(call.kwargs["block_index"])
+
+    async def test_model_override_applies_to_all_live_roles_without_changing_factors(self):
+        original = run_experiments.PREDEFINED_TREATMENTS["baseline"].creator_model
+        run = await self.invoke(run_experiments, [
+            "--cell", "M0-C0-T0-R0-S0-E0", "--blocks", "1", "--episodes", "2",
+            "--model", "test/paid-model", "--live",
+        ])
+        self.assertEqual(run.result, 0)
+        treatment = run.runner.run_experiment.await_args.args[0]
+        for role in ("creator", "challenger", "juror"):
+            self.assertEqual(getattr(treatment, f"{role}_model"), "test/paid-model")
+            self.assertEqual(getattr(treatment, f"{role}_provider"), "openrouter")
+        self.assertEqual(treatment.pay_multiplier, 1.0)
+        self.assertIs(treatment.transfers_enabled, False)
+        self.assertFalse(treatment.private_chat)
+        self.assertFalse(treatment.memory_enabled)
+        self.assertFalse(treatment.use_scripted_creator)
+        self.assertFalse(treatment.use_scripted_challenger)
+        self.assertEqual(treatment.scripted_juror_indices, [])
+        self.assertEqual(run_experiments.PREDEFINED_TREATMENTS["baseline"].creator_model, original)
+
+    async def test_blank_model_is_rejected_before_engine_startup(self):
+        errors = io.StringIO()
+        with patch.object(run_experiments, "CoreEngineAPI") as core, \
+             patch.object(sys, "argv", [run_experiments.__file__, "--cell", "M0-C0-T0-R0-S0-E0", "--model", "  "]), \
+             contextlib.redirect_stderr(errors), self.assertRaises(SystemExit):
+            await run_experiments.main()
+        core.assert_not_called()
+        self.assertIn("--model must not be blank", errors.getvalue())
+
     async def test_mock_requires_an_explicit_flag_in_both_entrypoints(self):
         for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
                                  (run_experiments, ["--treatment", "baseline"])]:

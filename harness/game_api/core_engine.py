@@ -262,6 +262,7 @@ class CoreEngineAPI(GameAPI):
             "message_count": report.message_count,
             "actors": {mapping.engine_to_harness.get(actor.actor_id, actor.actor_id): {
                 "sent_messages": actor.sent_messages, "read_requests": actor.read_requests,
+                "prohibited_sent_messages": actor.prohibited_sent_messages,
             } for actor in report.actors},
         }
 

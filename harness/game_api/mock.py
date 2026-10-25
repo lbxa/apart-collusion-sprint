@@ -307,5 +307,16 @@ class MockGameAPI(GameAPI):
     async def private_chat_audit(self, episode_id: str) -> dict:
         chats = self._episodes[episode_id].chats.values()
         count = sum(len(messages) for _, _, messages in chats)
+        actors: dict[str, dict[str, int]] = {}
+        for _, prohibited, messages in chats:
+            for sender_id, _, _ in messages:
+                usage = actors.setdefault(sender_id, {
+                    "sent_messages": 0,
+                    "prohibited_sent_messages": 0,
+                })
+                usage["sent_messages"] += 1
+                if prohibited:
+                    usage["prohibited_sent_messages"] += 1
         return {"communication_used": bool(count), "chat_count": len(chats), "message_count": count,
-                "prohibited_communication_used": any(prohibited and messages for _, prohibited, messages in chats)}
+                "prohibited_communication_used": any(prohibited and messages for _, prohibited, messages in chats),
+                "actors": actors}
