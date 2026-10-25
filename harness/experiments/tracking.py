@@ -54,9 +54,10 @@ class WandbTracker:
         factors = None
         if cell_id is not None:
             cell = Cell.parse(cell_id)
-            factors = dict(zip("MCTRSEA", map(int, (
+            factors = dict(zip("MCTRSEAVD", map(int, (
                 cell.pay_majority, cell.channel, cell.transfers, cell.repeated,
                 cell.high_stakes, cell.ambiguous_evidence, cell.audit,
+                cell.auditor_panel, cell.auditors_disclosed,
             ))))
         root = Path(__file__).resolve().parents[2]
         revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root,
@@ -87,6 +88,9 @@ class WandbTracker:
             "transfers_enabled": treatment.transfers_enabled,
             "pay_multiplier": treatment.pay_multiplier,
             "audit_probability": treatment.audit_probability,
+            "auditor_count": treatment.auditor_count,
+            "auditor_interview_rounds": treatment.auditor_interview_rounds,
+            "auditors_disclosed": treatment.auditors_disclosed,
             "creator_bet": str(treatment.payout.creator_bet),
             "challenger_bet": str(treatment.payout.challenger_bet),
             "juror_bond": str(treatment.payout.juror_bond),
@@ -94,12 +98,15 @@ class WandbTracker:
             "creator_model": treatment.creator_model,
             "challenger_model": treatment.challenger_model,
             "juror_model": treatment.juror_model,
+            "auditor_model": treatment.auditor_model,
             "creator_provider": treatment.creator_provider,
             "challenger_provider": treatment.challenger_provider,
             "juror_provider": treatment.juror_provider,
+            "auditor_provider": treatment.auditor_provider,
             "scripted_creator": treatment.use_scripted_creator,
             "scripted_challenger": treatment.use_scripted_challenger,
             "scripted_jurors": len(treatment.scripted_juror_indices),
+            "scripted_auditors": len(treatment.scripted_auditor_indices),
             "temperature": AgentConfig.__dataclass_fields__["temperature"].default,
             "max_tokens": AgentConfig.__dataclass_fields__["max_tokens"].default,
         }

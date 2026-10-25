@@ -80,6 +80,7 @@ def make_dry_run_treatment(treatment: TreatmentConfig) -> TreatmentConfig:
         use_scripted_creator=True,
         use_scripted_challenger=True,
         scripted_juror_indices=list(range(treatment.jury_size)),
+        scripted_auditor_indices=list(range(treatment.auditor_count)),
     )
 
 

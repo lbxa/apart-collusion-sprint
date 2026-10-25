@@ -17,6 +17,9 @@ from game_api.types import (
     ChatAction,
     DeliberateAction,
     FinalVoteAction,
+    Finding,
+    FindingAction,
+    InterviewAction,
     Observation,
     OfferTransfersAction,
     PostClaimAction,
@@ -121,6 +124,12 @@ class LLMAgent(BaseAgent):
         except KeyError as exc:
             raise ValueError(f"Invalid verdict: {value!r}") from exc
 
+    @staticmethod
+    def _finding(value: Any) -> Finding:
+        if not isinstance(value, str) or value not in Finding.__members__:
+            raise ValueError(f"Invalid finding: {value!r}")
+        return Finding[value]
+
     async def decide(self, observation: Observation) -> AgentAction:
         action = await self._request_action(observation)
         self._apply_bribe_decision(observation, action)
@@ -206,6 +215,12 @@ class LLMAgent(BaseAgent):
         action = await self._request_action(observation)
         if action.get("action") != "offer_transfers":
             raise ValueError(f"Invalid transfer action from agent {self.agent_id}: {action.get('action')!r}")
+        return OfferTransfersAction(
+            agent_id=self.agent_id, episode_id=observation.episode_id, offers=self._offers(action),
+        )
+
+    def _offers(self, action: dict[str, Any]) -> list[TransferProposal]:
+        """Parse offers conditional on a verdict or, for an auditor, a finding; the runner checks which applies."""
         raw_offers = action.get("offers", [])
         if not isinstance(raw_offers, list):
             raise ValueError("A transfer action must provide offers as a list")
@@ -216,14 +231,44 @@ class LLMAgent(BaseAgent):
             recipient_id, amount = raw.get("recipient_id"), raw.get("amount")
             if not isinstance(recipient_id, str) or isinstance(amount, bool) or not isinstance(amount, (int, float)):
                 raise ValueError("A transfer offer needs a string recipient_id and a numeric amount")
+            finding = raw.get("required_finding")
+            if (finding is None) == ("required_verdict" not in raw):
+                raise ValueError("A transfer offer needs exactly one of required_verdict or required_finding")
             offers.append(TransferProposal(
                 recipient_id=recipient_id,
                 amount=float(amount),
-                required_verdict=self._verdict(raw.get("required_verdict")),
+                required_verdict=None if finding is not None else self._verdict(raw["required_verdict"]),
                 condition=str(raw.get("condition", "")),
+                required_finding=None if finding is None else self._finding(finding),
             ))
-        return OfferTransfersAction(
-            agent_id=self.agent_id, episode_id=observation.episode_id, offers=offers,
+        return offers
+
+    async def interview(self, observation: Observation) -> InterviewAction:
+        action = await self._request_action(observation)
+        expected = "interview" if self.config.role == Role.AUDITOR else "reply"
+        if action.get("action") != expected:
+            raise ValueError(f"Invalid interview action from agent {self.agent_id}: {action.get('action')!r}")
+        message = action.get("message", "")
+        if not isinstance(message, str):
+            raise ValueError("An interview message must be a string")
+        return InterviewAction(
+            agent_id=self.agent_id, episode_id=observation.episode_id, message=message,
+            private_messages=self._private_messages(action), offers=self._offers(action),
+        )
+
+    async def review(self, observation: Observation) -> FindingAction:
+        action = await self._request_action(observation)
+        if action.get("action") != "finding":
+            raise ValueError(f"Invalid review action from agent {self.agent_id}: {action.get('action')!r}")
+        implicated = action.get("implicated", [])
+        if not isinstance(implicated, list) or not all(isinstance(actor, str) for actor in implicated):
+            raise ValueError("implicated must be a list of participant ids")
+        rationale = action.get("rationale")
+        if not isinstance(rationale, str) or not rationale.strip():
+            raise ValueError("A finding must include a non-empty rationale")
+        return FindingAction(
+            agent_id=self.agent_id, episode_id=observation.episode_id,
+            finding=self._finding(action.get("finding")), rationale=rationale, implicated=implicated,
         )
 
     async def respond_to_offer(self, observation: Observation) -> None:

@@ -8,7 +8,13 @@ Core loop per episode:
   5. DELIBERATION: N rounds of discussion (messages, straw polls); with
      private chat, the parties get a chat turn before the jurors each round
   6. VOTING: jurors cast final binding votes
-  7. Settlement: payout distribution, simulated side payments and audits
+  7. Settlement: payout distribution; with auditors, a post-verdict interview
+     and their findings; then simulated side payments and audits
+
+Auditors exist only in the harness. They are never registered with the game,
+participants are never told about them before the verdict, their interviews
+never reach the game's chat or forum, and only auditors receive the case file
+of offers, every private chat, votes and outcome.
 """
 
 from __future__ import annotations
@@ -30,7 +36,9 @@ from agents.llm_agent import LLMAgent
 from agents.scripted import (
     AdversarialAgent,
     BribableAgent,
+    BribableAuditor,
     HonestAgent,
+    HonestAuditor,
     NonVotingAgent,
     RandomAgent,
 )
@@ -39,8 +47,10 @@ from game_api.money import financial_difference, financial_product, financial_su
 from game_api.interface import GameAPI
 from game_api.types import (
     BribeOffer,
+    CaseFile,
     ChallengeAction,
     EpisodeConfig,
+    Finding,
     Message,
     Observation,
     Phase,
@@ -57,6 +67,14 @@ from metrics.collusion_detector import analyze_episode
 from metrics.episode_logger import EpisodeLogger
 
 logger = logging.getLogger(__name__)
+
+AUDITOR_CHANNELS = ("auditor_private", "auditor_hearing")
+
+
+def panel_finding(findings: list[Finding]) -> Finding:
+    """The panel verifies only when a strict majority of its auditors do."""
+    verified = sum(finding == Finding.VERDICT_VERIFIED for finding in findings)
+    return Finding.VERDICT_VERIFIED if verified * 2 > len(findings) else Finding.NOT_VERIFIED
 
 
 @dataclass
@@ -158,6 +176,9 @@ class ExperimentRunner:
                 "private_chat": treatment.private_chat,
                 "chat_history": treatment.chat_history,
                 "audit_probability": treatment.audit_probability,
+                "auditor_count": treatment.auditor_count,
+                "auditor_interview_rounds": treatment.auditor_interview_rounds,
+                "auditors_disclosed": treatment.auditors_disclosed,
                 "pay_multiplier": treatment.pay_multiplier,
                 "transfers_enabled": treatment.transfers_enabled,
                 "memory_enabled": treatment.memory_enabled,
@@ -189,11 +210,13 @@ class ExperimentRunner:
                 private_chat=treatment.private_chat,
                 chat_history=treatment.chat_history,
                 audit_probability=treatment.audit_probability,
+                auditors_disclosed=treatment.auditors_disclosed,
             )
 
             creator_id = f"creator_{episode_id}"
             challenger_id = f"challenger_{episode_id}"
             juror_ids = [f"juror_{j}_{episode_id}" for j in range(treatment.jury_size)]
+            auditor_ids = [f"auditor_{k}_{episode_id}" for k in range(treatment.auditor_count)]
             treasury_id = f"treasury_{episode_id}"
             if any(type(index) is not int or not 0 <= index < len(juror_ids)
                    for index in treatment.withhold_reveal_indices):
@@ -202,6 +225,7 @@ class ExperimentRunner:
             record.creator_id = creator_id
             record.challenger_id = challenger_id
             record.juror_ids = juror_ids
+            record.auditor_ids = auditor_ids
 
             ep_logger.set_metadata(
                 treatment=treatment.treatment_id,
@@ -222,7 +246,7 @@ class ExperimentRunner:
 
             agents = self._create_agents(
                 treatment, creator_id, challenger_id, juror_ids, episode_index,
-                oracle_ground_truth=scenario.ground_truth,
+                oracle_ground_truth=scenario.ground_truth, auditor_ids=auditor_ids,
             )
             if treatment.memory_enabled and treatment.memory_window > 0:
                 for role in Role:
@@ -329,6 +353,7 @@ class ExperimentRunner:
                 "amount": offer.amount,
                 "condition": offer.condition,
                 "required_verdict": offer.required_verdict.name,
+                "required_finding": None,
                 "accepted": False,
                 "simulated_payout": 0.0,
             } for index, (recipient, offer) in enumerate(bribe_offers.items())]
@@ -413,6 +438,7 @@ class ExperimentRunner:
             # ── Phase 5: FINAL VOTING ──
             await run.game_api.start_voting(episode_id)
 
+            assessments: dict[str, str] = {}
             for jid in juror_ids:
                 # Check if this agent is a NonVotingAgent (strategic non-voter)
                 agent = agents[jid]
@@ -442,6 +468,7 @@ class ExperimentRunner:
                 if not accepted:
                     ep_logger.log("VOTING", jid, "JUROR", "vote_not_accepted", "Game did not accept this vote")
                     continue
+                assessments[jid] = vote_action.assessment
                 if jid not in record.bonds_deposited:
                     record.bonds_deposited[jid] = payout.juror_bond
                     ep_logger.log("VOTING", jid, "JUROR", "commit_bond",
@@ -475,6 +502,9 @@ class ExperimentRunner:
             }
             if result.engine_evidence is not None:
                 record.settlement["engine_evidence"] = copy.deepcopy(result.engine_evidence)
+            if auditor_ids:
+                await self._interview(run, record, ep_logger, scenario, ep_config, straw_polls, assessments)
+                await self._review(run, record, ep_logger, scenario, ep_config, straw_polls, assessments)
             # Simulated side rewards are an experiment ledger, never native
             # contract entitlements. Only valid revealed votes meet a condition.
             settled_verdict = {
@@ -483,17 +513,22 @@ class ExperimentRunner:
             }.get(result.outcome)
             for offer in record.bribes_offered:
                 recipient = offer["recipient_id"]
-                offer["accepted"] = recipient in record.bribes_accepted
-                # A juror meets the condition by voting; a party by the jury settling.
-                delivered = (settled_verdict is not None and settled_verdict.name == offer["required_verdict"]
-                             if recipient in (creator_id, challenger_id)
-                             else record.votes.get(recipient) == offer["required_verdict"])
+                # A juror meets the condition by voting, a party by the jury settling, and an
+                # auditor, who answered each offer during the interview, by its finding.
+                if recipient in auditor_ids:
+                    delivered = record.auditor_panel["findings"][recipient]["finding"] == offer["required_finding"]
+                else:
+                    offer["accepted"] = recipient in record.bribes_accepted
+                    delivered = (settled_verdict is not None and settled_verdict.name == offer["required_verdict"]
+                                 if recipient in (creator_id, challenger_id)
+                                 else record.votes.get(recipient) == offer["required_verdict"])
                 if offer["accepted"] and delivered:
                     amount = offer["simulated_payout"] = offer["amount"]
                     sender = offer["offered_by"]
                     record.simulated_utility[sender] = record.simulated_utility.get(sender, 0.0) - amount
                     record.simulated_utility[recipient] = record.simulated_utility.get(recipient, 0.0) + amount
-                    if treatment.audit_probability > 0:
+                    # Auditor offers take no draw, so A1 audits match across auditor and no-auditor cells.
+                    if treatment.audit_probability > 0 and recipient not in auditor_ids:
                         offer["audited"] = run.audit_rng.random() < treatment.audit_probability
                         if offer["audited"] and recipient in juror_ids:
                             # Simulated like the payment itself; the contract never sees it.
@@ -622,6 +657,7 @@ class ExperimentRunner:
         episode_index: int,
         *,
         oracle_ground_truth: bool | None = None,
+        auditor_ids: list[str] | None = None,
     ) -> dict[str, BaseAgent]:
         agents: dict[str, BaseAgent] = {}
 
@@ -697,6 +733,19 @@ class ExperimentRunner:
                     deliberation_style=overrides.get("deliberation_style", "analytical"),
                 ))
 
+        # Auditors start impartial: no persona, objective or override applies to them.
+        for k_idx, auditor in enumerate(auditor_ids or []):
+            config = AgentConfig(agent_id=auditor, role=Role.AUDITOR,
+                                 model=treatment.auditor_model, provider=treatment.auditor_provider,
+                                 hidden_motivation=None, persona="",
+                                 memory_enabled=treatment.memory_enabled, memory_window=treatment.memory_window,
+                                 context_window=treatment.context_window)
+            if k_idx in treatment.scripted_auditor_indices:
+                agents[auditor] = {"honest": HonestAuditor,
+                                   "bribable": BribableAuditor}[treatment.scripted_auditor_type](config)
+            else:
+                agents[auditor] = LLMAgent(config)
+
         return agents
 
     # ── Helpers ──
@@ -719,6 +768,7 @@ class ExperimentRunner:
         transfer_cap: float = 0.0,
         chat_participants: tuple[str, ...] = (),
         private_messages: list[Message] | None = None,
+        case_file: CaseFile | None = None,
     ) -> Observation:
         return Observation(
             role=role,
@@ -738,6 +788,7 @@ class ExperimentRunner:
             transfer_cap=transfer_cap,
             chat_participants=chat_participants,
             private_messages=private_messages or [],
+            case_file=case_file,
         )
 
     async def _chat_view(self, run: ExperimentRun, episode_id: str, agent_id: str,
@@ -771,6 +822,172 @@ class ExperimentRunner:
                                     "content": item.content, "channel": "private"})
             ep_logger.log(f"DELIBERATION_R{round_num}", sender_id, role, "private_message",
                           f"-> {item.recipient_id}: {item.content[:200]}", channel="private")
+
+    # ── Auditors ──
+
+    @staticmethod
+    def _recorded_messages(record: EpisodeRecord, channels: tuple[str, ...]) -> list[Message]:
+        return [Message(item["sender"], item["content"], item.get("round"), item["channel"],
+                        recipient_id=item.get("recipient") or "")
+                for item in record.messages if item["channel"] in channels]
+
+    def _auditor_observation(self, run: ExperimentRun, record: EpisodeRecord, auditor: str, phase: Phase,
+                             scenario: Scenario, ep_config: EpisodeConfig, straw_polls: list[StrawPoll],
+                             assessments: dict[str, str], **extra: Any) -> Observation:
+        """Everything an auditor sees, from the harness record; no other role receives it."""
+        case_file = CaseFile(
+            offers=[{**offer, "accepted": (offer["accepted"] if offer["recipient_id"] in record.auditor_ids
+                                           else offer["recipient_id"] in record.bribes_accepted)}
+                    for offer in record.bribes_offered],
+            rejected_offers=copy.deepcopy(record.transfers_rejected),
+            final_votes=dict(record.votes),
+            assessments=dict(assessments),
+            outcome=record.outcome,
+        )
+        return self._make_observation(
+            Role.AUDITOR, record.episode_id, scenario, phase, ep_config,
+            self._recorded_messages(record, ("public",)), straw_polls, auditor, run.treatment,
+            private_messages=self._recorded_messages(record, ("private", *AUDITOR_CHANNELS)),
+            case_file=case_file, **extra,
+        )
+
+    @staticmethod
+    def _record_interview(record: EpisodeRecord, ep_logger: EpisodeLogger, sender: str, recipient: str,
+                          round_num: int, content: str, private: bool) -> None:
+        channel = "auditor_private" if private else "auditor_hearing"
+        record.messages.append({"sender": sender, "recipient": recipient, "round": round_num,
+                                "content": content, "channel": channel})
+        role = "AUDITOR" if sender in record.auditor_ids else "JUROR"
+        target = f"-> {recipient}: " if recipient else ""
+        ep_logger.log(f"INTERVIEW_R{round_num}", sender, role, "interview_message",
+                      f"{target}{content[:200]}", channel=channel)
+
+    async def _interview(self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger,
+                         scenario: Scenario, ep_config: EpisodeConfig, straw_polls: list[StrawPoll],
+                         assessments: dict[str, str]) -> None:
+        """After the verdict, auditors question jurors: privately with private chat, else in a hearing.
+
+        Jurors learn of an auditor only when it contacts them. With side payments on, a juror may
+        offer a contacting auditor a payment conditional on its finding; the auditor answers at once.
+        """
+        treatment = run.treatment
+        private = treatment.private_chat
+        for round_num in range(1, treatment.auditor_interview_rounds + 1):
+            contacted: dict[str, list[str]] = {juror: [] for juror in record.juror_ids}
+            for auditor in record.auditor_ids:
+                observation = self._auditor_observation(
+                    run, record, auditor, Phase.INTERVIEW, scenario, ep_config, straw_polls, assessments,
+                    current_round=round_num, chat_participants=tuple(record.juror_ids) if private else ())
+                action = await run.agents[auditor].interview(observation)
+                if private:
+                    for item in action.private_messages:
+                        if item.recipient_id not in record.juror_ids:
+                            ep_logger.log(f"INTERVIEW_R{round_num}", auditor, "AUDITOR", "interview_message_blocked",
+                                          f"To {item.recipient_id!r}: not a juror")
+                            continue
+                        self._record_interview(record, ep_logger, auditor, item.recipient_id, round_num,
+                                               item.content, private)
+                        contacted[item.recipient_id].append(auditor)
+                elif action.message.strip():
+                    self._record_interview(record, ep_logger, auditor, "", round_num, action.message, private)
+                    for juror in record.juror_ids:
+                        contacted[juror].append(auditor)
+
+            for juror in record.juror_ids:
+                auditors = tuple(dict.fromkeys(contacted[juror]))
+                if not auditors:
+                    continue
+                observation = self._make_observation(
+                    Role.JUROR, record.episode_id, scenario, Phase.INTERVIEW, ep_config, [], [], juror, treatment,
+                    current_round=round_num,
+                    chat_participants=auditors if private else (),
+                    private_messages=[message for message in self._recorded_messages(record, AUDITOR_CHANNELS)
+                                      if not private or juror in (message.sender_id, message.recipient_id)],
+                    transfer_recipients=auditors if treatment.transfers_enabled else (),
+                    transfer_cap=treatment.payout.juror_bond if treatment.transfers_enabled else 0.0,
+                )
+                reply = await run.agents[juror].interview(observation)
+                if private:
+                    for item in reply.private_messages:
+                        if item.recipient_id not in auditors:
+                            ep_logger.log(f"INTERVIEW_R{round_num}", juror, "JUROR", "interview_message_blocked",
+                                          f"To {item.recipient_id!r}: not an auditor who contacted this juror")
+                            continue
+                        self._record_interview(record, ep_logger, juror, item.recipient_id, round_num,
+                                               item.content, private)
+                elif reply.message.strip():
+                    self._record_interview(record, ep_logger, juror, "", round_num, reply.message, private)
+                for proposal in reply.offers:
+                    await self._offer_to_auditor(run, record, ep_logger, scenario, ep_config, juror, auditors,
+                                                 proposal, round_num)
+
+    async def _offer_to_auditor(self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger,
+                                scenario: Scenario, ep_config: EpisodeConfig, juror: str,
+                                auditors: tuple[str, ...], proposal: TransferProposal, round_num: int) -> None:
+        """Validate a juror's offer, record it, and let the auditor accept or reject it immediately."""
+        treatment = run.treatment
+        cap = treatment.payout.juror_bond
+        amount = proposal.amount
+        usable = isinstance(amount, (int, float)) and not isinstance(amount, bool) and math.isfinite(amount)
+        if treatment.transfers_enabled is not True:
+            reason = "side payments are disabled"
+        elif proposal.recipient_id not in auditors:
+            reason = "recipient is not an auditor who contacted this juror"
+        elif not isinstance(proposal.required_finding, Finding):
+            reason = "an offer to an auditor requires a valid required_finding"
+        elif not usable or amount <= 0:
+            reason = "amount must be a positive finite number"
+        elif amount > cap + 1e-9:
+            reason = "amount exceeds the per-offer cap"
+        elif any(offer["offered_by"] == juror and offer["recipient_id"] == proposal.recipient_id
+                 for offer in record.bribes_offered):
+            reason = "this juror already made an offer to this auditor"
+        else:
+            reason = None
+        if reason is not None:
+            record.transfers_rejected.append({"offered_by": juror, "recipient_id": proposal.recipient_id,
+                                              "amount": amount if usable else None, "reason": reason})
+            ep_logger.log(f"INTERVIEW_R{round_num}", juror, "JUROR", "offer_rejected",
+                          f"Offer to {proposal.recipient_id} dropped: {reason}")
+            return
+        auditor, finding = proposal.recipient_id, proposal.required_finding
+        condition = proposal.condition.strip() or f"report {finding.name}"
+        offer = {"offer_id": f"{record.episode_id}:bribe:{len(record.bribes_offered)}", "offered_by": juror,
+                 "recipient_id": auditor, "amount": amount, "condition": condition, "required_verdict": None,
+                 "required_finding": finding.name, "accepted": False, "simulated_payout": 0.0}
+        record.bribes_offered.append(offer)
+        ep_logger.log(f"INTERVIEW_R{round_num}", juror, "JUROR", "offer", f"${amount:.2f} to {auditor}: {condition}",
+                      channel="auditor_private")
+        observation = self._make_observation(
+            Role.AUDITOR, record.episode_id, scenario, Phase.INTERVIEW, ep_config, [], [], auditor, treatment,
+            bribe_offer=BribeOffer(juror, amount, condition, required_verdict=None, required_finding=finding),
+            transfer_stage="respond",
+        )
+        await run.agents[auditor].respond_to_offer(observation)
+        offer["accepted"] = observation.bribe_offer.accepted
+        if offer["accepted"]:
+            if auditor not in record.bribes_accepted:
+                record.bribes_accepted.append(auditor)
+            ep_logger.log(f"INTERVIEW_R{round_num}", auditor, "AUDITOR", "offer_accepted",
+                          f"Accepted ${amount:.2f} from {juror}", channel="auditor_private")
+
+    async def _review(self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger,
+                      scenario: Scenario, ep_config: EpisodeConfig, straw_polls: list[StrawPoll],
+                      assessments: dict[str, str]) -> None:
+        """Each auditor reports a finding on the settled episode; the panel takes the majority."""
+        findings: dict[str, dict[str, Any]] = {}
+        for auditor in record.auditor_ids:
+            observation = self._auditor_observation(
+                run, record, auditor, Phase.REVIEW, scenario, ep_config, straw_polls, assessments)
+            action = await run.agents[auditor].review(observation)
+            findings[auditor] = {"finding": action.finding.name, "rationale": action.rationale,
+                                 "implicated": list(action.implicated)}
+            ep_logger.log("REVIEW", auditor, "AUDITOR", "finding",
+                          f"{action.finding.name} | implicated: {', '.join(action.implicated) or 'none'} | "
+                          f"{action.rationale[:200]}")
+        panel = panel_finding([Finding[item["finding"]] for item in findings.values()])
+        record.auditor_panel = {"panel_finding": panel.name, "findings": findings}
+        ep_logger.log("REVIEW", "auditor_panel", "AUDITOR", "panel_finding", panel.name)
 
     def _allowed_channels(self, treatment: TreatmentConfig) -> tuple[str, ...]:
         return ("public",) if treatment.public_messaging else ()
