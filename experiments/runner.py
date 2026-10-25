@@ -221,6 +221,13 @@ class ExperimentRunner:
                     episode_id,
                 )
 
+            # If using core engine, pass claim text for the on-chain transaction
+            if hasattr(run.game_api, "set_claim_text"):
+                claim_text = scenario.claim
+                if isinstance(creator_action, PostClaimAction) and creator_action.claim_text:
+                    claim_text = creator_action.claim_text
+                run.game_api.set_claim_text(episode_id, claim_text)
+
             await run.game_api.post_claim(episode_id, creator_id)
             record.bonds_deposited[creator_id] = payout.creator_bet
             ep_logger.log(
@@ -254,6 +261,10 @@ class ExperimentRunner:
                         or "This claim lacks verifiable evidence and should be challenged."
                     ),
                 )
+
+            # If using core engine, pass evidence text for the on-chain transaction
+            if hasattr(run.game_api, "set_evidence_text"):
+                run.game_api.set_evidence_text(episode_id, challenger_action.evidence_text)
 
             await run.game_api.challenge(episode_id, challenger_id)
             record.bonds_deposited[challenger_id] = payout.challenger_bet

@@ -47,6 +47,11 @@ from game_api.mock import MockGameAPI
 from metrics.collector import MetricsCollector
 from scenarios.examples import FACTUAL_SCENARIOS, FALSE_CLAIMS_FOR_ATTACK
 
+try:
+    from game_api.core_engine import CoreEngineAPI
+except ImportError:
+    CoreEngineAPI = None
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
@@ -90,9 +95,19 @@ async def run_conditions(
     output_dir: Path,
     episodes_per_condition: int | None = None,
     dry_run: bool = False,
+    use_core_engine: bool = False,
+    core_engine_dir: str | None = None,
 ):
     """Run a set of conditions and produce comparative results."""
-    game_api = MockGameAPI()
+    if use_core_engine:
+        if CoreEngineAPI is None:
+            print("ERROR: CoreEngineAPI not available. Install aiohttp: pip install aiohttp")
+            sys.exit(1)
+        game_api = CoreEngineAPI(core_engine_dir=core_engine_dir)
+        logger.info("Using CORE ENGINE (Rust + Anvil on-chain settlement)")
+    else:
+        game_api = MockGameAPI()
+        logger.info("Using MockGameAPI (in-memory)")
     runner = ExperimentRunner(game_api, output_dir=output_dir)
 
     all_results = {}
@@ -151,6 +166,10 @@ async def run_conditions(
         print(f"{name:<30} {episodes:>8} {fvr:>13.1%} {acc:>9.1%} {hung:>5.1%}")
 
     print()
+
+    # Shutdown core engine if used
+    if use_core_engine and hasattr(game_api, "stop"):
+        await game_api.stop()
 
     # Save results
     results_file = output_dir / "knockout_results.json"
@@ -243,6 +262,10 @@ Examples:
                         help="Episodes per condition (overrides default)")
     parser.add_argument("--output", type=str, default="results/knockout",
                         help="Output directory")
+    parser.add_argument("--core-engine", action="store_true",
+                        help="Use the real Rust core engine with on-chain settlement (requires compiled binary)")
+    parser.add_argument("--core-engine-dir", type=str, default=None,
+                        help="Path to core engine repo (default: auto-detect)")
 
     args = parser.parse_args()
 
@@ -266,24 +289,32 @@ Examples:
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    engine_kwargs = {
+        "use_core_engine": args.core_engine,
+        "core_engine_dir": args.core_engine_dir,
+    }
+
     if args.pilot:
         conditions = {"knockout_full": KNOCKOUT_CONDITIONS["knockout_full"]}
         await run_conditions(
             conditions, output_dir,
             episodes_per_condition=args.episodes or 20,
             dry_run=args.dry_run,
+            **engine_kwargs,
         )
     elif args.minimum:
         await run_conditions(
             KNOCKOUT_MINIMUM, output_dir,
             episodes_per_condition=args.episodes,
             dry_run=args.dry_run,
+            **engine_kwargs,
         )
     elif args.full:
         await run_conditions(
             KNOCKOUT_CONDITIONS, output_dir,
             episodes_per_condition=args.episodes,
             dry_run=args.dry_run,
+            **engine_kwargs,
         )
     elif args.condition:
         if args.condition not in KNOCKOUT_CONDITIONS:
@@ -295,6 +326,7 @@ Examples:
             conditions, output_dir,
             episodes_per_condition=args.episodes,
             dry_run=args.dry_run,
+            **engine_kwargs,
         )
     else:
         parser.print_help()
