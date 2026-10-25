@@ -8,10 +8,15 @@ The harness manages: deliberation rounds, agent prompts.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import copy
+import hashlib
+import time
+import uuid
 
 from .interface import GameAPI
 from .types import (
     EpisodeConfig,
+    Message,
     PayoutConfig,
     Phase,
     SettlementResult,
@@ -37,6 +42,8 @@ class _EpisodeRecord:
     # Settlement
     settled: bool = False
     credits: dict[str, float] = field(default_factory=dict)
+    forum_messages: list[Message] = field(default_factory=list)
+    forum_events: list[dict] = field(default_factory=list)
 
 
 class MockGameAPI(GameAPI):
@@ -96,6 +103,76 @@ class MockGameAPI(GameAPI):
         assert rec.state == Phase.CHALLENGED
         rec.state = Phase.DELIBERATION
         return True
+
+    def _forum_actor(self, episode_id: str, actor_id: str) -> _EpisodeRecord:
+        rec = self._episodes[episode_id]
+        if actor_id not in [rec.creator_id, rec.challenger_id, *rec.juror_ids, rec.treasury_id]:
+            self._forum_event(rec, episode_id, actor_id, "access_denied")
+            raise ValueError("Participant is not assigned to this episode")
+        return rec
+
+    @staticmethod
+    def _forum_event(rec, episode_id, actor_id, kind, **metadata):
+        event = {"sequence": len(rec.forum_events) + 1, "episode_id": episode_id,
+                 "actor_id": actor_id, "actor_is_operator": False, "kind": kind,
+                 "message_sequence": None, "message_hash": None, "message_bytes": None,
+                 "round_num": None, "returned_sequences": [],
+                 "created_at_ms": time.time_ns() // 1_000_000} | metadata
+        rec.forum_events.append(event)
+
+    async def send_forum_message(self, episode_id: str, sender_id: str,
+                                 content: str, round_num: int) -> Message:
+        rec = self._forum_actor(episode_id, sender_id)
+        if (not content.strip() or len(content.encode("utf-8")) > 16384
+                or type(round_num) is not int or not 1 <= round_num <= 2**32 - 1):
+            raise ValueError("Invalid public forum message")
+        existing = next((msg for msg in rec.forum_messages
+                         if msg.sender_id == sender_id and msg.round_num == round_num), None)
+        if existing is not None:
+            if existing.content != content:
+                raise ValueError("Forum message retry changed its content")
+            return copy.deepcopy(existing)
+        created_at_ms = time.time_ns() // 1_000_000
+        message = Message(sender_id, content, round_num, timestamp=created_at_ms / 1000,
+            message_id=uuid.uuid4().hex, sequence=len(rec.forum_messages) + 1,
+            content_hash="sha256:" + hashlib.sha256(content.encode("utf-8")).hexdigest(),
+            created_at_ms=created_at_ms)
+        rec.forum_messages.append(message)
+        self._forum_event(rec, episode_id, sender_id, "message_sent",
+            message_sequence=message.sequence, message_hash=message.content_hash,
+            message_bytes=len(content.encode("utf-8")), round_num=round_num)
+        return copy.deepcopy(message)
+
+    async def get_forum_messages(self, episode_id: str, participant_id: str) -> list[Message]:
+        rec = self._forum_actor(episode_id, participant_id)
+        self._forum_event(rec, episode_id, participant_id, "messages_read",
+            returned_sequences=[message.sequence for message in rec.forum_messages])
+        return copy.deepcopy(rec.forum_messages)
+
+    async def get_forum_audit(self, episode_id: str) -> dict:
+        rec = self._episodes[episode_id]
+        actors = {}
+        for event in rec.forum_events:
+            usage = actors.setdefault(event["actor_id"], {"actor_id": event["actor_id"],
+                "sent_messages": 0, "read_requests": 0, "messages_returned": 0,
+                "denied_requests": 0, "sent_bytes": 0})
+            if event["kind"] == "message_sent":
+                usage["sent_messages"] += 1
+                usage["sent_bytes"] += event["message_bytes"]
+            elif event["kind"] == "messages_read":
+                usage["read_requests"] += 1
+                usage["messages_returned"] += len(event["returned_sequences"])
+            else:
+                usage["denied_requests"] += 1
+        return {"episode_id": episode_id, "forum_used": bool(rec.forum_events),
+                "communication_used": bool(rec.forum_messages),
+                "message_count": len(rec.forum_messages),
+                "total_message_bytes": sum(usage["sent_bytes"] for usage in actors.values()),
+                "active_sender_count": sum(usage["sent_messages"] > 0 for usage in actors.values()),
+                "first_message_at_ms": rec.forum_messages[0].created_at_ms if rec.forum_messages else None,
+                "last_message_at_ms": rec.forum_messages[-1].created_at_ms if rec.forum_messages else None,
+                "actors": copy.deepcopy(list(actors.values())), "events": copy.deepcopy(rec.forum_events),
+                "next_after": len(rec.forum_events), "has_more": False}
 
     async def start_voting(self, episode_id: str) -> bool:
         rec = self._episodes[episode_id]

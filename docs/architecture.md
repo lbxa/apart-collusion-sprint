@@ -7,9 +7,13 @@ replaces the spec's CLI-first presentation. The external experiment harness owns
 models, deliberation, private observations, and evaluation metrics.
 The game service owns episode registration, validated actions, chain submission,
 artifacts, durable operation records, and settlement queries.
-It also owns the experimental private-chat primitive and its audit trail.
+It also owns the public episode forum, experimental private-chat primitive,
+and their separate audit trails. The harness schedules discussion and builds
+observations; the core persists public messages and authenticates their reads.
 Behavioral prohibition is observable rather than a transport restriction;
 participant membership remains enforced. See [private chat](private-chat.md).
+The [public forum](public-forum.md) is available to all assigned episode
+participants, with operator transcript access kept distinct from participant use.
 
 Game instantiation requires only game identifiers, participants, and protocol
 parameters. Legacy experiment/scenario tags are optional opaque correlation
@@ -39,6 +43,9 @@ Integration documentation must explain these differences explicitly.
 - `core/src/chat/`: immutable pair/history/prohibition settings, caller policy,
   bounded messages, and audit use cases. SQLite work runs outside the chain
   mutex and off the async runtime; messages never become contract events.
+- `core/src/forum/`: shared episode history, authenticated posting/reads,
+  and metadata audits of public communication. Sends and their audit/retry
+  records commit atomically; private chats retain separate membership rules.
 - `harness/`: Python agent execution, observations, treatments, and metrics.
   `CoreClient` owns HTTP sessions and operation recovery over generated, validated
   `/v1` calls. `LocalEngine` owns development processes and Anvil time control;

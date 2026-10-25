@@ -50,7 +50,8 @@ save diagnostic records and exit unsuccessfully; failures do not become verdicts
   Run episodes sequentially on that node; use separate adapters for concurrent
   local runs. This convenience mode does not attach to public deployments.
 - Actual claim text, counter-evidence, and final assessments reach the engine.
-  Deliberation, straw polls, and simulated bribes stay here.
+  Enabled public deliberation is posted to and read from the core's episode
+  forum. Round scheduling, straw polls, and simulated bribes stay here.
   The runner enforces configured channels and keeps ground truth in evaluation.
   Scripted honest baselines receive explicit oracle labels as test doubles;
   their accuracy is plumbing evidence, not evidence about model ability.
@@ -73,6 +74,12 @@ can create/list their chats and send/read messages; operators can provision
 controls, inspect retained transcripts, and read usage audits. These methods
 return typed chat data directly. The experiment runner retains its public-channel
 configuration; private-chat endpoints are available for explicit SDK experiments.
+
+The [public forum](../docs/public-forum.md) is engine-backed. Each juror reads
+shared history with their own credentials before deliberation and final voting;
+failed posts or reads fail the episode. `public_messaging=False` disables these
+runner calls. Operator audit evidence is retained for evaluation, outside agent
+observations, and describes participants, volume, timing, rounds, and read patterns.
 
 `game_api/local_engine.py` owns subprocesses, local credentials, and time control.
 The existing `CoreEngineAPI` experiment adapter composes these components;
@@ -115,6 +122,9 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Publish enabled public deliberation to the core forum and fetch each agent's
+  observations through authenticated reads. Export full forum audit evidence,
+  including partial communication after failures, separately from agent context.
 - Use the Rust API by default and preserve exact settlement evidence. A failed
   HTTP operation, reverted receipt, or malformed response is an explicit failure,
   never a locally reconstructed verdict or payout.

@@ -108,8 +108,9 @@ the operator transcript. `after` and `limit` are optional on reads, listings,
 transcripts, and audits; omitted parameters use server defaults. Use
 `has_more`/`next_after` to walk a page rather than assuming it is a full transcript.
 
-The existing experiment runner continues to use its configured public channels.
-The SDK makes private chat available for explicit experiments without
+The experiment runner uses the core's [public forum](public-forum.md) when its
+public-messaging treatment is enabled. The SDK makes private chat available
+for explicit experiments without
 automatically exposing operator transcripts or wiring agent deliberation to it.
 
 ## Prohibition and audit

@@ -9,6 +9,7 @@ use std::{
 
 use rusqlite::{Connection, OptionalExtension, TransactionBehavior, params};
 mod chat;
+mod forum;
 
 #[derive(Debug, thiserror::Error)]
 pub enum StoreError {
@@ -224,7 +225,7 @@ impl Store {
         let migration = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
         let schema_version: u32 =
             migration.pragma_query_value(None, "user_version", |row| row.get(0))?;
-        if schema_version > 2 {
+        if schema_version > 3 {
             return Err(StoreError::InvalidRecord(
                 "database schema is newer than this service".into(),
             ));
@@ -234,6 +235,9 @@ impl Store {
         }
         if schema_version < 2 {
             migration.execute_batch(include_str!("chat-schema.sql"))?;
+        }
+        if schema_version < 3 {
+            migration.execute_batch(include_str!("forum-schema.sql"))?;
         }
         migration.commit()?;
         Ok(Self {

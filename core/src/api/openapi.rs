@@ -1,5 +1,5 @@
 use super::{
-    ApiProblem, ErrorResponse, chat,
+    ApiProblem, ErrorResponse, chat, forum,
     routes::{
         self, ChallengeRequest, ClaimRequest, CommitmentRequest, EmptyRequest, HealthResponse,
     },
@@ -7,6 +7,10 @@ use super::{
 use crate::chat::{
     ChatActorUsage, ChatAuditEvent, ChatAuditKind, ChatAuditReport, ChatMessage, ChatPage,
     ChatView, CreateChat, MessagePage, SendMessage,
+};
+use crate::forum::{
+    ForumActorUsage, ForumAuditEvent, ForumAuditKind, ForumAuditReport, ForumMessage,
+    ForumMessagePage, ForumSendMessage,
 };
 use crate::game::{
     BalancesView, DeploymentView, EpisodeView, JurorView, OperationView, ParticipantView,
@@ -19,7 +23,7 @@ use utoipa::{
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "Veracity Game API", version = "1.1.0",
+    info(title = "Veracity Game API", version = "1.2.0",
         description = "The game engine API for SPEC.md v0.2. The Solidity contract owns escrow, immutable chain-time deadlines, commit/reveal voting, and settlement. Amounts are decimal base-unit strings. Operator and participant bearer tokens have distinct authority. Experiments, agent execution, and evaluation belong to the caller's external harness."),
     paths(
         routes::health, routes::openapi_document, routes::docs, routes::participants,
@@ -27,7 +31,8 @@ use utoipa::{
         routes::commitment, routes::reveal, routes::settle, routes::expire,
         routes::withdraw, routes::settlement, routes::balances, routes::operation,
         routes::reconcile, routes::replay, routes::events,
-        chat::create, chat::list, chat::send, chat::messages, chat::transcript, chat::audit
+        chat::create, chat::list, chat::send, chat::messages, chat::transcript, chat::audit,
+        forum::send_forum_message,forum::get_forum_messages,forum::get_forum_transcript,forum::get_forum_audit
     ),
     components(schemas(
         ApiProblem, ErrorResponse, HealthResponse, ClaimRequest, ChallengeRequest,
@@ -36,7 +41,8 @@ use utoipa::{
         OperationView, JurorView, EpisodeView, SettlementView, BalancesView,
         routes::BlockRange, routes::ReplayResponse,
         ChatActorUsage, ChatAuditEvent, ChatAuditKind, ChatAuditReport, ChatMessage,
-        ChatPage, ChatView, CreateChat, MessagePage, SendMessage
+        ChatPage, ChatView, CreateChat, MessagePage, SendMessage,
+        ForumActorUsage,ForumAuditEvent,ForumAuditKind,ForumAuditReport,ForumMessage,ForumMessagePage,ForumSendMessage
     )),
     modifiers(&BearerSecurity),
     tags(
@@ -46,7 +52,9 @@ use utoipa::{
         (name = "operations", description = "Transaction evidence and safe recovery"),
         (name = "chain evidence", description = "Bounded replay and public chain-event exports"),
         (name = "private chat", description = "Experimental two-participant communication; prohibited use remains available and audited"),
-        (name = "chat audit", description = "Privileged usage flags, metadata events, and retained transcripts")
+        (name = "chat audit", description = "Privileged usage flags, metadata events, and retained transcripts"),
+        (name = "public forum", description = "Episode-wide participant communication with persistent chronological history"),
+        (name = "forum audit", description = "Privileged public-forum usage signals, communication metadata, and transcripts")
     )
 )]
 struct ApiDocument;
@@ -109,6 +117,9 @@ mod tests {
             "/v1/chats/{id}/messages",
             "/v1/chats/{id}/transcript",
             "/v1/episodes/{id}/chat-audit",
+            "/v1/episodes/{id}/forum/messages",
+            "/v1/episodes/{id}/forum/transcript",
+            "/v1/episodes/{id}/forum-audit",
         ] {
             assert!(document["paths"].get(path).is_some(), "missing {path}");
         }

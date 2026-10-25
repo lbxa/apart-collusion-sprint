@@ -40,6 +40,14 @@ fixture in `contracts/fixtures/commitment.json`.
 | `core/tests/configuration.rs` | Explicit startup modes, local listener restrictions, deployment identity, secret references, and database protection |
 | `core/tests/private_chat.rs` | Pair privacy, latest/history reads, audit flags, operator controls, immutable settings, HTTP documentation and caching |
 | `core/tests/chat_records.rs` | Atomic migrations, audit failure rollback, racing idempotent writes, and durable chat records |
+| `core/tests/public_forum.rs` | Shared history, participant/operator boundaries, exact read audits, UTF-8 limits, idempotency, pagination, concurrency, and restart persistence |
+| `core/tests/forum_records.rs` | Private-chat-preserving migration, forum audit rollback, and durable communication records |
+
+Python forum tests cover generated-client credentials and strict responses,
+full multi-page reads/exports, runner observation ordering, disabled
+communication, partial-failure evidence, and actual HTTP → Rust → SQLite →
+Anvil runs. The two-round, three-juror acceptance run checks six sends and nine
+reads, including final voting observations, against exact engine audit records.
 
 The implementation was built outward from failing contract examples to storage
 and adapter tests, then real API acceptance tests. Review findings receive a

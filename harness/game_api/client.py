@@ -26,6 +26,7 @@ from .generated import (
     EmptyRequest, EpisodeView, ErrorResponse, GeneratedAPI, HealthResponse,
     MessagePage, OperationView, ParticipantView, RegisterEpisode, ReplayResponse,
     SendMessage, SettlementView, Verdict,
+    ForumAuditReport, ForumMessage, ForumMessagePage, ForumSendMessage,
 )
 
 
@@ -394,6 +395,62 @@ class CoreClient:
                                                        token=self._operator()))
         if report.episode_id != episode_id or any(event.episode_id != episode_id for event in report.events):
             raise CoreClientError("Chat audit does not match the requested episode")
+        return report
+
+    async def send_forum_message(self, episode_id: str, sender_id: str, content: str, *,
+                                 idempotency_key: str, round_num: int | None = None) -> ForumMessage:
+        """Publish exact UTF-8 as the participant; caller-supplied rounds are annotations."""
+        message = await self._validated(self._api.send_forum_message(
+            episode_id, ForumSendMessage(content=content, round_num=round_num),
+            token=self._participant(sender_id), idempotency_key=_key(idempotency_key)))
+        if (message.sender_id != sender_id or message.content != content
+                or message.round_num != round_num):
+            raise CoreClientError("Forum message does not match the submitted sender, content, or round")
+        return message
+
+    @staticmethod
+    def _forum_page(page: ForumMessagePage, episode_id: str, after: int | None) -> ForumMessagePage:
+        cursor = 0 if after is None else after
+        sequences = [message.sequence for message in page.messages]
+        if (page.episode_id != episode_id
+                or any(sequence <= cursor for sequence in sequences)
+                or sequences != sorted(set(sequences))
+                or page.next_after != (sequences[-1] if sequences else cursor)
+                or (page.has_more and not sequences)):
+            raise CoreClientError("Forum history identity or pagination is inconsistent")
+        return page
+
+    async def get_forum_messages(self, episode_id: str, participant_id: str, *,
+                                 after: int | None = None, limit: int | None = None) -> ForumMessagePage:
+        """Read shared episode history under the participant's audited identity."""
+        _chat_pagination(after, limit)
+        page = await self._validated(self._api.get_forum_messages(
+            episode_id, after=after, limit=limit, token=self._participant(participant_id)))
+        return self._forum_page(page, episode_id, after)
+
+    async def get_forum_transcript(self, episode_id: str, *, after: int | None = None,
+                                   limit: int | None = None) -> ForumMessagePage:
+        """Read as evaluator without recording a participant read."""
+        _chat_pagination(after, limit)
+        page = await self._validated(self._api.get_forum_transcript(
+            episode_id, after=after, limit=limit, token=self._operator()))
+        return self._forum_page(page, episode_id, after)
+
+    async def get_forum_audit(self, episode_id: str, *, after: int | None = None,
+                              limit: int | None = None) -> ForumAuditReport:
+        """Read operator-only usage metadata; pagination never changes all-time totals."""
+        _chat_pagination(after, limit)
+        report = await self._validated(self._api.get_forum_audit(
+            episode_id, after=after, limit=limit, token=self._operator()))
+        cursor = 0 if after is None else after
+        sequences = [event.sequence for event in report.events]
+        if (report.episode_id != episode_id
+                or any(event.episode_id != episode_id for event in report.events)
+                or any(sequence <= cursor for sequence in sequences)
+                or sequences != sorted(set(sequences))
+                or report.next_after != (sequences[-1] if sequences else cursor)
+                or (report.has_more and not sequences)):
+            raise CoreClientError("Forum audit identity or pagination is inconsistent")
         return report
 
     async def get_operation(self, operation_id: str) -> OperationView:

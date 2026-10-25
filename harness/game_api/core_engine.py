@@ -16,7 +16,7 @@ from .core_types import Registration
 from .interface import GameAPI
 from .local_engine import LocalEngine
 from .money import base_units_to_tokens, integer_units
-from .types import EpisodeConfig, Phase, SettlementResult, Verdict
+from .types import EpisodeConfig, Message, Phase, SettlementResult, Verdict
 
 UNITS_PER_TOKEN = 100
 DEFAULT_PHASE_DURATION = 300
@@ -149,6 +149,59 @@ class CoreEngineAPI(GameAPI):
 
     async def start_deliberation(self, episode_id: str) -> bool:
         return await self.get_state(episode_id) == Phase.CHALLENGED
+
+    def _forum_role(self, episode_id: str, actor_id: str) -> str:
+        role = self._episodes[episode_id].harness_to_engine.get(actor_id)
+        if role is None:
+            raise ValueError("Forum caller is not registered in this episode")
+        return role
+
+    def _forum_message(self, episode_id: str, message) -> Message:
+        sender = self._episodes[episode_id].engine_to_harness.get(message.sender_id)
+        if sender is None:
+            raise CoreEngineError("Forum sender is not registered in this episode")
+        return Message(sender, message.content, message.round_num,
+            timestamp=message.created_at_ms / 1000, message_id=message.message_id,
+            sequence=message.sequence, content_hash=message.content_hash,
+            created_at_ms=message.created_at_ms)
+
+    async def send_forum_message(self, episode_id: str, sender_id: str,
+                                 content: str, round_num: int) -> Message:
+        role = self._forum_role(episode_id, sender_id)
+        message = await self.client.send_forum_message(episode_id, role, content,
+            round_num=round_num, idempotency_key=self._idem_key(
+                episode_id, f"forum-{role}-round-{round_num}"))
+        return self._forum_message(episode_id, message)
+
+    async def get_forum_messages(self, episode_id: str, participant_id: str) -> list[Message]:
+        role = self._forum_role(episode_id, participant_id)
+        messages = []
+        after = 0
+        while True:
+            page = await self.client.get_forum_messages(episode_id, role, after=after, limit=100)
+            messages.extend(self._forum_message(episode_id, message) for message in page.messages)
+            if not page.has_more:
+                return messages
+            if page.next_after <= after:
+                raise CoreEngineError("Forum history cursor did not advance")
+            after = page.next_after
+
+    async def get_forum_audit(self, episode_id: str) -> dict:
+        after = 0
+        events = []
+        while True:
+            report = await self.client.get_forum_audit(episode_id, after=after, limit=100)
+            events.extend(event.model_dump() for event in report.events)
+            if not report.has_more:
+                result = report.model_dump()
+                result["events"] = events
+                # Preserve engine identities in evidence and provide an explicit
+                # lookup rather than rewriting the engine's audit record.
+                result["actor_mapping"] = dict(self._episodes[episode_id].engine_to_harness)
+                return result
+            if report.next_after <= after:
+                raise CoreEngineError("Forum audit cursor did not advance")
+            after = report.next_after
 
     async def start_voting(self, episode_id: str) -> bool:
         return await self.get_state(episode_id) == Phase.CHALLENGED

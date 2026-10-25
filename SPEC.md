@@ -134,7 +134,14 @@ Agents supply artifact text and decisions. Rust saves the artifact bytes, comput
 | Juror            | Commit a verdict and assessment hash with a juror bond, then reveal     |
 | All participants | Read permitted observations and request withdrawal of their own credits |
 
-The external harness owns deliberation and behavioral treatment instructions.
+The external harness owns deliberation scheduling and behavioral treatment
+instructions. The core owns an append-only public forum per episode through
+`/v1`; see `docs/public-forum.md`. Assigned participants share chronological
+history, with identity derived from credentials. Durable metadata audits record
+senders, timestamps, round annotations, message sizes, and exact read responses.
+Operator transcript access is separate from participant use. The harness's
+public-messaging treatment controls its own sends and observations, not engine
+authorization. Forum messages remain off-chain and never change game phases.
 For experimental observation, the core also exposes episode-scoped private
 two-person chat through `/v1`; see `docs/private-chat.md`. Communication is
 prohibited by default but remains technically available, with durable usage

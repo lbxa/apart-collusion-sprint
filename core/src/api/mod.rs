@@ -3,6 +3,7 @@
 mod auth;
 mod chat;
 mod error;
+mod forum;
 mod openapi;
 mod routes;
 

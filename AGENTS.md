@@ -8,6 +8,8 @@ This repository implements the `SPEC.md` game engine and `/v1` API plus the Pyth
 
 `docs/private-chat.md` defines the experimental chat API. Prohibited chat is delivered and flagged; membership is enforced. Participant history settings never remove the operator's retained audit transcript. Keep chat bodies out of public game state and logs.
 
+`docs/public-forum.md` defines the core-owned public forum. Assigned episode participants share history; operator transcript/audit access is distinct. The harness publishes and reads public deliberation through HTTP. Keep message bodies out of ordinary logs and metadata audits.
+
 ## Build, Test, and Development Commands
 
 - `bash scripts/setup.sh`: install pinned local Foundry, build contracts, and fetch locked dependencies.
