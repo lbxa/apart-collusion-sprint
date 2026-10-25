@@ -108,6 +108,10 @@ class EpisodeConfig:
     jury_size: int = 5
     deliberation_rounds: int = 3    # how many rounds of discussion before vote
     allow_vote_change: bool = False  # can jurors change vote between rounds?
+    # Simulated multiple of the juror reward for jurors on the settled side.
+    pay_multiplier: float = 1.0
+    # None leaves the rule unstated; True or False is stated to agents.
+    transfers_enabled: bool | None = None
 
     @property
     def majority_threshold(self) -> int:
@@ -195,6 +199,12 @@ class Observation:
     # Bribe offer
     bribe_offer: BribeOffer | None = None
 
+    # Side-payment stage: "offer" asks a party for offers, "respond" asks a
+    # recipient to answer bribe_offer. The cap bounds each offer from this agent.
+    transfer_stage: str | None = None
+    transfer_recipients: tuple[str, ...] = ()
+    transfer_cap: float = 0.0
+
 
 # ── Agent actions ──
 
@@ -226,6 +236,21 @@ class DeliberateAction(AgentAction):
     channel: str = "public"     # "public"
     # Optional: straw poll vote (non-binding, visible to all)
     straw_vote: Verdict | None = None
+
+
+@dataclass
+class TransferProposal:
+    """One conditional side payment a party offers; never a contract payout."""
+    recipient_id: str
+    amount: float
+    required_verdict: Verdict
+    condition: str = ""
+
+
+@dataclass
+class OfferTransfersAction(AgentAction):
+    """A party's side-payment offers for the episode (possibly none)."""
+    offers: list[TransferProposal] = field(default_factory=list)
 
 
 @dataclass

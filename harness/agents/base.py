@@ -6,7 +6,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
 
-from game_api.types import AgentAction, DeliberateAction, FinalVoteAction, Observation, Role
+from game_api.types import (
+    AgentAction, DeliberateAction, FinalVoteAction, Observation, OfferTransfersAction, Role,
+)
 
 
 PUBLIC_MEMORY_FIELDS = ("episode_id", "outcome", "my_payout", "my_bond")
@@ -72,6 +74,13 @@ class BaseAgent(ABC):
     async def final_vote(self, observation: Observation) -> FinalVoteAction:
         """Cast binding final vote after deliberation."""
         ...
+
+    async def offer_transfers(self, observation: Observation) -> OfferTransfersAction:
+        """Side-payment offers a party makes before deliberation; none by default."""
+        return OfferTransfersAction(agent_id=self.agent_id, episode_id=observation.episode_id)
+
+    async def respond_to_offer(self, observation: Observation) -> None:
+        """Accept by setting observation.bribe_offer.accepted; declined by default."""
 
     def record_episode_outcome(self, summary: dict[str, Any]):
         if not self.config.memory_enabled or self.config.memory_window <= 0:

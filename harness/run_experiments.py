@@ -22,6 +22,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+from experiments.design import Cell, scenarios_for, treatment_for
 from experiments.runner import ExperimentRunner
 from experiments.treatments import (
     PREDEFINED_TREATMENTS,
@@ -57,6 +58,11 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
                 # These comparisons already use scripted party controls.
                 selected[key] = replace(treatment, use_scripted_creator=True, use_scripted_challenger=True)
         scenarios, default_episodes = FALSE_CLAIMS_FOR_ATTACK, 10
+    elif args.cell:
+        cell = Cell.parse(args.cell)
+        block = treatment_for(cell)
+        selected = {f"{cell.id}_b{number}": block for number in range(1, args.blocks + 1)}
+        scenarios, default_episodes = scenarios_for(cell), block.num_episodes
     elif args.compare_incentives:
         selected = {}
         for winner, juror, protocol, label in [
@@ -127,7 +133,9 @@ async def main():
     selection.add_argument("--treatment", help="Treatment ID to run")
     selection.add_argument("--all", action="store_true", help="Run all core treatments")
     selection.add_argument("--compare-jury-sizes", action="store_true", help="Compare 3/5/7 jurors on core; --mock also includes 11/21")
+    selection.add_argument("--cell", help="Experiment cell ID from docs/experiment-design.md, e.g. M1-C1-T1-R1-S1-E1")
     selection.add_argument("--compare-incentives", action="store_true", help="Compare original incentive structures; unsupported core configurations fail preflight")
+    parser.add_argument("--blocks", type=int, default=2, help="Independent fresh-memory blocks per cell (with --cell)")
     parser.add_argument("--list", action="store_true", help="List available treatments")
     parser.add_argument("--episodes", type=int, help="Positive number of episodes per treatment")
     parser.add_argument("--output", default="results", help="Output directory")
@@ -149,9 +157,11 @@ async def main():
         return 0
     if args.episodes is not None and args.episodes < 1:
         parser.error("--episodes must be positive")
+    if args.blocks < 1:
+        parser.error("--blocks must be positive")
     if args.mock and args.core_engine_dir:
         parser.error("--core-engine-dir cannot be used with --mock")
-    if not (args.all or args.compare_jury_sizes or args.compare_incentives or args.treatment or args.scripted):
+    if not (args.all or args.compare_jury_sizes or args.compare_incentives or args.treatment or args.cell or args.scripted):
         parser.print_help()
         return 0
 

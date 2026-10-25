@@ -24,7 +24,8 @@ Do not start a second server manually for these commands.
 
 Use `--list` to inspect conditions. `--pilot`, `--minimum`, and `--full` select
 knockout suites. `run_experiments.py` provides the original treatment catalog
-and comparisons. Both entrypoints default to the real engine; `--mock` explicitly
+and comparisons, and `--cell` runs one cell of the factorial design in
+[`docs/experiment-design.md`](../docs/experiment-design.md). Both entrypoints default to the real engine; `--mock` explicitly
 selects a harness-only simulation. `run_demo.py` is a mock-only illustration.
 `--core-engine-dir` or `CORE_ENGINE_DIR` optionally selects another built checkout.
 
