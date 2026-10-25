@@ -1,6 +1,7 @@
 pub mod types;
 pub use types::*;
 mod validation;
+pub(crate) use validation::validate_key;
 pub use validation::{artifact_hash, configuration_hash, validate_registration};
 mod events;
 mod execution;
@@ -15,11 +16,12 @@ use tokio::sync::Mutex;
 pub struct GameService {
     inner: Arc<Mutex<GameInner>>,
     operator_id: String,
+    chats: crate::chat::ChatService,
 }
 
 struct GameInner {
     chain: ChainClient,
-    store: Store,
+    store: Arc<Store>,
 }
 
 impl GameService {
@@ -35,13 +37,19 @@ impl GameService {
         let identity = serde_json::to_string(chain.identity())
             .map_err(|_| GameError::Internal("deployment serialization failed".into()))?;
         store.bind_deployment(&identity)?;
+        let store = Arc::new(store);
+        let chats = crate::chat::ChatService::new(store.clone(), operator_id.clone());
         Ok(Self {
             inner: Arc::new(Mutex::new(GameInner { chain, store })),
             operator_id,
+            chats,
         })
     }
     pub fn operator_id(&self) -> &str {
         &self.operator_id
+    }
+    pub fn chats(&self) -> &crate::chat::ChatService {
+        &self.chats
     }
     pub async fn identity(&self) -> DeploymentView {
         reads::deployment_view(self.inner.lock().await.chain.identity())
@@ -177,6 +185,7 @@ impl From<crate::store::StoreError> for GameError {
                 "immutable record or operation state conflicts with this request".into(),
             ),
             StoreError::NotFound(_) => Self::NotFound("record".into()),
+            StoreError::AccessDenied => Self::Forbidden("chat access denied".into()),
             _ => Self::Internal("local records are unavailable".into()),
         }
     }

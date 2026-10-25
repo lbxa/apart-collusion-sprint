@@ -323,3 +323,10 @@ receives 16, and the treasury receives 1 protocol unit plus 2 forfeited units:
 `16 + 3 × 2 + 3 = 25` deposited units. A 1.60 juror payout applies to five valid
 revealers, without those forfeitures. Integer rounding follows `SPEC.md` §9.2:
 initial percentage residual goes to the winner, jury-division dust to treasury.
+
+## Experimental private chat
+
+The core also exposes authenticated two-participant chats. See
+[the private-chat guide](private-chat.md) for create/send/read examples,
+latest-only versus full history, operator audit flags, and retained transcripts.
+These off-chain endpoints leave voting, escrow, and settlement unchanged.

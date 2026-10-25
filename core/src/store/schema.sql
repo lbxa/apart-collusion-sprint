@@ -1,4 +1,3 @@
-BEGIN IMMEDIATE;
 CREATE TABLE IF NOT EXISTS deployment (
     singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
     identity_json TEXT NOT NULL
@@ -65,4 +64,3 @@ CREATE TABLE IF NOT EXISTS chain_events (
     PRIMARY KEY (chain_id, contract_address, block_hash, transaction_hash, log_index)
 );
 PRAGMA user_version = 1;
-COMMIT;

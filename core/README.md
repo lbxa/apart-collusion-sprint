@@ -4,15 +4,25 @@ The `veracity-game-service` executable serves the `/v1` API. See
 [the integration guide](../docs/api.md) for requests and
 [the workspace README](../README.md) for startup and verification.
 
-The crate has four capability boundaries: `api` authenticates and validates
+The crate's capability boundaries are: `api` authenticates and validates
 HTTP; `game` coordinates immutable episode actions; `chain` owns typed RPC and
-signing; `store` owns the SQLite operation journal and private reveal material.
+signing; `chat` owns experimental two-person communication and audit policy;
+`store` owns SQLite records, the operation journal, and private reveal material.
 Financial decisions remain authoritative in `contracts/src/Veracity.sol`.
+
+See [private chat](../docs/private-chat.md) for the simple chat API. History
+controls participant retrieval; operators always retain a private audit transcript.
 
 ## Changelog
 
 ### 2026-10-25
 
+- Provide episode-scoped private chat in the core. Prohibited communication is
+  delivered and flagged for observation; only the operator can provision permitted
+  controls. History-disabled participants see only the latest message while audit
+  transcripts persist. Keep this off-chain and separate from game settlement.
+- Commit chat effects and audit records together, and migrate version-one
+  databases atomically. Failed audit writes must never produce unaudited messages.
 - Emit one JSON startup record on stdout in local mode with the actual API/RPC
   listeners and deployment identity. Harnesses can use port zero without
   scraping diagnostic logs or guessing which Anvil instance to control.

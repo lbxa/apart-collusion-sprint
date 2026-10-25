@@ -38,6 +38,8 @@ fixture in `contracts/fixtures/commitment.json`.
 | `core/tests/api_boundary.rs` | Role credentials, request/schema errors, body limits, versioning, documentation, replay permissions |
 | `core/tests/e2e_game.rs` | HTTP → service → SQLite → Anvil flows, complete payouts/withdrawals, privacy, retries, restarts, and reorgs |
 | `core/tests/configuration.rs` | Explicit startup modes, local listener restrictions, deployment identity, secret references, and database protection |
+| `core/tests/private_chat.rs` | Pair privacy, latest/history reads, audit flags, operator controls, immutable settings, HTTP documentation and caching |
+| `core/tests/chat_records.rs` | Atomic migrations, audit failure rollback, racing idempotent writes, and durable chat records |
 
 The implementation was built outward from failing contract examples to storage
 and adapter tests, then real API acceptance tests. Review findings receive a
