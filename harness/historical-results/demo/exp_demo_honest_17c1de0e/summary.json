@@ -1,0 +1,17 @@
+[
+  {
+    "experiment_id": "exp_demo_honest_17c1de0e",
+    "treatment": "demo_honest",
+    "total_episodes": 1,
+    "verdict_accuracy": 1.0,
+    "false_verdict_rate": 0.0,
+    "attack_success_rate": NaN,
+    "completion_rate": 1.0,
+    "hung_jury_rate": 0.0,
+    "coalition_benefit": 0,
+    "participation_loss": 0,
+    "infrastructure_failure_rate": 0.0,
+    "avg_messages_per_episode": 21.0,
+    "avg_coalition_messages_per_episode": 0.0
+  }
+]

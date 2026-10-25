@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This workspace implements the `SPEC.md` game engine and `/v1` API; the external harness owns experiments and agents. `core/src/` contains `api`, `game`, `chain`, `store`, and configuration modules. `contracts/` owns Solidity rules, Foundry tests, and the deployment artifact. Keep financial authority in the contract; add crates only for concrete ownership boundaries.
+This repository implements the `SPEC.md` game engine and `/v1` API plus the Python experiment harness in `harness/`. `core/src/` contains `api`, `game`, `chain`, `store`, and configuration modules. `contracts/` owns Solidity rules, Foundry tests, and the deployment artifact. The harness owns agents, treatments, observations, and metrics; it calls HTTP. Keep financial authority in the contract.
 
 `docs/api.md` is the harness integration guide; `docs/architecture.md` records boundaries. `configs/` and `examples/` contain deployment and request templates. Shared skills live in `.agents/skills/`; `.claude/skills` points there. Agent definitions and hooks live in `.codex/` and `.claude/`.
 
@@ -14,10 +14,11 @@ This workspace implements the `SPEC.md` game engine and `/v1` API; the external 
 - `cargo build --workspace --locked`: build workspace packages.
 - `cargo test --workspace --locked`: run unit, integration, and documentation tests.
 - `cargo test -p veracity-game-service`: test the service during iteration.
+- `bash scripts/verify-harness.sh`: run Python regressions and real engine acceptance tests after building Rust.
 - `cargo fmt --all`: format Rust sources.
 - `cargo clippy --workspace --all-targets --all-features --locked -- -D warnings`: reject lint warnings.
 
-Rust tooling is pinned in `rust-toolchain.toml`; Foundry in `.foundry-version`. Commit `Cargo.lock` and intentional artifact updates.
+Rust tooling is pinned in `rust-toolchain.toml`; Foundry in `.foundry-version`. Commit `Cargo.lock`, `harness/requirements.lock`, and intentional artifact updates. Setup requires uv and creates `harness/.venv`.
 
 ## Coding Style & Naming Conventions
 
@@ -25,7 +26,7 @@ Use Rust 2024 and rustfmt's default four-space indentation. Use `snake_case` for
 
 ## Testing Guidelines
 
-Follow the shared `tdd` skill: witness the intended failure, implement, and expand outward. Put unit tests in `#[cfg(test)]` modules and integration tests under `core/tests/`. Contract tests live in `contracts/test/`. Prove deadlines, conservation, commitments, role boundaries, and recovery with actual Anvil. Default tests require no public networks, funded public wallets, or model APIs. Never skip chain tests silently. No coverage percentage is configured.
+Follow the shared `tdd` skill: witness the intended failure, implement, and expand outward. Rust integration tests live in `core/tests/`, contract tests in `contracts/test/`, and Python unittest regressions in `harness/tests/`. Prove deadlines, conservation, commitments, role boundaries, and recovery with actual Anvil. Default tests require no public networks, funded public wallets, or model APIs. Never skip chain tests silently. No coverage percentage is configured.
 
 ## Commit & Pull Request Guidelines
 

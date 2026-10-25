@@ -11,6 +11,12 @@ Financial decisions remain authoritative in `contracts/src/Veracity.sol`.
 
 ## Changelog
 
+### 2026-10-25
+
+- Emit one JSON startup record on stdout in local mode with the actual API/RPC
+  listeners and deployment identity. Harnesses can use port zero without
+  scraping diagnostic logs or guessing which Anvil instance to control.
+
 ### 2026-10-24
 
 - Require only game inputs at registration. Experiment/scenario identifiers are

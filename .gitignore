@@ -10,3 +10,8 @@
 /contracts/out/
 /contracts/cache/
 /contracts/broadcast/
+**/__pycache__/
+*.py[cod]
+/harness/.venv/
+/harness/results/
+/results/

@@ -5,6 +5,7 @@ fixture="$(mktemp -d "${TMPDIR:-/tmp}/veracity-verify-test.XXXXXX")"
 trap 'rm -rf "$fixture"' EXIT
 mkdir -p "$fixture/repo with spaces/scripts" "$fixture/bin"
 cp "$repo_root/scripts/verify.sh" "$fixture/repo with spaces/scripts/verify.sh"
+cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/scripts/verify-harness.sh"
 cp "$repo_root/scripts/agent-hooks/fixtures/cargo.sh" "$fixture/bin/cargo"
 chmod +x "$fixture/bin/cargo"
 export PATH="$fixture/bin:$PATH"
@@ -36,6 +37,12 @@ for failure in fmt test; do
   [ ! -s "$CARGO_CALLS" ]
 done
 
+if VERIFY_EXIT=1 bash "$fixture/repo with spaces/scripts/verify.sh" >"$fixture/output" 2>&1; then
+  printf 'Verification hid a harness test failure\n' >&2
+  exit 1
+fi
+[ "$(tail -n 1 "$CARGO_CALLS" | cut -d ' ' -f 1)" = build ]
+
 mkdir -p "$fixture/repo with spaces/.claude/hooks"
 cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/.claude/hooks/failing.test.sh"
 : > "$CARGO_CALLS"
@@ -44,4 +51,4 @@ if VERIFY_EXIT=1 bash "$fixture/repo with spaces/scripts/verify.sh" >"$fixture/o
   exit 1
 fi
 [ ! -s "$CARGO_CALLS" ]
-printf 'Verification: hook, Forge, and Cargo failures, gate order, and locked flags passed.\n'
+printf 'Verification: hook, Forge, Cargo, and harness failures, gate order, and locked flags passed.\n'

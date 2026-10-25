@@ -8,8 +8,10 @@ description: Run the Rust workspace and agent-hook verification gate before hand
 Run `bash scripts/verify.sh` from the repository root. It runs isolated hook
 tests, pinned Foundry formatting/unit/fuzz/invariant tests, deployment artifact
 consistency, `cargo fmt --all -- --check`, Clippy with warnings denied, Cargo tests
-(including doctests), and builds all workspace targets. Dependencies must match
-the committed `Cargo.lock`; the toolchain is pinned in `rust-toolchain.toml`.
+(including doctests), builds all workspace targets, and runs Python harness
+regressions plus real Python → Rust → Anvil acceptance tests. Dependencies must
+match `Cargo.lock` and `harness/requirements.lock`; setup creates `harness/.venv`.
+The Rust toolchain is pinned in `rust-toolchain.toml`.
 
 Iterate with `cargo test -p veracity-game-service <test_name>` or the owning crate's
 equivalent, then rerun the full gate after fixes. Cargo reuses build artifacts;

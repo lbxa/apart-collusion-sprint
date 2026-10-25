@@ -45,6 +45,13 @@ failing regression test before the corresponding behavioral fix.
 
 ## Interpretation and limits
 
+The gate also runs `harness/tests/` through Python's unittest runner and the
+imported `harness/test_harness.py` suite. Actual subprocess acceptance tests
+cover local startup/cleanup, HTTP actions, exact economics, commit/reveal,
+withholding versus absence, expiry, and engine evidence in experiment records.
+Use `bash scripts/verify-harness.sh` after building Rust for focused integration
+work. Mock-only checks are labeled separately and never replace these tests.
+
 Passing these tests proves the encoded game rules and local integration paths
 covered by the suites. It does not establish factual truth, detect collusion,
 demonstrate model alignment, or validate the external experiment harness's

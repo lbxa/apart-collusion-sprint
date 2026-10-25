@@ -1,0 +1,221 @@
+"""CLI contracts without starting model clients or spending API credits."""
+
+import asyncio
+import contextlib
+import io
+import logging
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+from types import SimpleNamespace
+import unittest
+from unittest.mock import AsyncMock, Mock, patch
+
+import run_experiments
+import run_knockout
+
+
+def metrics(failure_rate=0.0):
+    return SimpleNamespace(summary=lambda: {
+        "total_episodes": 2,
+        "false_verdict_rate": 0.0,
+        "verdict_accuracy": 1.0,
+        "hung_jury_rate": 0.0,
+        "infrastructure_failure_rate": failure_rate,
+    })
+
+
+class EntryPointTests(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        previous = logging.root.manager.disable
+        logging.disable(logging.CRITICAL)
+        self.addCleanup(logging.disable, previous)
+
+    async def invoke(self, module, arguments, *, failure_rate=0.0, runner_error=None,
+                     startup_error=None, validation_error=None):
+        engine = SimpleNamespace(
+            backend="core", start=AsyncMock(side_effect=startup_error), stop=AsyncMock(),
+        )
+        core_factory = Mock(return_value=engine)
+        core_factory.validate_config = Mock(side_effect=validation_error)
+        mock_api = SimpleNamespace(backend="mock")
+        mock_factory = Mock(return_value=mock_api)
+        runner = Mock()
+        runner.run_experiment = AsyncMock(return_value=metrics(failure_rate), side_effect=runner_error)
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(module, "CoreEngineAPI", core_factory, create=True), \
+             patch.object(module, "MockGameAPI", mock_factory), \
+             patch.object(module, "ExperimentRunner", return_value=runner), \
+             patch.object(sys, "argv", [module.__file__, *arguments, "--output", directory]), \
+             patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-never-sent"}, clear=True), \
+             contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            result = await module.main()
+            output_exists = any(Path(directory).glob("*results.json"))
+        return SimpleNamespace(result=result, engine=engine, core=core_factory,
+                               mock=mock_factory, runner=runner, output_exists=output_exists)
+
+    async def test_knockout_dry_run_defaults_to_real_engine_and_honors_episode_override(self):
+        run = await self.invoke(run_knockout, ["--condition", "knockout_full", "--dry-run", "--episodes", "2"])
+        self.assertEqual(run.result, 0)
+        run.core.assert_called_once_with(core_engine_dir=None)
+        run.mock.assert_not_called()
+        run.engine.start.assert_awaited_once()
+        run.engine.stop.assert_awaited_once()
+        treatment = run.runner.run_experiment.await_args.args[0]
+        self.assertEqual(treatment.num_episodes, 2)
+        self.assertTrue(treatment.use_scripted_creator)
+        self.assertTrue(treatment.use_scripted_challenger)
+        self.assertEqual(treatment.scripted_juror_indices, list(range(treatment.jury_size)))
+
+    async def test_experiments_scripted_defaults_to_real_engine(self):
+        run = await self.invoke(run_experiments, ["--treatment", "baseline", "--scripted", "--episodes", "2"])
+        self.assertEqual(run.result, 0)
+        run.core.assert_called_once_with(core_engine_dir=None)
+        run.mock.assert_not_called()
+        run.engine.start.assert_awaited_once()
+        run.engine.stop.assert_awaited_once()
+        treatment = run.runner.run_experiment.await_args.args[0]
+        self.assertEqual(treatment.num_episodes, 2)
+        self.assertTrue(treatment.use_scripted_creator)
+        self.assertEqual(treatment.scripted_juror_indices, list(range(treatment.jury_size)))
+
+    async def test_mock_requires_an_explicit_flag_in_both_entrypoints(self):
+        for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
+                                 (run_experiments, ["--treatment", "baseline"])]:
+            with self.subTest(module=module.__name__):
+                run = await self.invoke(module, [*selector, "--mock", "--dry-run", "--episodes", "1"])
+                self.assertEqual(run.result, 0)
+                run.mock.assert_called_once_with()
+                run.core.assert_not_called()
+                run.engine.start.assert_not_awaited()
+                run.engine.stop.assert_not_awaited()
+
+    async def test_explicit_core_engine_flag_and_directory_override_remain_supported(self):
+        for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
+                                 (run_experiments, ["--treatment", "baseline"])]:
+            with self.subTest(module=module.__name__):
+                run = await self.invoke(module, [*selector, "--core-engine", "--core-engine-dir", "/tmp/test-engine", "--scripted", "--episodes", "1"])
+                self.assertEqual(run.result, 0)
+                run.core.assert_called_once_with(core_engine_dir="/tmp/test-engine")
+                run.mock.assert_not_called()
+
+    async def test_engine_stops_on_experiment_error_and_cancellation(self):
+        for error in [RuntimeError("experiment failed"), asyncio.CancelledError()]:
+            for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
+                                     (run_experiments, ["--treatment", "baseline"])]:
+                with self.subTest(module=module.__name__, error=type(error).__name__):
+                    engine = SimpleNamespace(backend="core", start=AsyncMock(), stop=AsyncMock())
+                    core_factory = Mock(return_value=engine)
+                    core_factory.validate_config = Mock()
+                    runner = Mock(run_experiment=AsyncMock(side_effect=error))
+                    with tempfile.TemporaryDirectory() as directory, \
+                         patch.object(module, "CoreEngineAPI", core_factory, create=True), \
+                         patch.object(module, "ExperimentRunner", return_value=runner), \
+                         patch.object(sys, "argv", [module.__file__, *selector, "--dry-run", "--output", directory]), \
+                         contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                        if isinstance(error, asyncio.CancelledError):
+                            with self.assertRaises(asyncio.CancelledError):
+                                await module.main()
+                        else:
+                            self.assertEqual(await module.main(), 1)
+                    engine.stop.assert_awaited_once()
+
+    async def test_failed_engine_start_is_cleaned_up_without_mock_fallback(self):
+        for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
+                                 (run_experiments, ["--treatment", "baseline"])]:
+            with self.subTest(module=module.__name__):
+                run = await self.invoke(module, [*selector, "--dry-run"], startup_error=RuntimeError("binary unavailable"))
+                self.assertEqual(run.result, 1)
+                run.engine.stop.assert_awaited_once()
+                run.mock.assert_not_called()
+                run.runner.run_experiment.assert_not_awaited()
+
+    async def test_preflight_failure_is_visible_before_engine_startup(self):
+        run = await self.invoke(run_experiments, ["--treatment", "jury_11", "--scripted"],
+                                validation_error=ValueError("unsupported jury size"))
+        self.assertEqual(run.result, 1)
+        run.core.assert_not_called()
+        run.mock.assert_not_called()
+        run.runner.run_experiment.assert_not_awaited()
+
+    async def test_jury_comparison_uses_only_supported_core_sizes(self):
+        run = await self.invoke(run_experiments, ["--compare-jury-sizes", "--scripted", "--episodes", "1"])
+        self.assertEqual(run.result, 0)
+        treatments = [call.args[0] for call in run.runner.run_experiment.await_args_list]
+        self.assertEqual([t.jury_size for t in treatments], [3, 3, 5, 5, 7, 7])
+        self.assertTrue(all(t.scripted_juror_indices == list(range(t.jury_size)) for t in treatments))
+
+    async def test_mock_jury_comparison_retains_larger_scientific_conditions(self):
+        run = await self.invoke(run_experiments, ["--compare-jury-sizes", "--mock", "--scripted", "--episodes", "1"])
+        self.assertEqual(run.result, 0)
+        sizes = [call.args[0].jury_size for call in run.runner.run_experiment.await_args_list]
+        self.assertEqual(sizes, [3, 3, 5, 5, 7, 7, 11, 11, 21, 21])
+
+    async def test_infrastructure_failures_are_saved_but_return_nonzero(self):
+        for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
+                                 (run_experiments, ["--treatment", "baseline"])]:
+            with self.subTest(module=module.__name__):
+                run = await self.invoke(module, [*selector, "--dry-run"], failure_rate=0.5)
+                self.assertEqual(run.result, 1)
+                self.assertTrue(run.output_exists)
+                run.engine.stop.assert_awaited_once()
+
+    async def test_live_option_uses_the_configured_models_instead_of_scripting(self):
+        run = await self.invoke(run_experiments, ["--treatment", "baseline", "--live", "--episodes", "1"])
+        self.assertEqual(run.result, 0)
+        treatment = run.runner.run_experiment.await_args.args[0]
+        self.assertFalse(treatment.use_scripted_creator)
+        self.assertEqual(treatment.scripted_juror_indices, [])
+
+    async def test_scripted_shorthand_still_starts_the_core_backend(self):
+        for module in (run_knockout, run_experiments):
+            with self.subTest(module=module.__name__):
+                run = await self.invoke(module, ["--dry-run", "--episodes", "1"])
+                self.assertEqual(run.result, 0)
+                run.core.assert_called_once_with(core_engine_dir=None)
+                run.engine.start.assert_awaited_once()
+                self.assertEqual(run.runner.run_experiment.await_args.args[0].num_episodes, 1)
+
+    async def test_invalid_episode_counts_and_contradictory_modes_fail_before_startup(self):
+        for module in (run_knockout, run_experiments):
+            for arguments in (["--dry-run", "--episodes", "0"],
+                              ["--dry-run", "--mock", "--core-engine"],
+                              ["--dry-run", "--live"]):
+                with self.subTest(module=module.__name__, arguments=arguments):
+                    with self.assertRaises(SystemExit) as raised:
+                        await self.invoke(module, arguments)
+                    self.assertEqual(raised.exception.code, 2)
+
+    async def test_scripted_runs_preserve_the_original_treatment_definitions(self):
+        original = run_knockout.KNOCKOUT_CONDITIONS["knockout_full"]
+        before = (original.num_episodes, original.use_scripted_creator,
+                  original.use_scripted_challenger, list(original.scripted_juror_indices))
+        await self.invoke(run_knockout, ["--condition", "knockout_full", "--scripted", "--episodes", "2"])
+        self.assertEqual((original.num_episodes, original.use_scripted_creator,
+                          original.use_scripted_challenger, original.scripted_juror_indices), before)
+
+    async def test_mock_incentive_comparison_preserves_the_equal_thirds_treatment(self):
+        run = await self.invoke(run_experiments, ["--compare-incentives", "--mock", "--scripted", "--episodes", "1"])
+        self.assertEqual(run.result, 0)
+        treatments = [call.args[0] for call in run.runner.run_experiment.await_args_list]
+        self.assertEqual(len(treatments), 5)
+        equal = treatments[-1].payout
+        self.assertEqual((equal.winner_pct, equal.juror_pool_pct, equal.protocol_pct), (1 / 3, 1 / 3, 1 / 3))
+
+
+class ProcessExitTests(unittest.TestCase):
+    def test_unsupported_real_configurations_exit_nonzero_without_launching_a_model(self):
+        for treatment, reason in [("jury_11", "jury"), ("incentive_equal", "payout")]:
+            with self.subTest(treatment=treatment), tempfile.TemporaryDirectory() as directory:
+                result = subprocess.run([
+                    sys.executable, str(Path(run_experiments.__file__)), "--treatment", treatment,
+                    "--scripted", "--episodes", "1", "--output", directory,
+                ], capture_output=True, text=True, timeout=15)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn(reason, (result.stdout + result.stderr).lower())
+
+
+if __name__ == "__main__":
+    unittest.main()

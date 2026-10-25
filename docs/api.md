@@ -302,7 +302,7 @@ contains party refunds on abort/expiry; juror refunds remain in `juror_payouts`.
 All monetary result fields are decimal base-unit strings. Ground truth is never
 inferred from the contract's verdict.
 
-The supplied `GAME_BUILDER_HANDOFF.md` cannot be used unchanged:
+The historical `harness/GAME_BUILDER_HANDOFF.md` cannot be used unchanged:
 
 | Handoff operation or convention | v1 mapping |
 | --- | --- |

@@ -27,3 +27,4 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 cargo test --workspace --all-features --locked
 cargo build --workspace --all-targets --all-features --locked
+bash "$repo_root/scripts/verify-harness.sh"

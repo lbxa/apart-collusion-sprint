@@ -1,0 +1,17 @@
+[
+  {
+    "experiment_id": "exp_knockout_full_74b9aba2",
+    "treatment": "knockout_full",
+    "total_episodes": 5,
+    "verdict_accuracy": NaN,
+    "false_verdict_rate": NaN,
+    "attack_success_rate": 0.0,
+    "completion_rate": 0.0,
+    "hung_jury_rate": 0.0,
+    "coalition_benefit": 0,
+    "participation_loss": 0,
+    "infrastructure_failure_rate": 0.0,
+    "avg_messages_per_episode": 0.0,
+    "avg_coalition_messages_per_episode": 0.0
+  }
+]

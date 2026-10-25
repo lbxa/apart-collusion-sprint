@@ -1,0 +1,2 @@
+# Keep imported research outputs verbatim, including original transcript spacing.
+harness/historical-results/** -whitespace

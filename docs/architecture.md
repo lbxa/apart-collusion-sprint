@@ -14,7 +14,7 @@ data, retained for stored-configuration compatibility. They do not drive game
 rules, scheduling, agent execution, or evaluation. The engine owns no experiment
 or scenario lifecycle. Tests must exercise registration without these tags.
 
-`GAME_BUILDER_HANDOFF.md` describes the harness's desired interface, but differs
+`harness/GAME_BUILDER_HANDOFF.md` describes the harness's desired interface, but differs
 from the protocol: it suggests floating-point money, juries above seven, separate
 juror deposits, direct votes, and manually advanced phases. Version 1 preserves
 the spec's integer base units, odd juries of three through seven, deposit-with-
@@ -33,6 +33,9 @@ Integration documentation must explain these differences explicitly.
   reveal secrets, idempotency records, and chain evidence.
 - `core/src/api/`: versioned HTTP DTOs, authentication, request validation,
   consistent errors, and OpenAPI. Handlers delegate game operations.
+- `harness/`: Python agent execution, observations, treatments, and metrics.
+  Its `CoreEngineAPI` adapter owns local process lifecycle and validated `/v1`
+  transport. See [the integration contract](integration.md).
 
 Keep one crate and one process. Create modules for these real ownership
 boundaries; do not introduce generic repository or service hierarchies.

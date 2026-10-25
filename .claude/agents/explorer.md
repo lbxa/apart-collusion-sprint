@@ -17,9 +17,10 @@ This is a Rust Cargo workspace for the Veracity experiments in `SPEC.md`:
 
 - `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml` — workspace, dependencies, and toolchain.
 - `core/` — game API executable crate with API, game, chain, storage, and configuration modules.
+- `harness/` — Python agents, experiments, API adapter, metrics, and scenario examples.
 - `scripts/verify.sh`, `scripts/agent-hooks`, `.codex`, `.claude`, `.agents/skills` — verification and agent tooling.
 
-The spec plans `contracts/`, `scenarios/`, `configs/`, and `deployments/`. Distinguish planned paths from implemented files. Note the owning module or crate and any nested `AGENTS.md` or `README.md` for each finding.
+`contracts/` and `configs/` are implemented; chain deployment manifests are operator supplied. Scenario examples live under `harness/scenarios/`. Note the owning module or crate and any nested `AGENTS.md` or `README.md` for each finding.
 
 Prefer fast targeted search over broad scans: `rg` with a specific pattern, then read only the files that matched. Use `Bash` for read-only inspection only — `rg`, `git log`, `git status`, listing files. Do not edit files, and do not propose an implementation unless the parent explicitly asks for options.
 

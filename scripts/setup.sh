@@ -25,4 +25,5 @@ bash "$repo_root/contracts/check-artifact.sh"
 cargo fmt --version
 cargo clippy --version
 cargo fetch --locked
-printf 'Rust workspace setup complete. Run bash scripts/verify.sh.\n'
+bash "$repo_root/scripts/setup-harness.sh"
+printf 'Engine and harness setup complete. Run bash scripts/verify.sh.\n'

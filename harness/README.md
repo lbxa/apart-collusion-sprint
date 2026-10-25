@@ -1,0 +1,111 @@
+# Collusion Experiment Harness
+
+Python agents, treatments, deliberation, and metrics for the Veracity game.
+Normal experiment commands wrap the Rust engine through its `/v1` HTTP API.
+Solidity remains authoritative for deposits, deadlines, votes, and settlement.
+
+## Setup and local execution
+
+From the repository root, install Rust and uv, then run:
+
+```sh
+bash scripts/setup.sh
+cargo build --workspace --locked
+harness/.venv/bin/python harness/run_knockout.py \
+  --condition knockout_honest --dry-run --episodes 2 \
+  --output .harness/experiments/honest
+```
+
+This needs no model credentials or public RPC. `--dry-run` / `--scripted`
+selects scripted agents while preserving actual Rust, SQLite, Solidity, and
+Anvil execution. The adapter starts a fresh server and local chain, discovers
+their exact loopback ports from startup JSON, and shuts down both afterward.
+Do not start a second server manually for these commands.
+
+Use `--list` to inspect conditions. `--pilot`, `--minimum`, and `--full` select
+knockout suites. `run_experiments.py` provides the original treatment catalog
+and comparisons. Both entrypoints default to the real engine; `--mock` explicitly
+selects a harness-only simulation. `run_demo.py` is a mock-only illustration.
+`--core-engine-dir` or `CORE_ENGINE_DIR` optionally selects another built checkout.
+
+To use model agents, omit `--dry-run` and supply the provider credentials through
+environment variables. Never commit them. Runs with infrastructure failures
+save diagnostic records and exit unsuccessfully; failures do not become verdicts.
+
+## Protocol and units
+
+- Supported real juries have 3, 5, or 7 distinct members. Rules and rosters freeze
+  at registration. Larger mock juries are simulations of a different protocol.
+- One harness token maps to **100 integer native base units**. Historical `$`
+  labels in prompts describe simulated utility, not fiat or valuable currency.
+  Decimal conversion rejects fractional base units and inexact basis points.
+  Equal party stakes, juror bond, and all payout shares come from the treatment.
+- The explicit mock preserves the earlier harness simulation, including
+  independent juror bonds, larger juries, and floating payouts. Its metrics
+  describe a different protocol and must not be pooled with real engine results.
+- Juror deposits occur with confirmed commitments. A juror who never commits
+  deposits nothing. A committed juror who withholds a reveal forfeits the bond.
+  Treatments can set `withhold_reveal_indices` explicitly to test the latter.
+- The adapter advances only its owned local Anvil to absolute contract deadlines.
+  Run episodes sequentially on that node; use separate adapters for concurrent
+  local runs. This convenience mode does not attach to public deployments.
+- Actual claim text, counter-evidence, and final assessments reach the engine.
+  Deliberation, straw polls, private channels, and simulated bribes stay here.
+  The runner enforces configured channels and keeps ground truth in evaluation.
+  Scripted honest baselines receive explicit oracle labels as test doubles;
+  their accuracy is plumbing evidence, not evidence about model ability.
+- Settlement and per-episode balances come from the engine. No cached vote or
+  mock calculation can substitute for a failed or unconfirmed chain operation.
+
+See [the API guide](../docs/api.md) and [integration contract](../docs/integration.md).
+`GAME_API_CONTRACT.md` and `GAME_BUILDER_HANDOFF.md` are historical proposals.
+
+## Structure and results
+
+`game_api/` owns the adapter and validated wire types; `agents/` owns decisions
+and prompts; `experiments/` owns treatments and execution; `metrics/` owns
+evaluation and exports; `scenarios/` holds examples. `example_experiment.toml`
+is a reference configuration, not an alternative game engine contract.
+
+Each run writes `episodes.jsonl`, `summary.json`, and transcripts. Records
+identify `config.game_backend`. Real settlements retain `engine_evidence` with
+exact integer amounts and deployment identity. Episode exports are scoped to
+their experiment. Verdict accuracy excludes failed runs; attack success uses
+the declared target and all assigned attack trials, with abort/failure counts
+reported separately. Undefined rates are JSON `null`. `simulated_utility` and
+the recipient-specific offer ledger stay separate from on-chain payouts.
+`collusion_analysis` includes eligible history but remains a heuristic flag,
+not proof of coordination. Imported `historical-results/` and `RESULTS.md` predate
+these integration fixes and must not be used as proof of corrected behavior.
+
+## Verification
+
+```sh
+bash scripts/verify.sh
+# Focused Python work, after building Rust:
+bash scripts/verify-harness.sh
+```
+
+Unittest regressions exercise HTTP failures, confirmation status, unit
+conversion, CLI defaults, channel controls, memory, metrics, and exports.
+Actual process tests drive Python → Rust → SQLite → Solidity → Anvil, including
+both winners, minority rewards, integer dust, nonparticipation/withholding,
+expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
+
+## Changelog
+
+### 2026-10-25
+
+- Use the Rust API by default and preserve exact settlement evidence. A failed
+  HTTP operation, reverted receipt, or malformed response is an explicit failure,
+  never a locally reconstructed verdict or payout.
+- Derive on-chain stakes, juror bonds, and payout shares from treatment values;
+  keep a fixed conversion scale so low-stakes and incentive comparisons execute
+  the economics described to agents.
+- Separate absence from reveal withholding, isolate evaluator truth and mutable
+  observations from agent contexts, enforce channel controls, preserve
+  enabled role memory across episodes, and scope exports to one experiment so
+  protocol and treatment differences remain observable in results.
+- Report attack targets against all assigned trials and persist conditional
+  simulated utility independently of contract finance. Keep undefined rates
+  valid JSON and compare repeated-play signals through stable role slots.

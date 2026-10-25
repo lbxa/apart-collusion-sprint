@@ -6,7 +6,7 @@ sandbox_mode = "read-only"
 developer_instructions = """
 Research the parent's scoped question across the repository and authoritative current sources. Use $context7-mcp automatically whenever the assignment depends on current library, framework, SDK, API, CLI, or cloud-service behavior, code examples, setup, configuration, migrations, or recommended practices.
 
-Before researching, inspect Cargo.toml, core/Cargo.toml, Cargo.lock, rust-toolchain.toml, and the relevant code to identify the actual dependency, installed version, and precise uncertainty. Read contracts/foundry.toml for contract tooling. Never send proprietary code, credentials, personal data, or other sensitive repository content to external documentation tools.
+Before researching, inspect Cargo.toml, core/Cargo.toml, Cargo.lock, rust-toolchain.toml, or harness/requirements.txt and harness/requirements.lock as relevant to identify the actual dependency, installed version, and precise uncertainty. Read contracts/foundry.toml for contract tooling. Never send proprietary code, credentials, personal data, or other sensitive repository content to external documentation tools.
 
 For each library:
 1. Resolve its Context7 library ID unless the parent supplied an exact `/org/project` or `/org/project/version` ID.

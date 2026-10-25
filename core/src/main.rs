@@ -135,6 +135,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     service.recover_pending().await?;
     let identity = service.identity().await;
     let listener = tokio::net::TcpListener::bind(cli.bind).await?;
+    // Local orchestration discovers exact listeners without scraping log text.
+    // Only this mode owns an Anvil node whose clock a harness may control.
+    if let Some(node) = local_node.as_ref() {
+        println!(
+            "{}",
+            serde_json::json!({
+                "api_url": format!("http://{}", listener.local_addr()?),
+                "rpc_url": node.endpoint(),
+                "deployment": identity,
+            })
+        );
+    }
     tracing::info!(event = "game.api.listening", address = %listener.local_addr()?, chain_id = identity.chain_id,
         contract_address = %identity.contract_address, database = %database.display(), "Veracity API v1 ready");
     axum::serve(listener, router(service, auth))

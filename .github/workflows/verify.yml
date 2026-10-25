@@ -1,0 +1,24 @@
+name: Verify engine and harness
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, feat/integration]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: '3.12'
+      - name: Install pinned tools and dependencies
+        run: bash scripts/setup.sh
+      - name: Verify protocol and actual harness integration
+        run: bash scripts/verify.sh

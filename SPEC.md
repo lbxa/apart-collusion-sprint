@@ -10,8 +10,8 @@ Scope Rust game engine and versioned API, with Solidity contracts on Polygon Amo
 
 This revision supersedes version 0.1. It replaces the custom blockchain build with an application deployed to an existing testnet. It implements a deliberately reduced version of the Veracity dispute mechanism.
 
-The deliverable in this repository is the game engine and its API. A separate
-team builds the experiment harness. Experiment execution, agent models,
+This specification defines the game engine and its API. The separately owned
+experiment harness is integrated under `harness/`. Experiment execution, agent models,
 prompts, jury sampling, deliberation, coalitions, simulated bribes, observation
 permissions, and research metrics belong to that external harness. Research
 requirements below describe its context, not additional engine components.
@@ -377,6 +377,7 @@ retrospective changes to registered rules.
 | -------------- | ---------------------------------------------------------------------------------------- |
 | `contracts/`   | Foundry project, Veracity contract, deployment script, and contract tests                |
 | `core/`        | Rust executable with API, game, chain, and storage modules                             |
+| `harness/`     | Python experiments and agents that call the engine's versioned HTTP API                |
 | `configs/`     | Game service deployment configuration                                                  |
 | `deployments/` | Chain IDs, addresses, deployment blocks, compiler settings, code hashes, and ABI digests |
 
@@ -433,10 +434,14 @@ agent models, prompts, role sampling, private observations, deliberation,
 coalition treatments, simulated utility, and research metrics. It supplies and
 records an explicit roster and provenance when instantiating an episode.
 
+The Python harness is integrated in this repository under `harness/` and remains
+a separate process and ownership boundary. It calls the Rust API; experiment
+logic must not move into the engine.
+
 The game service owns immutable episode registration, artifact integrity,
 isolated signing, durable operation recovery, chain evidence, and contract-backed
 queries. The monetary, voting, deadline, and settlement rules above remain
-unchanged. `GAME_BUILDER_HANDOFF.md` is an integration wish list rather than a
+unchanged. `harness/GAME_BUILDER_HANDOFF.md` is an integration wish list rather than a
 replacement protocol; its floating amounts, larger juries, direct votes, and
 manual phase transitions are not implemented as game rules.
 

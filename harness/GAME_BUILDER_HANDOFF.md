@@ -1,5 +1,9 @@
 # What the Harness Needs From the Game
 
+> Historical handoff retained for context. Use [SPEC.md](../SPEC.md),
+> [the `/v1` API](../docs/api.md), and [integration notes](../docs/integration.md)
+> for implemented rules. The contract controls phases and settlement.
+
 This document tells you exactly what the experiment harness expects from the game (Rust + Solidity on Polygon Amoy). The harness drives LLM-backed agents through a veracity dispute game and measures collusion across treatments. You build the game mechanics; the harness handles agents, prompts, coalition injection, and metrics.
 
 ---
