@@ -20,7 +20,7 @@ Prioritize correctness, security, accessibility, behavior regressions, and missi
 **Repository conventions worth checking**, from the root `AGENTS.md`:
 
 - Rust 2024 with rustfmt formatting, inherited workspace lints, and Clippy warnings denied.
-- `runner/` starts as one crate; modules own experiment, agent, chain, and storage behavior as it is implemented.
+- `core/` is one crate; modules own API, game, chain, and storage behavior.
 - Check ownership and borrowing, error propagation, async task cleanup, secret handling, and protocol boundary behavior.
 - Unit tests use `#[cfg(test)]`; integration tests live under the owning crate's `tests/`. Default tests must not depend on public RPC endpoints or live model services.
 - `bash scripts/verify.sh` is the shared verification gate; inspect whether the reported checks actually exercised the changed behavior.

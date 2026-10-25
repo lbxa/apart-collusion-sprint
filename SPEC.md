@@ -1,4 +1,4 @@
-# Veracity Agent Testing Specification
+# Veracity Game Engine Specification
 
 Version 0.2
 
@@ -6,15 +6,24 @@ Date 2026-10-24
 
 Status Draft for implementation
 
-Scope Rust environment for testing agent behaviour and alignment, with Solidity contracts on Polygon Amoy
+Scope Rust game engine and versioned API, with Solidity contracts on Polygon Amoy
 
 This revision supersedes version 0.1. It replaces the custom blockchain build with an application deployed to an existing testnet. It implements a deliberately reduced version of the Veracity dispute mechanism.
+
+The deliverable in this repository is the game engine and its API. A separate
+team builds the experiment harness. Experiment execution, agent models,
+prompts, jury sampling, deliberation, coalitions, simulated bribes, observation
+permissions, and research metrics belong to that external harness. Research
+requirements below describe its context, not additional engine components.
 
 ## 1. Purpose
 
 Build a small research environment in which agents create claims, challenge claims, assess evidence, vote, and receive contract-enforced payouts. Use it to measure how agent behaviour changes with incentives and opportunities to coordinate.
 
-Rust controls experiments and records observations. Solidity enforces bonds, voting rules, and settlement. Polygon Amoy supplies transaction execution and blockchain consensus.
+The Rust game service validates API actions and records protocol operations.
+Solidity enforces bonds, voting rules, and settlement. Polygon Amoy supplies
+transaction execution and blockchain consensus. The external harness controls
+experiments and observations.
 
 The blockchain provides an observable record and enforces the specified payment rules. It does not determine factual truth, detect collusion automatically, or establish that agents are aligned.
 
@@ -41,11 +50,12 @@ The core mechanism retained is equal creator and challenger bonds, juror bonds, 
 
 | Component          | Responsibilities                                                                                         |
 | ------------------ | -------------------------------------------------------------------------------------------------------- |
-| Rust runner        | Load scenarios, assign roles, control observations, execute agents, schedule actions, and export results |
+| Rust game service  | Expose the game API, validate actions, preserve artifacts and transaction intents, and return game state |
+| External harness   | Load scenarios, assign roles, control observations, execute agents, schedule trials, and evaluate results |
 | Rust chain adapter | Encode calls, sign transactions, track nonces and receipts, and collect contract events                  |
 | Solidity contract  | Register episode rules, escrow bonds, verify commitments, count votes, and credit withdrawals            |
 | Polygon Amoy       | Execute transactions and provide the public ledger                                                       |
-| Local storage      | Store scenarios, model outputs, messages, assessments, receipts, and analysis records                    |
+| Engine storage     | Store game configuration, claim/evidence/assessment artifacts, vote secrets, operations, and receipts    |
 
 Begin with one Rust process, one SQLite database, and a local artifact directory. An external queue, separate indexer service, web server, and distributed agent infrastructure are unnecessary for the MVP.
 
@@ -82,9 +92,14 @@ Use Anvil for unit tests, rapid iteration, and larger batches. Use Amoy for publ
 
 Pin Rust, dependencies, Foundry, and the Solidity compiler in the repository. Set the compiler EVM target explicitly and verify its output on the selected networks before running experiments. There is no custom EVM implementation or network fork to maintain.
 
-## 5. Experiment model
+## 5. External experiment context
 
 An experiment contains one or more independent episodes. Each episode contains one claim, one creator, one designated challenger, and a fixed jury. An unchallenged episode has no vote or jury payouts.
+
+Only the episode's game identity, roster, and protocol parameters are engine
+inputs. The external harness owns the experiment, scenario, model, treatment,
+and evaluation records below. The engine does not require those records in
+order to instantiate or play a game.
 
 | Record     | Required information                                                                          |
 | ---------- | --------------------------------------------------------------------------------------------- |
@@ -98,11 +113,17 @@ An experiment contains one or more independent episodes. Each episode contains o
 
 Freeze the episode configuration before posting. Record role assignments and communication permissions before observing model outputs. Never change labels or treatment rules after seeing the verdict.
 
-Ground truth belongs to the evaluator. Agents receive only the scenario information allowed by their treatment. Treat hidden labels, other agents' private observations, and signing keys as privileged runner data.
+Ground truth belongs to the external evaluator. The external harness controls
+scenario visibility and private observations. The game engine holds signing
+keys and unrevealed vote material; it does not receive hidden truth labels or
+manage treatment-specific observations.
 
-## 6. Agent interface
+## 6. External harness integration
 
-Start with scripted agents for integration tests and a model-backed adapter for research runs. Each adapter receives an observation and returns a structured action. The runner validates the action and invokes the appropriate contract function.
+The external harness adapts its agents to structured game API actions. The
+engine validates those actions and invokes the appropriate contract function.
+The engine's automated protocol tests do not constitute an experiment harness;
+no scripted or model-backed research agents are production engine components.
 
 Agents supply artifact text and decisions. Rust saves the artifact bytes, computes their hashes, generates vote salts, and builds commitments and transaction calldata. Models do not need to calculate cryptographic hashes or construct raw transactions.
 
@@ -113,11 +134,17 @@ Agents supply artifact text and decisions. Rust saves the artifact bytes, comput
 | Juror            | Commit a verdict and assessment hash with a juror bond, then reveal     |
 | All participants | Read permitted observations and request withdrawal of their own credits |
 
-Explicit communication actions are enabled only when the treatment permits them. The runner logs messages and enforces recipient and phase restrictions. Agents cannot execute arbitrary shell commands, access the runner database, choose another participant's signer, or call administrative functions.
+The external harness owns communication channels, message logs, recipient
+permissions, and treatment restrictions. The game API exposes protocol actions
+only. Callers cannot execute shell commands, access engine storage, choose
+another participant's signer, or bypass administrative authorization.
 
-Use a separate memory and observation context for each agent. Model endpoints and the runner remain trusted infrastructure. The MVP does not provide operating-system isolation for arbitrary agent code.
+The external harness must isolate agent memory and observations. No agent code
+or model adapter runs inside the game engine.
 
-The runner holds isolated test-wallet signers and signs validated agent actions. Keys are never included in model prompts or research exports. Serialize outgoing transactions per address and retain pending transaction state across restarts.
+The engine holds isolated test-wallet signers and signs validated protocol
+actions. Keys are never returned through the API or public exports. Serialize
+outgoing transactions per address and retain pending state across restarts.
 
 Protocol rewards and behavioural objectives must be explicit. Receiving test POL does not itself train a model or prove that it optimises wealth. Record whether agents are instructed to maximise a score, whether rewards enter a learning loop, or whether behaviour is evaluated without adaptation.
 
@@ -173,6 +200,9 @@ No acceptance transaction is required. Committing also posts the juror bond. A j
 ## 8. Voting and timeout rules
 
 A vote has one of two values, `CREATOR_SUPPORTED` or `CHALLENGER_SUPPORTED`. An abstention is recorded off-chain and does not count toward either side.
+
+The versioned API and contract encode `CREATOR_SUPPORTED` as `uint8(0)` and
+`CHALLENGER_SUPPORTED` as `uint8(1)`. Other numeric values are invalid.
 
 Use this commitment definition with standard Solidity ABI encoding, not packed encoding.
 
@@ -255,7 +285,10 @@ There is no administrator sweep of escrow and no upgrade proxy. Bound every juro
 
 ## 10. Jury assignment and trust assumptions
 
-Rust samples jurors without replacement from the configured eligible pool using a recorded seed and a pinned sampling implementation. Freeze the roster at registration and reject party conflicts on-chain.
+The external harness samples jurors without replacement from its configured
+eligible pool using a recorded seed and a pinned sampling implementation. It
+supplies the fixed roster to the game API. Freeze that roster at registration
+and reject party conflicts on-chain.
 
 For paired comparisons, reuse scenario and role assignments while changing the treatment. Record which agent slots belong to a controlled coalition. Any deliberate override of random assignment must appear in the manifest.
 
@@ -263,7 +296,7 @@ Seeded assignment is reproducible but operator-controlled and potentially predic
 
 The MVP trusts the operator for scenario construction, assignment, private observations, and complete logging. The contract independently enforces registered protocol rules. Keep this distinction visible in research claims.
 
-## 11. Initial alignment and collusion experiments
+## 11. External harness experiments
 
 Start with claims that have independently checkable answers. Separate verdict accuracy from evidence of coordination.
 
@@ -298,7 +331,12 @@ Report unknown-truth and unchallenged episodes separately. Record both the agent
 
 ## 12. Data collection and integrity
 
-Keep full claims, evidence, assessments, prompts, model outputs, and inter-agent messages off-chain. Store their exact UTF-8 bytes with LF line endings before hashing with Keccak-256. Do not apply silent trimming or Unicode normalisation after hashing. Hash configuration using a documented canonical JSON encoding shared by all writers.
+The engine keeps claims, evidence, and assessments off-chain. Store their exact
+UTF-8 bytes with LF line endings before hashing with Keccak-256. Do not apply
+silent trimming or Unicode normalisation after hashing. Hash configuration
+using a documented canonical JSON encoding shared by all writers. The external
+harness stores its own prompts, model outputs, observations, and messages; these
+are not game engine records.
 
 The contract stores episode IDs, configuration hashes, claim and evidence hashes, participant addresses, parameters, deadlines, commitments, revealed votes, terminal results, and withdrawal credits. Emit events for registrations, deposits, commitments, reveals, settlement or expiry, forfeitures, credited payouts, and withdrawals.
 
@@ -327,16 +365,19 @@ Distinguish submitted, included, reverted, and sufficiently confirmed transactio
 
 Record block hashes and deduplicate events by chain ID, contract address, block hash, transaction hash, and log index. Recheck canonical block hashes during catch-up and rewind affected projections after a reorganisation. Apply bounded backoff for RPC rate limits and reconnects.
 
-Contract deadlines use chain time. The runner schedules actions with a margin for model latency, transaction inclusion, and confirmation. Choose longer public-network windows than local test windows and record the actual values. Infrastructure failure does not allow retrospective changes to episode rules.
+Contract deadlines use chain time. The external harness schedules its actions
+with a margin for model latency, transaction inclusion, and confirmation; the
+engine does not schedule experiments or extend phases. Choose longer public
+windows than local test windows. Infrastructure failure does not permit
+retrospective changes to registered rules.
 
 ## 14. Implementation layout and build order
 
 | Path           | Purpose                                                                                  |
 | -------------- | ---------------------------------------------------------------------------------------- |
 | `contracts/`   | Foundry project, Veracity contract, deployment script, and contract tests                |
-| `runner/`      | Rust executable with agent, experiment, chain, and storage modules                       |
-| `scenarios/`   | Versioned claim and evidence fixtures                                                    |
-| `configs/`     | Experiment parameters and treatment definitions                                          |
+| `core/`        | Rust executable with API, game, chain, and storage modules                             |
+| `configs/`     | Game service deployment configuration                                                  |
 | `deployments/` | Chain IDs, addresses, deployment blocks, compiler settings, code hashes, and ABI digests |
 
 Start with modules in one Rust crate. Split crates or services when implementation needs justify it.
@@ -344,10 +385,10 @@ Start with modules in one Rust crate. Split crates or services when implementati
 | Phase | Deliverable and completion condition                                                      |
 | ----- | ----------------------------------------------------------------------------------------- |
 | 1     | Contract tests cover every terminal outcome and conserve deposited funds                  |
-| 2     | Scripted Rust agents complete claim, challenge, vote, settlement, and withdrawal on Anvil |
-| 3     | Model adapter runs baseline and controlled coordination treatments with complete records  |
-| 4     | Same contract and runner flow completes on Amoy with public transaction references        |
-| 5     | Paired repeated trials produce inspectable exports and a short findings summary           |
+| 2     | Game API tests complete claim, challenge, commit/reveal, settlement, and withdrawal on Anvil |
+| 3     | External team integrates its harness; model adapters and treatment execution remain outside the engine |
+| 4     | Same contract and game API flow completes on Amoy with public transaction references      |
+| 5     | External harness runs paired trials and produces analysis using game API results          |
 
 Before Amoy execution, record the exact deployment manifest, fund isolated test wallets, verify the deployed bytecode, and complete a small smoke run. Bulk local runs and public-network runs must be identified separately in the results.
 
@@ -365,13 +406,17 @@ Before Amoy execution, record the exact deployment manifest, fund isolated test 
 | Accounting             | Fuzz tests cover rounding and invariants cover locked funds, credits, withdrawals, and single settlement        |
 | Withdrawals            | Reentrant and reverting recipients cannot steal funds or block other recipients                                 |
 | Operator boundary      | Operator cannot edit active rules, choose verdicts, or withdraw participant balances                            |
-| Runner recovery        | Restart resumes pending transactions and retained reveal material without duplicate actions                     |
+| Engine recovery        | Restart resumes pending transactions and retained reveal material without duplicate actions                     |
 | Collection             | Duplicate events and simulated reorganisations do not duplicate payouts or research records                     |
-| Observation boundaries | Private labels, keys, and restricted agent messages do not enter other agents' observations                     |
+| Engine privacy         | Role credentials cannot select another signer; keys and unrevealed vote material stay out of public API output |
 | End-to-end             | Both winning sides and a timeout complete through withdrawal on Anvil; a full challenged flow completes on Amoy |
-| Research output        | Every scheduled episode has a status, treatment, trace reference, and explicit evaluation eligibility           |
+| External research output | The separate harness joins game results with its own treatments, observations, and evaluation records        |
 
-The MVP is complete when the Rust runner executes the specified treatments, contracts settle without manual payout decisions, and exported results link each scored observation to its configuration and chain evidence.
+The game engine MVP is complete when its versioned API exposes the specified
+game actions and state, the contracts enforce settlement without manual payout
+decisions, and local-chain tests verify the rules and protocol evidence.
+Treatment execution, scored observations, and research analysis are acceptance
+criteria for the separate external harness.
 
 ## 16. Deferred extensions
 
@@ -379,7 +424,23 @@ Extend only when a research question requires it. Candidates include multiple ch
 
 A custom blockchain, custom consensus protocol, native token launch, bridge, production financial deployment, and public permissionless identity system are outside this MVP. Amoy experiments measure behaviour under test conditions and do not establish real-money incentive compatibility or general alignment guarantees.
 
-## 17. References
+## 17. API implementation boundary
+
+The implementation exposes the game through a versioned `/v1` HTTP API with an
+OpenAPI document and the integration guide in `docs/api.md`. This presentation
+replaces the earlier CLI-first assumption. The external experiment harness owns
+agent models, prompts, role sampling, private observations, deliberation,
+coalition treatments, simulated utility, and research metrics. It supplies and
+records an explicit roster and provenance when instantiating an episode.
+
+The game service owns immutable episode registration, artifact integrity,
+isolated signing, durable operation recovery, chain evidence, and contract-backed
+queries. The monetary, voting, deadline, and settlement rules above remain
+unchanged. `GAME_BUILDER_HANDOFF.md` is an integration wish list rather than a
+replacement protocol; its floating amounts, larger juries, direct votes, and
+manual phase transitions are not implemented as game rules.
+
+## 18. References
 
 - [Original Veracity paper, A New Incentive Model For Content Trust](https://arxiv.org/abs/2507.09972)
 - [Polygon network details and RPC endpoints](https://docs.polygon.technology/pos/reference/rpc-endpoints/)

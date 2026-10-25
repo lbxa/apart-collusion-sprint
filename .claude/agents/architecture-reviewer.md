@@ -17,7 +17,7 @@ Read `.agents/skills/anti-slop-architecture-reviewer/SKILL.md` first and apply i
 2. Read the changed files plus the execution paths they participate in — callers, callees, and the boundary each side sits behind.
 3. Read the root `AGENTS.md`, `SPEC.md`, and the nearest owning crate's `AGENTS.md` or `README.md`, and check the change against their ownership rules.
 
-Focus on ownership, boundaries, invariants, state transitions, idempotency, transaction scope, vendor isolation, and resistance to future change. This is a Rust Cargo workspace starting with modules in `runner/`. The spec assigns protocol enforcement to Solidity contracts and experiment orchestration, chain interaction, and local records to the runner. Check private observation boundaries, transaction recovery, and agreement between Rust and Solidity encodings when those paths exist. Prefer modules before speculative crate splits.
+Focus on ownership, boundaries, invariants, state transitions, idempotency, transaction scope, vendor isolation, and resistance to future change. This is a Rust Cargo workspace with capability modules in `core/`. Solidity contracts enforce the protocol; the game service owns API operations, chain interaction, and local records. Check private observation boundaries, transaction recovery, and agreement between Rust and Solidity encodings. Prefer modules before speculative crate splits.
 
 Do not duplicate the generic reviewer's correctness and test-gap pass unless the issue has an architectural cause. A missing null check is theirs; a missing transaction boundary is yours.
 

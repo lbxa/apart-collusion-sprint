@@ -1,0 +1,15 @@
+{
+  "episode_id": "trial-001",
+  "creator_id": "creator",
+  "challenger_id": "challenger",
+  "juror_ids": ["juror-1", "juror-2", "juror-3"],
+  "treasury_id": "treasury",
+  "parameters": {
+    "beta_wei": "1000",
+    "gamma_bps": 1000,
+    "posting_duration_secs": 300,
+    "challenge_duration_secs": 300,
+    "commit_duration_secs": 300,
+    "reveal_duration_secs": 300
+  }
+}

@@ -1,0 +1,41 @@
+# Replace deployment identity with the output of your own verified deployment.
+# Keep private keys and tokens in environment variables, outside this file.
+rpc_url = "http://127.0.0.1:8545"
+expected_chain_id = 31337
+contract_address = "0x1111111111111111111111111111111111111111"
+expected_code_hash = "0x2222222222222222222222222222222222222222222222222222222222222222"
+confirmation_depth = 1
+max_gas_limit = 3000000
+max_fee_per_gas_wei = "100000000000"
+operator_id = "treasury"
+operator_token_env = "VERACITY_OPERATOR_TOKEN"
+
+[[participants]]
+id = "creator"
+private_key_env = "VERACITY_CREATOR_PRIVATE_KEY"
+token_env = "VERACITY_CREATOR_TOKEN"
+
+[[participants]]
+id = "challenger"
+private_key_env = "VERACITY_CHALLENGER_PRIVATE_KEY"
+token_env = "VERACITY_CHALLENGER_TOKEN"
+
+[[participants]]
+id = "juror-1"
+private_key_env = "VERACITY_JUROR_1_PRIVATE_KEY"
+token_env = "VERACITY_JUROR_1_TOKEN"
+
+[[participants]]
+id = "juror-2"
+private_key_env = "VERACITY_JUROR_2_PRIVATE_KEY"
+token_env = "VERACITY_JUROR_2_TOKEN"
+
+[[participants]]
+id = "juror-3"
+private_key_env = "VERACITY_JUROR_3_PRIVATE_KEY"
+token_env = "VERACITY_JUROR_3_TOKEN"
+
+[[participants]]
+id = "treasury"
+private_key_env = "VERACITY_TREASURY_PRIVATE_KEY"
+token_env = "VERACITY_TREASURY_TOKEN"

@@ -15,7 +15,7 @@ with warnings denied. Preserve the committed `Cargo.lock` and pinned toolchain.
 
 Use `bash scripts/verify.sh`: it runs hook tests, formatting, Clippy, tests, and
 builds. Both agent Stop hooks use this same gate; avoid duplicate pipelines.
-Iterate with a focused `cargo test -p veracity-runner <test_name>`, then rerun the
+Iterate with a focused `cargo test -p veracity-game-service <test_name>`, then rerun the
 full gate after fixes. A failed or skipped runtime check is not success.
 
 ## Tests That Prove Behavior

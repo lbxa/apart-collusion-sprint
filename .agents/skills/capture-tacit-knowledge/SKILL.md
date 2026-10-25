@@ -43,7 +43,7 @@ Use this format when the README has no existing changelog convention:
 
 Map knowledge to the narrowest package that owns it:
 
-- Runner behavior belongs in `runner/README.md`.
+- Game service behavior belongs in `core/README.md`.
 - Additional Rust crate behavior belongs beside that crate's `Cargo.toml`.
 - Contract behavior belongs in `contracts/README.md` once contracts exist.
 - Workspace and agent-tooling decisions belong in the root `README.md`.

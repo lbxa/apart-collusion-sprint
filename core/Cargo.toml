@@ -1,0 +1,34 @@
+[package]
+name = "veracity-game-service"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+alloy = { version = "=1.8.3", features = ["provider-anvil-api", "node-bindings"] }
+axum = "=0.8.4"
+tokio = { version = "1.48", features = ["macros", "rt-multi-thread", "net", "signal", "sync", "time"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_jcs = "0.1"
+thiserror = "2"
+rusqlite = { version = "0.37", features = ["bundled"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+rand = "0.9"
+utoipa = "5"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+clap = { version = "4.5", features = ["derive", "env"] }
+toml = "0.9"
+url = "2.5"
+backon = { version = "=1.6.0", default-features = false, features = ["tokio-sleep"] }
+
+[dev-dependencies]
+tempfile = "3"
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+[lints]
+workspace = true

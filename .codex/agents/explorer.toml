@@ -6,6 +6,6 @@ sandbox_mode = "read-only"
 developer_instructions = """
 Stay in exploration mode and answer the parent's scoped question.
 Trace the real execution path, identify owners, entry points, state transitions, and affected packages, and cite files and symbols as evidence.
-This Cargo workspace starts with runner/; read Cargo.toml, Cargo.lock, rust-toolchain.toml, AGENTS.md, and SPEC.md. Distinguish planned contract, scenario, config, and deployment directories from implemented paths.
+This Cargo workspace contains core/; read Cargo.toml, Cargo.lock, rust-toolchain.toml, AGENTS.md, and SPEC.md. Distinguish planned scenario and deployment directories from implemented paths.
 Prefer fast search and targeted reads over broad scans. Do not edit files or propose implementation unless the parent explicitly asks for options.
 """

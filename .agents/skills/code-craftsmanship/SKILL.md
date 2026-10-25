@@ -44,9 +44,9 @@ If a service, job, workflow, harness, or runtime path is not observable, the
 implementation is not complete. Future agents need enough telemetry to diagnose
 what happened without rediscovering the system from source and terminal scraps.
 
-The specification chooses Rust `tracing` for runtime telemetry. Introduce it
-with the runtime behavior that needs it; no telemetry dependency exists in the
-empty runner scaffold. Configure subscribers at the executable boundary and
+The game service uses Rust `tracing` for runtime telemetry. Preserve safe
+request, operation, transaction, recovery, and reorg lifecycle events.
+Configure subscribers at the executable boundary and
 use structured spans for experiment, episode, agent, and transaction identities
 where those concepts are implemented. Read `SPEC.md` for collection and
 observation-boundary requirements.

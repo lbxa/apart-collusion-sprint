@@ -27,7 +27,7 @@ Use descriptive `snake_case` names such as `rejects_duplicate_episode_ids`.
 Arrange inputs, act through the public boundary, and assert one coherent outcome.
 
 ```sh
-cargo test -p veracity-runner <test_name>
+cargo test -p veracity-game-service <test_name>
 cargo test --workspace --all-features --locked
 ```
 

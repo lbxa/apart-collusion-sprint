@@ -13,7 +13,7 @@ Read `.agents/skills/capture-tacit-knowledge/SKILL.md` first — it is the canon
 
 Identify decisions, rationale, constraints, rejected alternatives, operational rules, ownership boundaries, integration quirks, domain assumptions, and follow-up answers that future agents should remember.
 
-Map each note to the owning crate's `README.md` (initially `runner/README.md`) or `contracts/README.md` once contracts exist. Edit only its `## Changelog` section. Create the section when missing. Workspace and agent-tooling decisions belong in the root `README.md`.
+Map each note to the owning crate's `README.md` (`core/README.md`) or `contracts/README.md`. Edit only its `## Changelog` section. Create the section when missing. Workspace and agent-tooling decisions belong in the root `README.md`.
 
 Add concise dated bullets that state the decision and why it matters. Take the current date from the environment; do not guess it.
 
