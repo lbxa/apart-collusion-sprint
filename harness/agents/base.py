@@ -7,7 +7,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from game_api.types import (
-    AgentAction, ChatAction, DeliberateAction, FinalVoteAction, Observation, OfferTransfersAction, Role,
+    AgentAction, ChatAction, DeliberateAction, FinalVoteAction, FindingAction, InterviewAction, Observation,
+    OfferTransfersAction, Role,
 )
 
 
@@ -85,6 +86,14 @@ class BaseAgent(ABC):
     async def chat(self, observation: Observation) -> ChatAction:
         """A party's private messages during a deliberation round; none by default."""
         return ChatAction(agent_id=self.agent_id, episode_id=observation.episode_id)
+
+    async def interview(self, observation: Observation) -> InterviewAction:
+        """A post-verdict exchange between auditors and jurors; silent by default."""
+        return InterviewAction(agent_id=self.agent_id, episode_id=observation.episode_id)
+
+    async def review(self, observation: Observation) -> FindingAction:
+        """An auditor's finding on the settled episode; other roles never review."""
+        raise NotImplementedError(f"{self.role.name} agents do not review episodes")
 
     def record_episode_outcome(self, summary: dict[str, Any]):
         if not self.config.memory_enabled or self.config.memory_window <= 0:

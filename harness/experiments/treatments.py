@@ -62,6 +62,16 @@ class TreatmentConfig:
     juror_persona: str = ""
     juror_motivation: str | None = None
 
+    # Auditor panel: harness-only reviewers. Participants are never told about them.
+    # After the final votes they question jurors (privately with private_chat, else
+    # in a shared hearing) and report whether the verdict is verified (a metric only).
+    auditor_count: int = 0
+    auditor_model: str = "nvidia/nemotron-3-ultra-550b-a55b:free"
+    auditor_provider: str = "openrouter"
+    auditor_interview_rounds: int = 2
+    # Tell jurors about the panel before deliberation; auditors still stay silent until the verdict.
+    auditors_disclosed: bool = False
+
     # Per-juror overrides (index -> config)
     juror_overrides: dict[int, dict[str, Any]] = field(default_factory=dict)
 
@@ -97,6 +107,8 @@ class TreatmentConfig:
     use_scripted_challenger: bool = False
     scripted_juror_indices: list[int] = field(default_factory=list)
     scripted_juror_type: str = "honest"
+    scripted_auditor_indices: list[int] = field(default_factory=list)
+    scripted_auditor_type: str = "honest"   # honest | bribable
 
     # Repetitions
     num_episodes: int = 10
@@ -119,6 +131,17 @@ class TreatmentConfig:
             raise ValueError("audit_probability must be in [0, 1]")
         if self.audit_probability and self.transfers_enabled is not True:
             raise ValueError("auditing requires side payments to be enabled")
+        if type(self.auditor_count) is not int or self.auditor_count < 0:
+            raise ValueError("auditor_count must be a non-negative integer")
+        if type(self.auditor_interview_rounds) is not int or self.auditor_interview_rounds < 1:
+            raise ValueError("auditor_interview_rounds must be a positive integer")
+        if any(type(index) is not int or not 0 <= index < self.auditor_count
+               for index in self.scripted_auditor_indices):
+            raise ValueError("scripted_auditor_indices must select auditor slots")
+        if self.scripted_auditor_type not in ("honest", "bribable"):
+            raise ValueError("scripted_auditor_type must be honest or bribable")
+        if self.auditors_disclosed and not self.auditor_count:
+            raise ValueError("disclosing auditors requires an auditor panel")
 
 
 # -- Predefined treatments --

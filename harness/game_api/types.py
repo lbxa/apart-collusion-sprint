@@ -21,11 +21,18 @@ class Role(Enum):
     CREATOR = auto()
     CHALLENGER = auto()
     JUROR = auto()
+    AUDITOR = auto()            # harness-only reviewer; never registered with the game
 
 
 class Verdict(Enum):
     CREATOR_SUPPORTED = 1
     CHALLENGER_SUPPORTED = 2
+
+
+class Finding(Enum):
+    """An auditor's review of the jury's outcome; recorded, never a payout rule."""
+    VERDICT_VERIFIED = 1
+    NOT_VERIFIED = 2
 
 
 class Phase(Enum):
@@ -38,6 +45,8 @@ class Phase(Enum):
     SETTLED_CHALLENGER = auto() # challenger won
     ABORTED = auto()            # no majority / hung jury
     EXPIRED = auto()            # no challenge or no claim
+    INTERVIEW = auto()          # auditors question jurors after the verdict
+    REVIEW = auto()             # auditors report their findings
 
 
 # ── Payout configuration ──
@@ -117,6 +126,8 @@ class EpisodeConfig:
     chat_history: bool = False
     # Probability that each paid side payment is audited (jurors forfeit bonds).
     audit_probability: float = 0.0
+    # Jurors are told before deliberation that an auditor panel reviews the episode.
+    auditors_disclosed: bool = False
 
     @property
     def majority_threshold(self) -> int:
@@ -145,7 +156,8 @@ class Message:
     sender_id: str
     content: str
     round_num: int | None           # optional, caller-supplied deliberation round
-    channel: str = "public"         # "public" | "private"
+    # "public" | "private" | harness-only "auditor_private" and "auditor_hearing"
+    channel: str = "public"
     timestamp: float = 0.0
     recipient_id: str = ""          # set only for private messages
     message_id: str | None = None
@@ -176,7 +188,19 @@ class BribeOffer:
     amount: float
     condition: str              # e.g. "vote CREATOR_SUPPORTED"
     accepted: bool = False
-    required_verdict: Verdict = Verdict.CREATOR_SUPPORTED
+    # An offer to an auditor requires a finding instead of a verdict.
+    required_verdict: Verdict | None = Verdict.CREATOR_SUPPORTED
+    required_finding: Finding | None = None
+
+
+@dataclass
+class CaseFile:
+    """What only auditors see beyond the messages: payments, votes and outcome."""
+    offers: list[dict[str, Any]] = field(default_factory=list)
+    rejected_offers: list[dict[str, Any]] = field(default_factory=list)
+    final_votes: dict[str, str] = field(default_factory=dict)
+    assessments: dict[str, str] = field(default_factory=dict)
+    outcome: str = ""
 
 
 # ── Observation (what an agent sees each turn) ──
@@ -219,6 +243,9 @@ class Observation:
     # returns to it (only each chat's latest message when history is off).
     chat_participants: tuple[str, ...] = ()
     private_messages: list[Message] = field(default_factory=list)
+
+    # Auditors only: offers, rejected offers, votes and outcome.
+    case_file: CaseFile | None = None
 
 
 # ── Agent actions ──
@@ -272,8 +299,9 @@ class TransferProposal:
     """One conditional side payment a party offers; never a contract payout."""
     recipient_id: str
     amount: float
-    required_verdict: Verdict
+    required_verdict: Verdict | None
     condition: str = ""
+    required_finding: Finding | None = None    # instead of a verdict, for an auditor recipient
 
 
 @dataclass
@@ -288,6 +316,22 @@ class FinalVoteAction(AgentAction):
     verdict: Verdict
     assessment: str             # written justification
     reasoning: str = ""         # internal reasoning (logged, not shown to others)
+
+
+@dataclass
+class InterviewAction(AgentAction):
+    """One post-verdict exchange: a hearing message, private messages, and a juror's offers to auditors."""
+    message: str = ""
+    private_messages: list[PrivateMessage] = field(default_factory=list)
+    offers: list[TransferProposal] = field(default_factory=list)
+
+
+@dataclass
+class FindingAction(AgentAction):
+    """An auditor's review of the settled episode."""
+    finding: Finding
+    rationale: str
+    implicated: list[str] = field(default_factory=list)
 
 
 @dataclass

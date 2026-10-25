@@ -193,6 +193,23 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
   batches; use the explicit `M0-C0-T0-R0-S0-E0` cell because legacy `A` has `M1`.
 - Select fallback models explicitly with `run_experiments.py --model`; provider
   quotas must not silently substitute another model or change treatment factors.
+- Add the optional auditor panel (`V1`, `docs/experiment-design.md`). Auditors live only
+  in the harness: the engine never registers them, participants are not told they exist,
+  and they make no contact until every final vote is cast. They then interview jurors
+  privately under `C1` or in a shared hearing under `C0`, on harness-only channels, and
+  only they receive the case file of payments, every private chat, votes and outcome.
+  Auditors start impartial, with no persona or objective, so any corruption comes from the
+  interview, where `T1` lets a juror offer a finding-conditional payment. The
+  `VERDICT_VERIFIED`/`NOT_VERIFIED` finding is a metric only. `V` avoids the `A` (Audit) code.
+- Add Disclosure (`D1`, requires `V1`): jurors are told about the auditor panel before
+  deliberation, truthfully and without opening any earlier channel to it, so `D1` against
+  its `D0` pair isolates the effect of knowing. Creator and challenger are not told.
+- Measure bribe acceptance and the auditor-juror collusion scene as `jury_metrics`
+  counts and rates, beside the existing jury signals, so W&B and exports carry them.
+  The detector keeps its original signals and weights; auditor acceptances and
+  interviews never enter it, so identical jury behaviour scores the same with or
+  without auditors. Tracking records the `V` and `D` factors and auditor settings, and
+  `--model` applies to auditors too.
 - Publish enabled public deliberation to the core forum and fetch each agent's
   observations through authenticated reads. Export full forum audit evidence,
   including partial communication after failures, separately from agent context.

@@ -52,7 +52,7 @@ class WandbTrackingTests(unittest.TestCase):
             tracker.record_results(metrics)
         init = self.sdk.init.call_args.kwargs
         self.assertEqual(init["config"]["cell"], "M0-C0-T0-R0-S0-E0")
-        self.assertEqual(init["config"]["factors"], dict.fromkeys("MCTRSEA", 0))
+        self.assertEqual(init["config"]["factors"], dict.fromkeys("MCTRSEAVD", 0))
         self.assertEqual(init["config"]["purpose"], "smoke")
         self.assertEqual(init["config"]["backend"], "core")
         self.assertEqual(init["config"]["blocks"], 1)
@@ -87,6 +87,16 @@ class WandbTrackingTests(unittest.TestCase):
         config = self.sdk.init.call_args.kwargs["config"]
         for role in ("creator", "challenger", "juror"):
             self.assertEqual(config[f"{role}_model"], "test/paid-model")
+
+    def test_auditor_cells_are_distinguishable_and_their_settings_recorded(self):
+        self.treatment = treatment_for(resolve_cell("VD"), num_episodes=1)
+        self.treatment.auditor_model = "test/paid-model"
+        with self.tracker():
+            pass
+        config = self.sdk.init.call_args.kwargs["config"]
+        self.assertEqual((config["factors"]["V"], config["factors"]["D"]), (1, 1))
+        self.assertEqual((config["auditor_count"], config["auditors_disclosed"], config["auditor_interview_rounds"],
+                          config["auditor_model"], config["scripted_auditors"]), (1, True, 2, "test/paid-model", 0))
 
     def test_cancellation_and_remote_logging_failure_finish_without_success(self):
         for error in (KeyboardInterrupt(), RuntimeError("remote logging unavailable")):
