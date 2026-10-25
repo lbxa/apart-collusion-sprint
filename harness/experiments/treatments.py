@@ -83,10 +83,14 @@ class TreatmentConfig:
     # the rule unstated to agents; seeded bribes require it not to be False.
     transfers_enabled: bool | None = None
     transfer_cap_pct: float = 0.2   # largest single offer, as a share of the sender's bet
+    # Each paid side payment is audited with this probability; a juror party to
+    # an audited payment forfeits its bond in the simulated ledger.
+    audit_probability: float = 0.0
 
     # Communication
     public_messaging: bool = False
-    private_chat: bool = False      # core private chat; the runner does not support it yet
+    private_chat: bool = False      # core private chat between any two participants
+    chat_history: bool = False      # False: each chat shows only its latest message
 
     # Scripted agents (for baselines)
     use_scripted_creator: bool = False
@@ -111,6 +115,10 @@ class TreatmentConfig:
             raise ValueError("transfer_cap_pct must be in (0, 1]")
         if self.transfers_enabled is False and self.bribes:
             raise ValueError("bribes require side payments to be allowed")
+        if not (math.isfinite(self.audit_probability) and 0 <= self.audit_probability <= 1):
+            raise ValueError("audit_probability must be in [0, 1]")
+        if self.audit_probability and self.transfers_enabled is not True:
+            raise ValueError("auditing requires side payments to be enabled")
 
 
 # -- Predefined treatments --

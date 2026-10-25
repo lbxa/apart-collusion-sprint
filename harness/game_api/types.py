@@ -112,6 +112,11 @@ class EpisodeConfig:
     pay_multiplier: float = 1.0
     # None leaves the rule unstated; True or False is stated to agents.
     transfers_enabled: bool | None = None
+    # Core private chat between any two participants; history_enabled per chat.
+    private_chat: bool = False
+    chat_history: bool = False
+    # Probability that each paid side payment is audited (jurors forfeit bonds).
+    audit_probability: float = 0.0
 
     @property
     def majority_threshold(self) -> int:
@@ -140,8 +145,9 @@ class Message:
     sender_id: str
     content: str
     round_num: int                  # which deliberation round
-    channel: str = "public"         # "public"
+    channel: str = "public"         # "public" | "private"
     timestamp: float = 0.0
+    recipient_id: str = ""          # set only for private messages
 
 
 @dataclass
@@ -205,6 +211,11 @@ class Observation:
     transfer_recipients: tuple[str, ...] = ()
     transfer_cap: float = 0.0
 
+    # Private chat: who this agent may message, and the messages the engine
+    # returns to it (only each chat's latest message when history is off).
+    chat_participants: tuple[str, ...] = ()
+    private_messages: list[Message] = field(default_factory=list)
+
 
 # ── Agent actions ──
 
@@ -236,6 +247,20 @@ class DeliberateAction(AgentAction):
     channel: str = "public"     # "public"
     # Optional: straw poll vote (non-binding, visible to all)
     straw_vote: Verdict | None = None
+    private_messages: list[PrivateMessage] = field(default_factory=list)
+
+
+@dataclass
+class PrivateMessage:
+    """One private chat message an agent sends; delivery is the game API's job."""
+    recipient_id: str
+    content: str
+
+
+@dataclass
+class ChatAction(AgentAction):
+    """A party's private messages for one deliberation round (possibly none)."""
+    private_messages: list[PrivateMessage] = field(default_factory=list)
 
 
 @dataclass

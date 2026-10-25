@@ -252,6 +252,28 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(result.refunds, {creator: 10})
             self.assertEqual(result.winner_payout, 0)
 
+    async def test_private_chat_delivers_reads_and_audits_through_the_real_api(self):
+        async with CoreEngineAPI() as api:
+            episode, creator, _, jurors, treasury = await self._register(api)
+            await api.send_private_message(episode, creator, jurors[0], "Offer café\n")
+            await api.send_private_message(episode, jurors[0], creator, "Reply")
+            await api.send_private_message(episode, creator, jurors[1], "Other chat", history_enabled=True)
+            await api.send_private_message(episode, jurors[1], creator, "Other reply", history_enabled=True)
+            for sender, recipient in [(creator, creator), (creator, treasury), (creator, "outsider")]:
+                with self.assertRaises(ValueError):
+                    await api.send_private_message(episode, sender, recipient, "Rejected")
+            # History off returns only the latest message; history on returns both.
+            self.assertEqual(await api.read_private_messages(episode, jurors[0]), [(jurors[0], creator, "Reply")])
+            self.assertEqual(await api.read_private_messages(episode, jurors[1]),
+                             [(creator, jurors[1], "Other chat"), (jurors[1], creator, "Other reply")])
+            self.assertEqual(await api.read_private_messages(episode, jurors[2]), [])
+            audit = await api.private_chat_audit(episode)
+            self.assertEqual((audit["chat_count"], audit["message_count"]), (2, 4))
+            self.assertTrue(audit["prohibited_communication_used"])
+            self.assertEqual(audit["actors"][creator]["sent_messages"], 2)
+            raw = await self._get(api, f"/v1/episodes/{episode}")
+            self.assertNotIn("Offer", json.dumps(raw), "chat bodies stay out of public game state")
+
     async def test_roles_content_and_assessments_cross_the_real_api_unchanged(self):
         async with CoreEngineAPI() as api:
             episode, creator, challenger, jurors, _ = await self._register(api)

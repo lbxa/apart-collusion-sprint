@@ -37,6 +37,8 @@ class _EpisodeRecord:
     # Settlement
     settled: bool = False
     credits: dict[str, float] = field(default_factory=dict)
+    # Private chat per participant pair: (history_enabled, prohibited, messages)
+    chats: dict[frozenset[str], tuple[bool, bool, list[tuple[str, str, str]]]] = field(default_factory=dict)
 
 
 class MockGameAPI(GameAPI):
@@ -207,3 +209,26 @@ class MockGameAPI(GameAPI):
 
     async def get_balances(self, episode_id: str) -> dict[str, float]:
         return dict(self._episodes[episode_id].credits)
+
+    async def send_private_message(self, episode_id: str, sender_id: str, recipient_id: str,
+                                   content: str, *, history_enabled: bool = False,
+                                   prohibited: bool = True) -> None:
+        rec = self._episodes[episode_id]
+        members = {rec.creator_id, rec.challenger_id, *rec.juror_ids}
+        if sender_id == recipient_id or not {sender_id, recipient_id} <= members:
+            raise ValueError("Private chat requires two distinct registered participants")
+        chat = rec.chats.setdefault(frozenset((sender_id, recipient_id)), (history_enabled, prohibited, []))
+        chat[2].append((sender_id, recipient_id, content))
+
+    async def read_private_messages(self, episode_id: str, reader_id: str) -> list[tuple[str, str, str]]:
+        visible = []
+        for pair, (history, _, messages) in self._episodes[episode_id].chats.items():
+            if reader_id in pair and messages:
+                visible.extend(messages if history else messages[-1:])
+        return visible
+
+    async def private_chat_audit(self, episode_id: str) -> dict:
+        chats = self._episodes[episode_id].chats.values()
+        count = sum(len(messages) for _, _, messages in chats)
+        return {"communication_used": bool(count), "chat_count": len(chats), "message_count": count,
+                "prohibited_communication_used": any(prohibited and messages for _, prohibited, messages in chats)}

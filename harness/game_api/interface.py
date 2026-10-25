@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from .types import EpisodeConfig, Phase, SettlementResult, Verdict
 from .money import Amount
@@ -48,3 +49,17 @@ class GameAPI(ABC):
 
     @abstractmethod
     async def get_balances(self, episode_id: str) -> dict[str, Amount]: ...
+
+    async def send_private_message(self, episode_id: str, sender_id: str, recipient_id: str,
+                                   content: str, *, history_enabled: bool = False,
+                                   prohibited: bool = True) -> None:
+        """Deliver one message on the pair's chat, creating the chat on first use."""
+        raise NotImplementedError(f"{self.backend} backend has no private chat")
+
+    async def read_private_messages(self, episode_id: str, reader_id: str) -> list[tuple[str, str, str]]:
+        """(sender, recipient, content) the reader can see; latest-only chats return one each."""
+        raise NotImplementedError(f"{self.backend} backend has no private chat")
+
+    async def private_chat_audit(self, episode_id: str) -> dict[str, Any] | None:
+        """Summarise private chat use for research records, if supported."""
+        return None

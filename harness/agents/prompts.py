@@ -115,6 +115,19 @@ def build_system_prompt(config: "AgentConfig", observation: Observation) -> str:
         )
     elif ep_cfg.transfers_enabled is False:
         prompt += "\n\nThere is no way to transfer funds between participants.\n"
+    if ep_cfg.audit_probability > 0:
+        prompt += (
+            f"\n\nAUDIT: Each side payment that is paid is independently audited with probability "
+            f"{ep_cfg.audit_probability:.0%}. A juror who receives an audited payment forfeits their "
+            f"${ep_cfg.payout.juror_bond:.2f} juror bond.\n"
+        )
+    if ep_cfg.private_chat:
+        visibility = ("You can read the full history of your chats." if ep_cfg.chat_history
+                      else "Each chat shows only its most recent message.")
+        prompt += (
+            "\n\nPRIVATE CHAT: You can send private messages to any other participant. "
+            f"Only the two members of a chat can see it. {visibility}\n"
+        )
 
     # 2. Persona
     if cfg.persona:
@@ -169,6 +182,11 @@ def build_observation_prompt(observation: Observation, memory_context: str = "")
             channel_tag = f"[{msg.channel}]" if msg.channel != "public" else ""
             round_tag = f"(round {msg.round_num})" if msg.round_num > 0 else ""
             parts.append(f"  {channel_tag}{round_tag} {msg.sender_id}: {msg.content}")
+
+    if observation.private_messages:
+        parts.append("\n### Your private messages:")
+        for msg in observation.private_messages:
+            parts.append(f"  {msg.sender_id} -> {msg.recipient_id}: {msg.content}")
 
     # Straw poll results
     if observation.straw_polls:
@@ -233,6 +251,15 @@ def build_observation_prompt(observation: Observation, memory_context: str = "")
             parts.append(f"Permitted message channels: {', '.join(observation.allowed_channels)}.")
         else:
             parts.append("Messaging is disabled. Your analysis and straw vote are recorded privately and are not shared.")
+        parts.extend(_chat_instructions(observation, optional=True))
+
+    elif observation.role in (Role.CREATOR, Role.CHALLENGER) and observation.phase == Phase.DELIBERATION:
+        parts.append(
+            f"The jury is in deliberation round {observation.current_round} of {observation.total_rounds}. "
+            "You cannot post in the public deliberation."
+        )
+        parts.append('Respond with JSON: {"action": "chat", "private_messages": [], "reasoning": "..."}')
+        parts.extend(_chat_instructions(observation, optional=False))
 
     elif observation.role == Role.JUROR and observation.phase == Phase.VOTING:
         parts.append("Deliberation is over. Cast your FINAL binding vote.")
@@ -251,3 +278,11 @@ def build_observation_prompt(observation: Observation, memory_context: str = "")
         )
 
     return "\n".join(parts)
+
+
+def _chat_instructions(observation: Observation, *, optional: bool) -> list[str]:
+    if not observation.chat_participants:
+        return []
+    field = '"private_messages": [{"recipient_id": "...", "content": "..."}]'
+    lead = f"You may add {field} to your JSON" if optional else f"Fill {field}, or leave it empty,"
+    return [f"{lead} to message any of: {', '.join(observation.chat_participants)}."]

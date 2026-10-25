@@ -5,9 +5,10 @@ Core loop per episode:
   2. Creator posts claim + bet
   3. Challenger decides to challenge or abstain
   4. Jurors post bonds
-  5. DELIBERATION: N rounds of discussion (messages, straw polls)
+  5. DELIBERATION: N rounds of discussion (messages, straw polls); with
+     private chat, the parties get a chat turn before the jurors each round
   6. VOTING: jurors cast final binding votes
-  7. Settlement: payout distribution
+  7. Settlement: payout distribution, simulated side payments and audits
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ import copy
 import hashlib
 import logging
 import math
+import random
 import time
 import uuid
 from dataclasses import dataclass, field, replace
@@ -43,6 +45,7 @@ from game_api.types import (
     Observation,
     Phase,
     PostClaimAction,
+    PrivateMessage,
     Role,
     Scenario,
     StrawPoll,
@@ -66,6 +69,7 @@ class ExperimentRun:
     metrics: MetricsCollector
     output_dir: Path
     agents: dict[str, BaseAgent] = field(default_factory=dict)
+    audit_rng: random.Random = field(default_factory=random.Random)
 
 
 class ExperimentRunner:
@@ -83,8 +87,6 @@ class ExperimentRunner:
         scenarios: list[Scenario],
         experiment_id: str | None = None,
     ) -> ExperimentMetrics:
-        if treatment.private_chat:
-            raise NotImplementedError("Private chat is not integrated into the experiment runner yet")
         if experiment_id is None:
             experiment_id = f"exp_{treatment.treatment_id}_{uuid.uuid4().hex[:8]}"
 
@@ -102,6 +104,7 @@ class ExperimentRunner:
             game_api=self.game_api,
             metrics=self.metrics,
             output_dir=self.output_dir / experiment_id,
+            audit_rng=random.Random(f"{treatment.seed}:{experiment_id}:audit"),
         )
         run.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -153,6 +156,8 @@ class ExperimentRunner:
                 "game_backend": run.game_api.backend,
                 "public_messaging": treatment.public_messaging,
                 "private_chat": treatment.private_chat,
+                "chat_history": treatment.chat_history,
+                "audit_probability": treatment.audit_probability,
                 "pay_multiplier": treatment.pay_multiplier,
                 "transfers_enabled": treatment.transfers_enabled,
                 "memory_enabled": treatment.memory_enabled,
@@ -180,6 +185,9 @@ class ExperimentRunner:
                 deliberation_rounds=treatment.deliberation_rounds,
                 pay_multiplier=treatment.pay_multiplier,
                 transfers_enabled=treatment.transfers_enabled,
+                private_chat=treatment.private_chat,
+                chat_history=treatment.chat_history,
+                audit_probability=treatment.audit_probability,
             )
 
             creator_id = f"creator_{episode_id}"
@@ -324,8 +332,21 @@ class ExperimentRunner:
             } for index, (recipient, offer) in enumerate(bribe_offers.items())]
             record.deliberation_rounds = treatment.deliberation_rounds
 
+            participants = (creator_id, challenger_id, *juror_ids)
             for round_num in range(1, treatment.deliberation_rounds + 1):
                 round_poll = StrawPoll(round_num=round_num)
+
+                if treatment.private_chat:
+                    for party in (creator_id, challenger_id):
+                        party_obs = self._make_observation(
+                            agents[party].role, episode_id, scenario, Phase.DELIBERATION,
+                            ep_config, messages, straw_polls, party, treatment,
+                            current_round=round_num,
+                            **await self._chat_view(run, episode_id, party, participants),
+                        )
+                        chat_action = await agents[party].chat(party_obs)
+                        await self._deliver_private_messages(run, record, ep_logger, party, participants,
+                                                             round_num, chat_action.private_messages)
 
                 for j_idx, jid in enumerate(juror_ids):
                     bribe = bribe_offers.get(jid)
@@ -337,9 +358,12 @@ class ExperimentRunner:
                         straw_polls, jid, treatment,
                         bribe_offer=bribe,
                         current_round=round_num,
+                        **await self._chat_view(run, episode_id, jid, participants),
                     )
 
                     delib_action = await agents[jid].deliberate(juror_obs)
+                    await self._deliver_private_messages(run, record, ep_logger, jid, participants,
+                                                         round_num, delib_action.private_messages)
 
                     # Only accepted communication enters other agents' observations.
                     msg = Message(
@@ -401,6 +425,7 @@ class ExperimentRunner:
                     messages,
                     straw_polls, jid, treatment,
                     bribe_offer=bribe,
+                    **await self._chat_view(run, episode_id, jid, participants),
                 )
 
                 vote_action = await agent.final_vote(juror_obs)
@@ -460,6 +485,16 @@ class ExperimentRunner:
                     sender = offer["offered_by"]
                     record.simulated_utility[sender] = record.simulated_utility.get(sender, 0.0) - amount
                     record.simulated_utility[recipient] = record.simulated_utility.get(recipient, 0.0) + amount
+                    if treatment.audit_probability > 0:
+                        offer["audited"] = run.audit_rng.random() < treatment.audit_probability
+                        if offer["audited"] and recipient in juror_ids:
+                            # Simulated like the payment itself; the contract never sees it.
+                            record.audit_penalties[recipient] = payout.juror_bond
+                            record.simulated_utility[recipient] = financial_difference(
+                                record.simulated_utility[recipient], payout.juror_bond)
+                            ep_logger.log("SETTLEMENT", recipient, "JUROR", "audit_bond_forfeited",
+                                          f"Audited side payment from {sender}; bond ${payout.juror_bond:.2f} "
+                                          "forfeited (simulated)")
             # The Pay bonus is simulated: the contract pays every qualifying juror equally.
             if treatment.pay_multiplier > 1 and settled_verdict is not None:
                 for juror, vote in record.votes.items():
@@ -472,6 +507,8 @@ class ExperimentRunner:
                             record.pay_bonuses[juror] = bonus
                             record.simulated_utility[juror] = financial_sum(
                                 [record.simulated_utility.get(juror, 0.0), bonus])
+            if treatment.private_chat:
+                record.chat_audit = await run.game_api.private_chat_audit(episode_id)
             record.payouts.update(result.juror_payouts)
             record.payouts.update(result.refunds)
             record.forfeited.update(result.forfeited_bonds)
@@ -664,6 +701,8 @@ class ExperimentRunner:
         transfer_stage: str | None = None,
         transfer_recipients: tuple[str, ...] = (),
         transfer_cap: float = 0.0,
+        chat_participants: tuple[str, ...] = (),
+        private_messages: list[Message] | None = None,
     ) -> Observation:
         return Observation(
             role=role,
@@ -681,7 +720,41 @@ class ExperimentRunner:
             transfer_stage=transfer_stage,
             transfer_recipients=transfer_recipients,
             transfer_cap=transfer_cap,
+            chat_participants=chat_participants,
+            private_messages=private_messages or [],
         )
+
+    async def _chat_view(self, run: ExperimentRun, episode_id: str, agent_id: str,
+                         participants: tuple[str, ...]) -> dict[str, Any]:
+        """Chat recipients and the messages the game returns to this agent, under its history rule."""
+        if not run.treatment.private_chat:
+            return {}
+        visible = await run.game_api.read_private_messages(episode_id, agent_id)
+        return {
+            "chat_participants": tuple(actor for actor in participants if actor != agent_id),
+            "private_messages": [Message(sender, content, 0, "private", recipient_id=recipient)
+                                 for sender, recipient, content in visible],
+        }
+
+    async def _deliver_private_messages(
+        self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger, sender_id: str,
+        participants: tuple[str, ...], round_num: int, private_messages: list[PrivateMessage],
+    ) -> None:
+        """Send permitted private messages; agent mistakes are logged, never fatal."""
+        treatment = run.treatment
+        role = run.agents[sender_id].role.name
+        for item in private_messages:
+            if not treatment.private_chat or item.recipient_id == sender_id or item.recipient_id not in participants:
+                ep_logger.log(f"DELIBERATION_R{round_num}", sender_id, role, "private_message_blocked",
+                              f"To {item.recipient_id!r}: private chat is off or the recipient is invalid")
+                continue
+            await run.game_api.send_private_message(
+                record.episode_id, sender_id, item.recipient_id, item.content,
+                history_enabled=treatment.chat_history, prohibited=True)
+            record.messages.append({"sender": sender_id, "recipient": item.recipient_id, "round": round_num,
+                                    "content": item.content, "channel": "private"})
+            ep_logger.log(f"DELIBERATION_R{round_num}", sender_id, role, "private_message",
+                          f"-> {item.recipient_id}: {item.content[:200]}", channel="private")
 
     def _allowed_channels(self, treatment: TreatmentConfig) -> tuple[str, ...]:
         return ("public",) if treatment.public_messaging else ()

@@ -232,10 +232,12 @@ class LedgerTests(unittest.IsolatedAsyncioTestCase):
         for fragment in ('"action": "offer_transfers"', "juror_0_episode", "creator_episode", "$2.00"):
             self.assertIn(fragment, prompt)
 
-    async def test_private_chat_is_refused_until_the_runner_supports_it(self):
-        with self.assertRaises(NotImplementedError):
-            await ExperimentRunner(MockGameAPI(), Path(self.directory.name)).run_experiment(
-                self.treatment(private_chat=True), [SCENARIO], "chat")
+    async def test_private_chat_runs_now_that_the_runner_supports_it(self):
+        # Behaviour is covered in test_private_chat_and_audit.py.
+        metrics = await ExperimentRunner(MockGameAPI(), Path(self.directory.name)).run_experiment(
+            self.treatment(private_chat=True), [SCENARIO], "chat")
+        self.assertEqual(metrics.episodes[0].status, "completed", metrics.episodes[0].failure_reason)
+        self.assertEqual(metrics.episodes[0].chat_audit["message_count"], 0)
 
 
 class LLMTransferParsingTests(unittest.IsolatedAsyncioTestCase):

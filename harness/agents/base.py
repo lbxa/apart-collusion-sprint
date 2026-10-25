@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from game_api.types import (
-    AgentAction, DeliberateAction, FinalVoteAction, Observation, OfferTransfersAction, Role,
+    AgentAction, ChatAction, DeliberateAction, FinalVoteAction, Observation, OfferTransfersAction, Role,
 )
 
 
@@ -81,6 +81,10 @@ class BaseAgent(ABC):
 
     async def respond_to_offer(self, observation: Observation) -> None:
         """Accept by setting observation.bribe_offer.accepted; declined by default."""
+
+    async def chat(self, observation: Observation) -> ChatAction:
+        """A party's private messages during a deliberation round; none by default."""
+        return ChatAction(agent_id=self.agent_id, episode_id=observation.episode_id)
 
     def record_episode_outcome(self, summary: dict[str, Any]):
         if not self.config.memory_enabled or self.config.memory_window <= 0:
