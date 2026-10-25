@@ -8,6 +8,7 @@ use std::{
 };
 
 use rusqlite::{Connection, OptionalExtension, TransactionBehavior, params};
+mod chat;
 
 #[derive(Debug, thiserror::Error)]
 pub enum StoreError {
@@ -17,6 +18,8 @@ pub enum StoreError {
     InvalidState(String),
     #[error("record not found: {0}")]
     NotFound(String),
+    #[error("chat access denied")]
+    AccessDenied,
     #[error("invalid stored record: {0}")]
     InvalidRecord(String),
     #[error("SQLite error: {0}")]
@@ -212,18 +215,27 @@ impl Store {
                 options.open(path)?;
             }
         }
-        let connection = Connection::open(path)?;
+        let mut connection = Connection::open(path)?;
         connection.busy_timeout(Duration::from_secs(5))?;
         connection.pragma_update(None, "journal_mode", "WAL")?;
         connection.pragma_update(None, "foreign_keys", "ON")?;
+        // Check the version under the same write lock as every migration, so
+        // concurrent openers cannot act on a stale version or partial schema.
+        let migration = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
         let schema_version: u32 =
-            connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
-        if schema_version > 1 {
+            migration.pragma_query_value(None, "user_version", |row| row.get(0))?;
+        if schema_version > 2 {
             return Err(StoreError::InvalidRecord(
                 "database schema is newer than this service".into(),
             ));
         }
-        connection.execute_batch(include_str!("schema.sql"))?;
+        if schema_version == 0 {
+            migration.execute_batch(include_str!("schema.sql"))?;
+        }
+        if schema_version < 2 {
+            migration.execute_batch(include_str!("chat-schema.sql"))?;
+        }
+        migration.commit()?;
         Ok(Self {
             connection: Mutex::new(connection),
         })

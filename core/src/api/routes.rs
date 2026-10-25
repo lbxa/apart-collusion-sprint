@@ -24,8 +24,8 @@ use crate::game::{
 
 #[derive(Clone)]
 pub(super) struct AppState {
-    service: GameService,
-    auth: AuthConfig,
+    pub(super) service: GameService,
+    pub(super) auth: AuthConfig,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -76,6 +76,7 @@ pub(super) struct ReplayResponse {
 /// Invalid credential configurations fail closed at the authentication boundary.
 pub fn router(service: GameService, auth: AuthConfig) -> Router {
     Router::new()
+        .merge(super::chat::router())
         .route("/v1/health", get(health))
         .route("/v1/openapi.json", get(openapi_document))
         .route("/v1/docs", get(docs))
@@ -148,7 +149,7 @@ fn actor(headers: &HeaderMap, auth: &AuthConfig) -> Result<String, ApiError> {
     }
 }
 
-fn idempotency_key(headers: &HeaderMap) -> Result<&str, ApiError> {
+pub(super) fn idempotency_key(headers: &HeaderMap) -> Result<&str, ApiError> {
     let mut values = headers.get_all("Idempotency-Key").iter();
     let key = values.next().and_then(|value| value.to_str().ok());
     match key {
@@ -168,7 +169,7 @@ fn idempotency_key(headers: &HeaderMap) -> Result<&str, ApiError> {
     }
 }
 
-fn request_json<T>(body: Result<Json<T>, JsonRejection>) -> Result<T, ApiError> {
+pub(super) fn request_json<T>(body: Result<Json<T>, JsonRejection>) -> Result<T, ApiError> {
     body.map(|Json(value)| value).map_err(|rejection| {
         if rejection.status() == StatusCode::PAYLOAD_TOO_LARGE {
             ApiError::new(
@@ -186,7 +187,7 @@ fn request_json<T>(body: Result<Json<T>, JsonRejection>) -> Result<T, ApiError> 
     })
 }
 
-fn resource_id(id: Result<Path<String>, PathRejection>) -> Result<String, ApiError> {
+pub(super) fn resource_id(id: Result<Path<String>, PathRejection>) -> Result<String, ApiError> {
     id.map(|Path(value)| value).map_err(|_| {
         ApiError::new(
             StatusCode::UNPROCESSABLE_ENTITY,

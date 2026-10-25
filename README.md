@@ -131,10 +131,15 @@ For focused iteration, use `cargo test -p veracity-game-service --test e2e_game`
 changes require `forge build --root contracts` followed by
 `bash contracts/check-artifact.sh --write`; commit the resulting artifact.
 
-The workspace stays in one Rust crate with `api`, `game`, `chain`, `store`, and
+The workspace stays in one Rust crate with `api`, `game`, `chain`, `chat`, `store`, and
 configuration modules. The Solidity contract owns financial rules; Rust does
 not independently calculate a competing settlement ledger. See
 [contracts/README.md](contracts/README.md) for the contract's acceptance tests.
+
+The core's [experimental private-chat API](docs/private-chat.md) lets any two
+episode participants communicate while retaining operator-only usage flags and
+transcripts. Prohibited communication stays possible for observation. Participant
+history can show either the full conversation or only its latest message.
 
 ## Agent tooling
 

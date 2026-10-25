@@ -1,6 +1,7 @@
 //! Versioned HTTP boundary for the contract-backed game service.
 
 mod auth;
+mod chat;
 mod error;
 mod openapi;
 mod routes;

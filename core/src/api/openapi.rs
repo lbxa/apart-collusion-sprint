@@ -1,8 +1,12 @@
 use super::{
-    ApiProblem, ErrorResponse,
+    ApiProblem, ErrorResponse, chat,
     routes::{
         self, ChallengeRequest, ClaimRequest, CommitmentRequest, EmptyRequest, HealthResponse,
     },
+};
+use crate::chat::{
+    ChatActorUsage, ChatAuditEvent, ChatAuditKind, ChatAuditReport, ChatMessage, ChatPage,
+    ChatView, CreateChat, MessagePage, SendMessage,
 };
 use crate::game::{
     BalancesView, DeploymentView, EpisodeView, JurorView, OperationView, ParticipantView,
@@ -15,21 +19,24 @@ use utoipa::{
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "Veracity Game API", version = "1.0.0",
+    info(title = "Veracity Game API", version = "1.1.0",
         description = "The game engine API for SPEC.md v0.2. The Solidity contract owns escrow, immutable chain-time deadlines, commit/reveal voting, and settlement. Amounts are decimal base-unit strings. Operator and participant bearer tokens have distinct authority. Experiments, agent execution, and evaluation belong to the caller's external harness."),
     paths(
         routes::health, routes::openapi_document, routes::docs, routes::participants,
         routes::register, routes::episode, routes::claim, routes::challenge,
         routes::commitment, routes::reveal, routes::settle, routes::expire,
         routes::withdraw, routes::settlement, routes::balances, routes::operation,
-        routes::reconcile, routes::replay, routes::events
+        routes::reconcile, routes::replay, routes::events,
+        chat::create, chat::list, chat::send, chat::messages, chat::transcript, chat::audit
     ),
     components(schemas(
         ApiProblem, ErrorResponse, HealthResponse, ClaimRequest, ChallengeRequest,
         CommitmentRequest, EmptyRequest, RegisterEpisode, ProtocolParameters,
         Verdict, DeploymentView, ParticipantView, ReceiptView, TransactionView,
         OperationView, JurorView, EpisodeView, SettlementView, BalancesView,
-        routes::BlockRange, routes::ReplayResponse
+        routes::BlockRange, routes::ReplayResponse,
+        ChatActorUsage, ChatAuditEvent, ChatAuditKind, ChatAuditReport, ChatMessage,
+        ChatPage, ChatView, CreateChat, MessagePage, SendMessage
     )),
     modifiers(&BearerSecurity),
     tags(
@@ -37,7 +44,9 @@ use utoipa::{
         (name = "episodes", description = "Immutable game registration and chain-backed queries"),
         (name = "actions", description = "Role-bound protocol actions with durable idempotency"),
         (name = "operations", description = "Transaction evidence and safe recovery"),
-        (name = "chain evidence", description = "Bounded replay and public chain-event exports")
+        (name = "chain evidence", description = "Bounded replay and public chain-event exports"),
+        (name = "private chat", description = "Experimental two-participant communication; prohibited use remains available and audited"),
+        (name = "chat audit", description = "Privileged usage flags, metadata events, and retained transcripts")
     )
 )]
 struct ApiDocument;

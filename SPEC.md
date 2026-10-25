@@ -134,10 +134,17 @@ Agents supply artifact text and decisions. Rust saves the artifact bytes, comput
 | Juror            | Commit a verdict and assessment hash with a juror bond, then reveal     |
 | All participants | Read permitted observations and request withdrawal of their own credits |
 
-The external harness owns communication channels, message logs, recipient
-permissions, and treatment restrictions. The game API exposes protocol actions
-only. Callers cannot execute shell commands, access engine storage, choose
-another participant's signer, or bypass administrative authorization.
+The external harness owns deliberation and behavioral treatment instructions.
+For experimental observation, the core also exposes episode-scoped private
+two-person chat through `/v1`; see `docs/private-chat.md`. Communication is
+prohibited by default but remains technically available, with durable usage
+and policy-violation flags. Only the operator can provision permitted controls.
+History-enabled participants can read the conversation; history-disabled
+participants see only the latest message. The operator retains full private
+transcripts and metadata audits in both modes. Chat settings are immutable per
+conversation, messages remain off-chain, and chat never changes game phases,
+financial rules, or contract evidence. Callers cannot execute shell commands,
+access engine storage, select another signer, or bypass chat membership.
 
 The external harness must isolate agent memory and observations. No agent code
 or model adapter runs inside the game engine.
