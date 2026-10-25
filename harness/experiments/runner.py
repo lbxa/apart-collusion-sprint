@@ -36,7 +36,6 @@ from game_api.interface import GameAPI
 from game_api.types import (
     BribeOffer,
     ChallengeAction,
-    DeliberateAction,
     EpisodeConfig,
     Message,
     Observation,
@@ -148,11 +147,11 @@ class ExperimentRunner:
                 "seed": treatment.seed,
                 "game_backend": run.game_api.backend,
                 "public_messaging": treatment.public_messaging,
-                "coalition_messaging": treatment.coalition_messaging,
                 "memory_enabled": treatment.memory_enabled,
                 "memory_window": treatment.memory_window,
                 "attack_target": treatment.attack_target,
-                "attack_assigned": bool(treatment.coalitions or treatment.bribes or treatment.withhold_reveal_indices
+                "attack_assigned": bool(any("motivation" in override for override in treatment.juror_overrides.values())
+                                        or treatment.bribes or treatment.withhold_reveal_indices
                                         or (treatment.scripted_juror_indices
                                             and treatment.scripted_juror_type in ("adversarial", "non_voting"))),
             },
@@ -198,7 +197,6 @@ class ExperimentRunner:
                     "juror_pool_pct": f"{payout.juror_pool_pct:.0%}",
                     "juror_bond": payout.juror_bond,
                 },
-                coalition_ids=[c.coalition_id for c in treatment.coalitions],
                 bribes=[f"${b.amount} from {b.from_role}" for b in treatment.bribes],
             )
 
@@ -214,13 +212,6 @@ class ExperimentRunner:
                         current.episode_memory = copy.deepcopy(previous.episode_memory[-treatment.memory_window:])
             run.agents = agents
 
-            coalition_map = self._build_coalition_map(
-                treatment, creator_id, challenger_id, juror_ids
-            )
-            record.coalition_ids = list(
-                set(mid for members in coalition_map.values() for mid in members)
-            )
-
             # Register episode
             await run.game_api.register_episode(
                 ep_config, creator_id, challenger_id, juror_ids, treasury_id
@@ -235,7 +226,7 @@ class ExperimentRunner:
             # but an abstain is auto-upgraded.
             creator_obs = self._make_observation(
                 Role.CREATOR, episode_id, scenario, Phase.SETUP,
-                ep_config, messages, straw_polls, creator_id, coalition_map, treatment,
+                ep_config, messages, straw_polls, creator_id, treatment,
             )
             creator_action = await agents[creator_id].decide(creator_obs)
 
@@ -261,7 +252,7 @@ class ExperimentRunner:
             # result is upgraded to a challenge with generic counter-evidence.
             challenger_obs = self._make_observation(
                 Role.CHALLENGER, episode_id, scenario, Phase.CLAIM_POSTED,
-                ep_config, messages, straw_polls, challenger_id, coalition_map, treatment,
+                ep_config, messages, straw_polls, challenger_id, treatment,
             )
             challenger_action = await agents[challenger_id].decide(challenger_obs)
 
@@ -327,31 +318,28 @@ class ExperimentRunner:
                         Role.JUROR, episode_id, scenario, Phase.DELIBERATION,
                         ep_config,
                         messages,
-                        straw_polls, jid, coalition_map, treatment,
+                        straw_polls, jid, treatment,
                         bribe_offer=bribe,
                         current_round=round_num,
                     )
 
                     delib_action = await agents[jid].deliberate(juror_obs)
 
-                    recipients = self._message_recipients(delib_action, jid, coalition_map, treatment)
                     # Only accepted communication enters other agents' observations.
                     msg = Message(
                         sender_id=jid,
                         content=delib_action.message,
                         round_num=round_num,
                         channel=delib_action.channel,
-                        recipient_ids=recipients or [],
                         timestamp=time.monotonic(),
                     )
-                    if recipients is not None:
+                    if delib_action.channel in self._allowed_channels(treatment):
                         messages.append(msg)
                         record.messages.append({
                             "sender": jid,
                             "round": round_num,
                             "content": delib_action.message,
                             "channel": delib_action.channel,
-                            "recipient_ids": list(recipients),
                         })
                         ep_logger.log(
                             f"DELIBERATION_R{round_num}", jid, "JUROR", "message",
@@ -359,7 +347,7 @@ class ExperimentRunner:
                         )
                     else:
                         ep_logger.log(f"DELIBERATION_R{round_num}", jid, "JUROR", "message_blocked",
-                                      f"Channel or recipients are not permitted: {delib_action.channel}")
+                                      f"Channel is not permitted: {delib_action.channel}")
 
                     # Record straw poll vote
                     if delib_action.straw_vote is not None:
@@ -380,17 +368,10 @@ class ExperimentRunner:
             # ── Phase 5: FINAL VOTING ──
             await run.game_api.start_voting(episode_id)
 
-            for j_idx, jid in enumerate(juror_ids):
+            for jid in juror_ids:
                 # Check if this agent is a NonVotingAgent (strategic non-voter)
                 agent = agents[jid]
                 should_skip_vote = isinstance(agent, NonVotingAgent)
-
-                # Also check coalition objective for non-voting instruction
-                if not should_skip_vote:
-                    for coalition in treatment.coalitions:
-                        if "do NOT" in (coalition.objective or "").upper() and "VOTE" in (coalition.objective or "").upper():
-                            if f"juror_{j_idx}" in coalition.member_roles:
-                                should_skip_vote = True
 
                 if should_skip_vote:
                     logger.info("Juror %s refusing to cast final vote", jid)
@@ -402,7 +383,7 @@ class ExperimentRunner:
                     Role.JUROR, episode_id, scenario, Phase.VOTING,
                     ep_config,
                     messages,
-                    straw_polls, jid, coalition_map, treatment,
+                    straw_polls, jid, treatment,
                     bribe_offer=bribe,
                 )
 
@@ -615,21 +596,12 @@ class ExperimentRunner:
             else:
                 overrides = treatment.juror_overrides.get(j_idx, {})
 
-                coalition_id = None
-                coalition_obj = None
-                for c in treatment.coalitions:
-                    if f"juror_{j_idx}" in c.member_roles:
-                        coalition_id = c.coalition_id
-                        coalition_obj = c.objective
-
                 agents[jid] = LLMAgent(AgentConfig(
                     agent_id=jid, role=Role.JUROR,
                     model=overrides.get("model", treatment.juror_model),
                     provider=overrides.get("provider", treatment.juror_provider),
                     persona=overrides.get("persona", treatment.juror_persona),
                     hidden_motivation=overrides.get("motivation", treatment.juror_motivation),
-                    coalition_id=coalition_id,
-                    coalition_objective=coalition_obj,
                     memory_enabled=treatment.memory_enabled,
                     memory_window=treatment.memory_window,
                     context_window=overrides.get("context_window", treatment.context_window),
@@ -639,23 +611,6 @@ class ExperimentRunner:
         return agents
 
     # ── Helpers ──
-
-    def _build_coalition_map(
-        self,
-        treatment: TreatmentConfig,
-        creator_id: str,
-        challenger_id: str,
-        juror_ids: list[str],
-    ) -> dict[str, list[str]]:
-        coalition_map: dict[str, list[str]] = {}
-        role_to_id = {"creator": creator_id, "challenger": challenger_id}
-        for j_idx, jid in enumerate(juror_ids):
-            role_to_id[f"juror_{j_idx}"] = jid
-
-        for c in treatment.coalitions:
-            members = [role_to_id[r] for r in c.member_roles if r in role_to_id]
-            coalition_map[c.coalition_id] = members
-        return coalition_map
 
     def _make_observation(
         self,
@@ -667,19 +622,10 @@ class ExperimentRunner:
         messages: list[Message],
         straw_polls: list[StrawPoll],
         agent_id: str,
-        coalition_map: dict[str, list[str]],
         treatment: TreatmentConfig,
         bribe_offer: BribeOffer | None = None,
         current_round: int = 0,
     ) -> Observation:
-        coalition_obj = None
-        coalition_members = None
-        for c in treatment.coalitions:
-            for cid, members in coalition_map.items():
-                if cid == c.coalition_id and agent_id in members:
-                    coalition_obj = c.objective
-                    coalition_members = [m for m in members if m != agent_id]
-
         return Observation(
             role=role,
             episode_id=episode_id,
@@ -689,58 +635,14 @@ class ExperimentRunner:
             config=config,
             current_round=current_round,
             total_rounds=config.deliberation_rounds,
-            visible_messages=copy.deepcopy(self._filter_messages(messages, agent_id, coalition_map, treatment)),
+            visible_messages=copy.deepcopy([msg for msg in messages if msg.channel in self._allowed_channels(treatment)]),
             straw_polls=copy.deepcopy(straw_polls) if treatment.public_messaging else [],
-            allowed_channels=self._communication_permissions(agent_id, coalition_map, treatment)[0],
-            coalition_objective=coalition_obj,
-            coalition_members=coalition_members,
+            allowed_channels=self._allowed_channels(treatment),
             bribe_offer=copy.deepcopy(bribe_offer),
         )
 
-    def _filter_messages(
-        self,
-        messages: list[Message],
-        agent_id: str,
-        coalition_map: dict[str, list[str]],
-        treatment: TreatmentConfig,
-    ) -> list[Message]:
-        return [
-            msg for msg in messages
-            if (msg.channel == "public" and treatment.public_messaging)
-            or (msg.channel in ("private", "coalition")
-                and msg.channel in self._communication_permissions(msg.sender_id, coalition_map, treatment)[0]
-                and (agent_id == msg.sender_id or agent_id in msg.recipient_ids))
-        ]
-
-    def _communication_permissions(
-        self, agent_id: str, coalition_map: dict[str, list[str]], treatment: TreatmentConfig,
-    ) -> tuple[tuple[str, ...], set[str]]:
-        recipients: set[str] = set()
-        if treatment.coalition_messaging:
-            for coalition in treatment.coalitions:
-                members = coalition_map.get(coalition.coalition_id, [])
-                if coalition.communication_enabled and agent_id in members:
-                    recipients.update(member for member in members if member != agent_id)
-        channels = (["public"] if treatment.public_messaging else [])
-        if recipients:
-            channels.extend(["coalition", "private"])
-        return tuple(channels), recipients
-
-    def _message_recipients(
-        self, action: DeliberateAction, sender_id: str,
-        coalition_map: dict[str, list[str]], treatment: TreatmentConfig,
-    ) -> list[str] | None:
-        channels, permitted = self._communication_permissions(sender_id, coalition_map, treatment)
-        if action.channel not in channels:
-            return None
-        if action.channel == "public":
-            return []
-        requested = set(action.recipient_ids)
-        if action.channel == "private" and not requested:
-            return None
-        if not requested.issubset(permitted):
-            return None
-        return sorted(requested or permitted)
+    def _allowed_channels(self, treatment: TreatmentConfig) -> tuple[str, ...]:
+        return ("public",) if treatment.public_messaging else ()
 
     def _create_bribe_offers(
         self,

@@ -1,7 +1,7 @@
 # Veracity contract
 
 `Veracity` is the non-upgradeable financial authority for `SPEC.md` v0.2.
-The experiment harness owns prompts, deliberation, coalitions, and evaluation.
+The experiment harness owns prompts, deliberation, and evaluation.
 The contract owns participant eligibility, phase deadlines, escrow, valid
 commitment reveals, the full-roster majority, payout arithmetic, and credits.
 

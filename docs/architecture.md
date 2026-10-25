@@ -4,7 +4,7 @@
 
 `SPEC.md` version 0.2 defines the game rules. The HTTP API requested by the user
 replaces the spec's CLI-first presentation. The external experiment harness owns
-models, deliberation, coalitions, private observations, and evaluation metrics.
+models, deliberation, private observations, and evaluation metrics.
 The game service owns episode registration, validated actions, chain submission,
 artifacts, durable operation records, and settlement queries.
 

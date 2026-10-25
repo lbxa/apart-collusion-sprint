@@ -149,7 +149,7 @@ class LLMAgent(BaseAgent):
         if not isinstance(message, str) or not message.strip():
             raise ValueError("A deliberate action must include a non-empty message")
         channel = action.get("channel", "public")
-        if channel not in ("public", "coalition"):
+        if channel != "public":
             raise ValueError(f"Invalid deliberation channel: {channel!r}")
 
         straw_vote = action.get("straw_vote")

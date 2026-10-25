@@ -4,7 +4,7 @@ A versioned HTTP API for the Veracity dispute game in [SPEC.md](SPEC.md).
 The Rust service connects to a non-upgradeable Solidity contract that enforces
 escrow, timed commit/reveal voting, full-jury majorities, and withdrawal credits.
 The Python experiment harness in `harness/` supplies agents, deliberation,
-coalition treatments, observations, and evaluation metrics. It wraps the Rust
+treatments, observations, and evaluation metrics. It wraps the Rust
 engine through HTTP; experiment behavior stays outside the engine. Creating a
 game through the API does not require an experiment or scenario record.
 

@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 
 from experiments.runner import ExperimentRunner
-from experiments.treatments import CoalitionDef, TreatmentConfig
+from experiments.treatments import TreatmentConfig
 from game_api.mock import MockGameAPI
 from game_api.types import Scenario
 from run_knockout import run_conditions
@@ -20,8 +20,7 @@ class ResearchExportTests(unittest.IsolatedAsyncioTestCase):
         treatment = TreatmentConfig("history", "History", "Two distinct episodes",
             jury_size=3, num_episodes=2, deliberation_rounds=1,
             use_scripted_creator=True, use_scripted_challenger=True,
-            scripted_juror_indices=[0, 1, 2], scripted_juror_type="adversarial",
-            coalitions=[CoalitionDef("c", ["juror_0", "juror_1"], "Support creator")])
+            scripted_juror_indices=[0, 1, 2], scripted_juror_type="adversarial")
         with tempfile.TemporaryDirectory() as directory:
             await ExperimentRunner(MockGameAPI(), directory).run_experiment(
                 treatment, [Scenario("s", "Claim", "For", "Against", False)], "history")

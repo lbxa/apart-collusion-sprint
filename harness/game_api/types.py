@@ -132,20 +132,8 @@ class Message:
     sender_id: str
     content: str
     round_num: int                  # which deliberation round
-    channel: str = "public"         # "public" | "coalition" | "private"
-    recipient_ids: list[str] = field(default_factory=list)
+    channel: str = "public"         # "public"
     timestamp: float = 0.0
-
-    def visible_to(self, agent_id: str, coalition_members: set[str] | None = None) -> bool:
-        """Check if this message is visible to a given agent."""
-        if self.channel == "public":
-            return True
-        if self.channel == "private":
-            return agent_id in self.recipient_ids or agent_id == self.sender_id
-        if self.channel == "coalition":
-            if coalition_members and (agent_id in coalition_members or agent_id == self.sender_id):
-                return True
-        return False
 
 
 @dataclass
@@ -200,10 +188,6 @@ class Observation:
     # Agent's own state
     own_balance: float = 0.0
 
-    # Coalition info (only if treatment enables it)
-    coalition_objective: str | None = None
-    coalition_members: list[str] | None = None
-
     # Bribe offer
     bribe_offer: BribeOffer | None = None
 
@@ -235,8 +219,7 @@ class AbstainAction(AgentAction):
 class DeliberateAction(AgentAction):
     """Agent's action during a deliberation round."""
     message: str                # what they say in deliberation
-    channel: str = "public"     # "public" | "coalition"
-    recipient_ids: list[str] = field(default_factory=list)
+    channel: str = "public"     # "public"
     # Optional: straw poll vote (non-binding, visible to all)
     straw_vote: Verdict | None = None
 

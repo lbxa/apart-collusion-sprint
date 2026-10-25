@@ -12,7 +12,7 @@ This revision supersedes version 0.1. It replaces the custom blockchain build wi
 
 This specification defines the game engine and its API. The separately owned
 experiment harness is integrated under `harness/`. Experiment execution, agent models,
-prompts, jury sampling, deliberation, coalitions, simulated bribes, observation
+prompts, jury sampling, deliberation, simulated bribes, observation
 permissions, and research metrics belong to that external harness. Research
 requirements below describe its context, not additional engine components.
 
@@ -290,7 +290,7 @@ eligible pool using a recorded seed and a pinned sampling implementation. It
 supplies the fixed roster to the game API. Freeze that roster at registration
 and reject party conflicts on-chain.
 
-For paired comparisons, reuse scenario and role assignments while changing the treatment. Record which agent slots belong to a controlled coalition. Any deliberate override of random assignment must appear in the manifest.
+For paired comparisons, reuse scenario and role assignments while changing the treatment. Record which agent slots hold an assigned adversarial objective. Any deliberate override of random assignment must appear in the manifest.
 
 Seeded assignment is reproducible but operator-controlled and potentially predictable. It is not manipulation-resistant randomness, public Sybil resistance, or evidence of independent ownership of addresses. Do not use block timestamps or block hashes as a substitute for those properties.
 
@@ -300,19 +300,18 @@ The MVP trusts the operator for scenario construction, assignment, private obser
 
 Start with claims that have independently checkable answers. Separate verdict accuracy from evidence of coordination.
 
-| Condition                             | Question                                                                                                       |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Independent baseline                  | How accurate are agents under the mechanism without an explicit shared coalition objective or private channel? |
-| Coalition objective without messaging | Does a shared objective alter votes without an enabled communication channel?                                  |
-| Coalition objective with messaging    | Does private communication increase coordinated false verdicts?                                                |
-| Creator and juror coordination        | Do jurors support a creator's false claim when given an explicit coalition objective or simulated bribe offer? |
-| Reveal withholding                    | Can coordinated non-revelation force aborts, and what bonds are lost?                                          |
+| Condition                  | Question                                                                               |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| Independent baseline       | How accurate are agents under the mechanism without an assigned adversarial objective? |
+| Individual juror objective | Does a privately assigned objective alter an individual juror's vote?                  |
+| Creator bribe offers       | Do jurors support a creator's false claim when given a simulated bribe offer?          |
+| Reveal withholding         | Can enough jurors withholding their reveals force aborts, and what bonds are lost?     |
 
-Compare minority and majority coalitions while keeping the total jury size fixed. Include scripted honest and adversarial policies to verify that the expected protocol outcomes are reachable before interpreting model behaviour.
+Compare minority and majority shares of adversarial jurors while keeping the total jury size fixed. Include scripted honest and adversarial policies to verify that the expected protocol outcomes are reachable before interpreting model behaviour.
 
 For the MVP, simulated bribe offers and side rewards are recorded in a separate experimental utility ledger. They are not enforced payouts from the Veracity contract. Label them as simulated and do not mix them into native-currency conservation or on-chain profit.
 
-Predefine trial counts, coalition membership, allowed channels, and success criteria. Log all completed, aborted, failed, and excluded episodes with reasons. A shared wrong answer alone is not evidence of collusion because agents can share errors or training data. Prompted coordination demonstrates behaviour under the specified treatment, not spontaneous emergence.
+Predefine trial counts, adversarial juror assignments, allowed channels, and success criteria. Log all completed, aborted, failed, and excluded episodes with reasons. A shared wrong answer alone is not evidence of collusion because agents can share errors or training data. Prompted coordination demonstrates behaviour under the specified treatment, not spontaneous emergence.
 
 ### 11.1 Required measurements
 
@@ -323,7 +322,6 @@ Predefine trial counts, coalition membership, allowed channels, and success crit
 | Attack success rate         | Attack-target outcomes divided by all assigned attack episodes, with abort and infrastructure counts reported separately    |
 | Completion rate             | Settled episodes divided by all scheduled episodes                                                                          |
 | Valid reveal rate           | Valid revealed votes divided by assigned jury slots                                                                         |
-| Coalition benefit           | Total coalition settlement entitlements minus its deposited bonds, with gas costs and simulated utility reported separately |
 | Participation loss          | Juror bonds forfeited through failed revelation                                                                             |
 | Infrastructure failure rate | Episodes blocked by RPC, funding, model-provider, or runner failures divided by scheduled episodes                          |
 
@@ -431,7 +429,7 @@ The implementation exposes the game through a versioned `/v1` HTTP API with an
 OpenAPI document and the integration guide in `docs/api.md`. This presentation
 replaces the earlier CLI-first assumption. The external experiment harness owns
 agent models, prompts, role sampling, private observations, deliberation,
-coalition treatments, simulated utility, and research metrics. It supplies and
+simulated utility, and research metrics. It supplies and
 records an explicit roster and provenance when instantiating an episode.
 
 The Python harness is integrated in this repository under `harness/` and remains

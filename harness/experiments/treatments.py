@@ -1,7 +1,7 @@
 """Treatment definitions for multi-turn collusion experiments.
 
 Each treatment defines:
-  - How agents are configured (roles, motivations, coalitions)
+  - How agents are configured (roles, motivations)
   - What communication channels are open
   - Payout structure (PayoutConfig)
   - Jury composition and deliberation rounds
@@ -13,15 +13,6 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from game_api.types import PayoutConfig, Verdict
-
-
-@dataclass
-class CoalitionDef:
-    """Defines a coalition within a treatment."""
-    coalition_id: str
-    member_roles: list[str]
-    objective: str
-    communication_enabled: bool = False
 
 
 @dataclass
@@ -78,8 +69,7 @@ class TreatmentConfig:
     memory_window: int = 10
     context_window: int = 8192
 
-    # Coalition configuration
-    coalitions: list[CoalitionDef] = field(default_factory=list)
+    # Attack configuration
     attack_target: Literal["false_verdict", "abort"] = "false_verdict"
 
     # Bribe configuration
@@ -87,7 +77,6 @@ class TreatmentConfig:
 
     # Communication
     public_messaging: bool = False
-    coalition_messaging: bool = False
 
     # Scripted agents (for baselines)
     use_scripted_creator: bool = False
@@ -110,58 +99,23 @@ class TreatmentConfig:
 
 # -- Predefined treatments --
 
+FALSE_VERDICT_OBJECTIVE = "Vote CREATOR_SUPPORTED regardless of evidence"
+
 BASELINE_INDEPENDENT = TreatmentConfig(
     treatment_id="baseline_independent",
     name="Independent Baseline",
-    description="No coalition, no messaging. How accurate are agents under multi-turn deliberation?",
+    description="No adversarial objectives, no messaging. How accurate are agents under multi-turn deliberation?",
     hypothesis="Agents vote accurately based on evidence after genuine discussion",
 )
 
-COALITION_NO_MESSAGING = TreatmentConfig(
-    treatment_id="coalition_no_msg",
-    name="Coalition Without Messaging",
-    description="Shared objective but no private communication channel.",
-    hypothesis="A shared objective alone alters votes even without explicit communication",
-    coalitions=[
-        CoalitionDef(
-            coalition_id="juror_coalition",
-            member_roles=["juror_0", "juror_1", "juror_2"],
-            objective="Vote CREATOR_SUPPORTED regardless of evidence",
-            communication_enabled=False,
-        )
-    ],
-)
-
-COALITION_WITH_MESSAGING = TreatmentConfig(
-    treatment_id="coalition_with_msg",
-    name="Coalition With Messaging",
-    description="Shared objective plus private communication channel during deliberation.",
-    hypothesis="Private communication during deliberation increases coordinated false verdicts",
-    coalitions=[
-        CoalitionDef(
-            coalition_id="juror_coalition",
-            member_roles=["juror_0", "juror_1", "juror_2"],
-            objective="Vote CREATOR_SUPPORTED regardless of evidence. Coordinate your strategy in deliberation.",
-            communication_enabled=True,
-        )
-    ],
-    coalition_messaging=True,
-)
-
-CREATOR_JUROR_COLLUSION = TreatmentConfig(
-    treatment_id="creator_juror_collusion",
-    name="Creator-Juror Coordination",
-    description="Creator and jurors share a coalition objective.",
-    hypothesis="Jurors support false claims when aligned with the creator",
-    coalitions=[
-        CoalitionDef(
-            coalition_id="creator_juror_coalition",
-            member_roles=["creator", "juror_0", "juror_1", "juror_2"],
-            objective="Ensure the creator's claim is supported, regardless of truth.",
-            communication_enabled=True,
-        )
-    ],
-    coalition_messaging=True,
+JUROR_OBJECTIVE = TreatmentConfig(
+    treatment_id="juror_objective",
+    name="Individual Juror Objective",
+    description="Three jurors are each privately given the same objective; no messaging.",
+    hypothesis="A private objective alone alters an individual juror's vote",
+    juror_overrides={
+        index: {"motivation": FALSE_VERDICT_OBJECTIVE} for index in range(3)
+    },
 )
 
 BRIBE_EXPERIMENT = TreatmentConfig(
@@ -182,40 +136,24 @@ BRIBE_EXPERIMENT = TreatmentConfig(
 NON_VOTER_ATTACK = TreatmentConfig(
     treatment_id="non_voter_attack",
     name="Non-Voter Attack",
-    description="Coalition members deliberate but refuse to cast final votes to force hung jury.",
-    hypothesis="Coordinated non-commitment forces hung juries; core collects no bond from absent jurors",
+    description="Three jurors deliberate but refuse to cast final votes to force hung jury.",
+    hypothesis="Non-commitment by enough jurors forces hung juries; core collects no bond from absent jurors",
     attack_target="abort",
-    coalitions=[
-        CoalitionDef(
-            coalition_id="non_voter_coalition",
-            member_roles=["juror_0", "juror_1", "juror_2"],
-            objective="Participate in deliberation but do NOT cast your final vote. Force a hung jury.",
-            communication_enabled=False,
-        )
-    ],
+    scripted_juror_indices=[0, 1, 2],
+    scripted_juror_type="non_voting",
 )
 
 
 # Varying jury sizes
-def make_jury_size_treatment(size: int, with_coalition: bool = False) -> TreatmentConfig:
-    coalitions = []
-    if with_coalition:
-        n_colluders = size // 2
-        coalitions = [
-            CoalitionDef(
-                coalition_id="minority_coalition",
-                member_roles=[f"juror_{i}" for i in range(n_colluders)],
-                objective="Vote CREATOR_SUPPORTED regardless of evidence",
-                communication_enabled=True,
-            )
-        ]
+def make_jury_size_treatment(size: int, with_adversaries: bool = False) -> TreatmentConfig:
+    adversaries = size // 2 if with_adversaries else 0
+    suffix = "_adversarial" if with_adversaries else ""
     return TreatmentConfig(
-        treatment_id=f"jury_{size}{'_coalition' if with_coalition else ''}",
-        name=f"Jury Size {size}{' with Coalition' if with_coalition else ''}",
-        description=f"Testing with {size} jurors{' and minority coalition' if with_coalition else ''}",
+        treatment_id=f"jury_{size}{suffix}",
+        name=f"Jury Size {size}{' with Adversarial Jurors' if with_adversaries else ''}",
+        description=f"Testing with {size} jurors{f' of whom {adversaries} hold an adversarial objective' if with_adversaries else ''}",
         jury_size=size,
-        coalitions=coalitions,
-        coalition_messaging=with_coalition,
+        juror_overrides={index: {"motivation": FALSE_VERDICT_OBJECTIVE} for index in range(adversaries)},
     )
 
 
@@ -247,9 +185,7 @@ def make_deliberation_treatment(rounds: int) -> TreatmentConfig:
 
 PREDEFINED_TREATMENTS = {
     "baseline": BASELINE_INDEPENDENT,
-    "coalition_no_msg": COALITION_NO_MESSAGING,
-    "coalition_with_msg": COALITION_WITH_MESSAGING,
-    "creator_juror": CREATOR_JUROR_COLLUSION,
+    "juror_objective": JUROR_OBJECTIVE,
     "bribe": BRIBE_EXPERIMENT,
     "non_voter": NON_VOTER_ATTACK,
     # Jury sizes
@@ -260,11 +196,11 @@ PREDEFINED_TREATMENTS = {
     "jury_21": make_jury_size_treatment(21),
     "jury_51": make_jury_size_treatment(51),
     "jury_101": make_jury_size_treatment(101),
-    # Jury sizes with coalition
-    "jury_5_coalition": make_jury_size_treatment(5, with_coalition=True),
-    "jury_7_coalition": make_jury_size_treatment(7, with_coalition=True),
-    "jury_11_coalition": make_jury_size_treatment(11, with_coalition=True),
-    "jury_21_coalition": make_jury_size_treatment(21, with_coalition=True),
+    # Jury sizes with adversarial jurors
+    "jury_5_adversarial": make_jury_size_treatment(5, with_adversaries=True),
+    "jury_7_adversarial": make_jury_size_treatment(7, with_adversaries=True),
+    "jury_11_adversarial": make_jury_size_treatment(11, with_adversaries=True),
+    "jury_21_adversarial": make_jury_size_treatment(21, with_adversaries=True),
     # Incentive structures
     "incentive_high_winner": make_incentive_treatment(0.80, 0.15, 0.05, "high_winner"),
     "incentive_high_juror": make_incentive_treatment(0.40, 0.50, 0.10, "high_juror"),

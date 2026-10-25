@@ -15,7 +15,7 @@ from agents.base import AgentConfig
 from agents.prompts import build_system_prompt
 from agents.scripted import HonestAgent
 from experiments.runner import ExperimentRunner
-from experiments.treatments import BribeDef, CoalitionDef, NON_VOTER_ATTACK, TreatmentConfig
+from experiments.treatments import BribeDef, NON_VOTER_ATTACK, TreatmentConfig
 from game_api.mock import MockGameAPI
 from game_api.state_file import state_to_settlement
 from game_api.types import (
@@ -78,7 +78,6 @@ class DeferredBondGame(MockGameAPI):
 class RecordingAgent(HonestAgent):
     observations = []
     configured_channel = "public"
-    target_outsider = False
 
     async def decide(self, observation):
         self.observations.append((self.agent_id, copy.deepcopy(observation), len(self.episode_memory)))
@@ -86,12 +85,8 @@ class RecordingAgent(HonestAgent):
 
     async def deliberate(self, observation):
         self.observations.append((self.agent_id, copy.deepcopy(observation), len(self.episode_memory)))
-        recipients = []
-        if self.configured_channel == "private":
-            recipients = [f"juror_2_{observation.episode_id}"] if self.target_outsider else list((observation.coalition_members or [])[:1])
         return DeliberateAction(self.agent_id, observation.episode_id,
                                 f"message from {self.agent_id}", self.configured_channel,
-                                recipient_ids=recipients,
                                 straw_vote=Verdict.CREATOR_SUPPORTED)
 
 
@@ -232,38 +227,23 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("ground_truth", agent.get_memory_context())
         self.assertNotIn("SECRET", agent.get_memory_context())
 
-    async def test_channel_permissions_prevent_disabled_or_cross_coalition_messages(self):
-        for public_enabled, coalition_enabled, member_enabled, expected_messages in [
-            (False, False, False, 0), (False, True, False, 0), (False, False, True, 0), (False, True, True, 4),
+    async def test_only_the_enabled_public_channel_carries_messages(self):
+        for public_enabled, channel, expected_messages in [
+            (False, "public", 0), (True, "public", 6), (True, "private", 0),
         ]:
-            RecordingAgent.observations = []
-            RecordingAgent.configured_channel = "coalition"
-            treatment = self.treatment(deliberation_rounds=2, public_messaging=public_enabled, coalition_messaging=coalition_enabled,
-                                       coalitions=[CoalitionDef("pair", ["juror_0", "juror_1"], "Shared objective", member_enabled)])
-            runner = ExperimentRunner(MockGameAPI(), self.output / f"{coalition_enabled}-{member_enabled}")
-            with patch("experiments.runner.HonestAgent", RecordingAgent):
-                metrics = await runner.run_experiment(treatment, [self.scenario], "channels")
-            record = metrics.episodes[0]
-            self.assertEqual(len(record.messages), expected_messages)
-            outsiders = [observation for actor, observation, _ in RecordingAgent.observations if actor == record.juror_ids[2]]
-            self.assertTrue(all(not observation.visible_messages for observation in outsiders))
-            self.assertTrue(all(not observation.straw_polls for _, observation, _ in RecordingAgent.observations))
-            if not (coalition_enabled and member_enabled):
-                member = next(observation for actor, observation, _ in RecordingAgent.observations if actor == record.juror_ids[0])
-                prompt = build_system_prompt(AgentConfig(record.juror_ids[0], Role.JUROR, coalition_id="pair"), member)
-                self.assertNotIn("You can send private messages", prompt)
-
-    async def test_private_messages_cannot_target_an_outsider_even_when_coalition_channel_is_enabled(self):
-        RecordingAgent.observations = []
-        RecordingAgent.configured_channel = "private"
-        RecordingAgent.target_outsider = True
-        self.addCleanup(setattr, RecordingAgent, "target_outsider", False)
-        treatment = self.treatment(public_messaging=False, coalition_messaging=True,
-                                   coalitions=[CoalitionDef("pair", ["juror_0", "juror_1"], "Shared objective", True)])
-        with patch("experiments.runner.HonestAgent", RecordingAgent):
-            metrics = await ExperimentRunner(MockGameAPI(), self.output).run_experiment(treatment, [self.scenario], "private")
-        self.assertEqual(metrics.episodes[0].messages, [])
-        self.assertTrue(all(not observation.visible_messages for _, observation, _ in RecordingAgent.observations))
+            with self.subTest(public_enabled=public_enabled, channel=channel):
+                RecordingAgent.observations = []
+                RecordingAgent.configured_channel = channel
+                treatment = self.treatment(deliberation_rounds=2, public_messaging=public_enabled)
+                runner = ExperimentRunner(MockGameAPI(), self.output / f"{public_enabled}-{channel}")
+                with patch("experiments.runner.HonestAgent", RecordingAgent):
+                    metrics = await runner.run_experiment(treatment, [self.scenario], "channels")
+                self.assertEqual(len(metrics.episodes[0].messages), expected_messages)
+                observations = [observation for _, observation, _ in RecordingAgent.observations]
+                self.assertEqual(any(observation.visible_messages for observation in observations), expected_messages > 0)
+                self.assertTrue(all(observation.allowed_channels == (("public",) if public_enabled else ())
+                                    for observation in observations))
+                self.assertEqual(any(observation.straw_polls for observation in observations), public_enabled)
 
     def test_random_agents_use_the_recorded_seed_instead_of_process_entropy(self):
         treatment = self.treatment(scripted_juror_type="random", seed=2741)
@@ -276,30 +256,29 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         third = runner._create_agents(treatment, "creator-c", "challenger-c", ["g", "h", "i"], 0)
         self.assertNotEqual(first["a"]._rng.getstate(), third["g"]._rng.getstate())
 
-    def test_failed_and_partial_records_cannot_contribute_success_or_benefit(self):
+    def test_failed_and_partial_records_cannot_contribute_success(self):
+        attack = {"attack_assigned": True, "attack_target": "false_verdict"}
         records = [
-            EpisodeRecord("ok", "exp", "sc", "treatment", {}, coalition_ids=["coalition"], ground_truth=True,
-                          outcome="SETTLED_CREATOR", verdict_correct=True, status="completed", bonds_deposited={"coalition": 1}, payouts={"coalition": 2}),
-            EpisodeRecord("failed", "exp", "sc", "treatment", {}, coalition_ids=["coalition"], ground_truth=True,
-                          outcome="SETTLED_CHALLENGER", verdict_correct=False, status="failed", infrastructure_failure=True,
-                          bonds_deposited={"coalition": 1}, payouts={"coalition": 100}),
-            EpisodeRecord("partial", "exp", "sc", "treatment", {}, coalition_ids=["coalition"], ground_truth=True,
-                          outcome="SETTLED_CHALLENGER", verdict_correct=False, status="running",
-                          bonds_deposited={"coalition": 1}, payouts={"coalition": 100}),
+            EpisodeRecord("ok", "exp", "sc", "treatment", dict(attack), ground_truth=True,
+                          outcome="SETTLED_CREATOR", verdict_correct=True, status="completed"),
+            EpisodeRecord("failed", "exp", "sc", "treatment", dict(attack), ground_truth=True,
+                          outcome="SETTLED_CHALLENGER", verdict_correct=False, status="failed",
+                          infrastructure_failure=True),
+            EpisodeRecord("partial", "exp", "sc", "treatment", dict(attack), ground_truth=True,
+                          outcome="SETTLED_CHALLENGER", verdict_correct=False, status="running"),
         ]
         metrics = ExperimentMetrics("exp", "treatment", records)
         self.assertEqual(metrics.verdict_accuracy, 1.0)
         self.assertEqual(metrics.attack_success_rate, 0.0)
-        self.assertEqual(metrics.total_coalition_benefit, 1)
         self.assertEqual(metrics.completion_rate, 1 / 3)
 
     def test_attack_rate_counts_every_assigned_trial_and_reports_reveals_and_failures(self):
         config = {"attack_assigned": True, "attack_target": "false_verdict", "jury_size": 3, "game_backend": "core"}
         records = [
-            EpisodeRecord("wrong", "exp", "sc", "attack", dict(config), coalition_ids=["member"], ground_truth=True,
+            EpisodeRecord("wrong", "exp", "sc", "attack", dict(config), ground_truth=True,
                           outcome="SETTLED_CHALLENGER", verdict_correct=False, status="completed",
                           votes={"a": "CHALLENGER_SUPPORTED", "b": "CHALLENGER_SUPPORTED", "c": "CHALLENGER_SUPPORTED"}),
-            EpisodeRecord("abort", "exp", "sc", "attack", dict(config), coalition_ids=["member"], ground_truth=True,
+            EpisodeRecord("abort", "exp", "sc", "attack", dict(config), ground_truth=True,
                           outcome="ABORTED", status="completed", votes={"a": "CREATOR_SUPPORTED"}),
             EpisodeRecord("infra", "exp", "sc", "attack", dict(config), ground_truth=True,
                           outcome="SETTLED_CHALLENGER", verdict_correct=False, status="failed", infrastructure_failure=True),
@@ -328,7 +307,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(NON_VOTER_ATTACK.attack_target, "abort")
 
     async def test_attack_assignment_and_target_survive_failure_before_participants_are_recorded(self):
-        treatment = self.treatment(attack_target="abort", coalitions=[CoalitionDef("attack", ["juror_0"], "Force an abort")])
+        treatment = self.treatment(attack_target="abort", juror_overrides={0: {"motivation": "Force an abort"}})
         with self.assertLogs("experiments.runner", level="ERROR"), patch("experiments.runner.ExperimentRunner._create_agents", side_effect=RuntimeError("unavailable")):
             metrics = await ExperimentRunner(MockGameAPI(), self.output).run_experiment(treatment, [self.scenario], "early-failure")
         record = metrics.episodes[0]
@@ -347,7 +326,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         poll = StrawPoll(1, {"sender": Verdict.CREATOR_SUPPORTED})
         bribe = BribeOffer("creator", 5.0, "vote CREATOR_SUPPORTED")
         observation = runner._make_observation(Role.JUROR, "episode", self.scenario, Phase.DELIBERATION,
-                                               EpisodeConfig("episode"), [message], [poll], "malicious", {},
+                                               EpisodeConfig("episode"), [message], [poll], "malicious",
                                                self.treatment(), bribe_offer=bribe)
 
         class MutatingAgent(HonestAgent):

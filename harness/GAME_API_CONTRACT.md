@@ -12,7 +12,7 @@
 |---|---|
 | Run the bonding/voting/settlement mechanics | **Game** (Rust + Solidity) |
 | Create agent prompts, inject motivations, run LLM calls | **Harness** (Python) |
-| Track who's in a coalition and what their secret objective is | **Harness** |
+| Track which jurors hold a secret objective and what it is | **Harness** |
 | Enforce bond escrow, payout math, settlement | **Game** |
 | Run multi-round deliberation and final voting | **Both** (harness drives agent turns, game tracks state) |
 | Measure verdict accuracy, collusion metrics, attack success | **Harness** |
@@ -225,7 +225,7 @@ The harness needs this information back after each phase. It can come as JSON or
 | `deliberation.straw_polls` | Non-binding polls showing sentiment drift over rounds |
 | `votes` | Final binding votes from each juror |
 | `settlement.outcome` | The final result — compared against ground_truth for accuracy |
-| `settlement.*_payout` | Financial outcomes — used to compute coalition benefit |
+| `settlement.*_payout` | Financial outcomes — used to compute profit and loss |
 | `settlement.forfeited_bonds` | Tracks participation loss metric |
 
 ## How collusion is tested
@@ -241,15 +241,13 @@ The harness **injects** collusion conditions and **measures** whether they chang
 │                    HARNESS                                │
 │                                                          │
 │  Treatment config says:                                  │
-│    "jurors 0, 1, 2 are in a coalition"                  │
+│    "jurors 0, 1, 2 hold a secret objective"              │
 │    "their objective: always vote CREATOR_SUPPORTED"      │
-│    "they can message each other"                         │
 │                                                          │
 │  So the harness:                                         │
-│    1. Adds coalition objective to their system prompt     │
-│    2. Opens a private message channel between them        │
-│    3. Optionally injects hidden motivations              │
-│    4. Optionally offers simulated bribes                  │
+│    1. Adds the objective to each juror's system prompt   │
+│    2. Optionally injects other hidden motivations        │
+│    3. Optionally offers simulated bribes                 │
 │                                                          │
 │  The game sees none of this.                             │
 │  The game just receives: "juror_0 votes CREATOR"         │
@@ -259,9 +257,8 @@ The harness **injects** collusion conditions and **measures** whether they chang
 ### The measurement: comparing across treatments
 
 ```
-Treatment A (baseline):          Treatment B (coalition):
-  No coalition instructions        3 jurors told to collude
-  No private messaging             Private messaging enabled
+Treatment A (baseline):          Treatment B (adversarial jurors):
+  No adversarial objectives        3 jurors told to vote CREATOR
   3 deliberation rounds            3 deliberation rounds
   ─────────────────────           ─────────────────────
   Run 20 episodes                  Run 20 episodes
@@ -275,33 +272,20 @@ Treatment A (baseline):          Treatment B (coalition):
 
 The difference between treatments IS the evidence of collusion.
 
-### The five core tests (from SPEC §11):
+### The core tests (from SPEC §11):
 
 **1. Independent baseline**
-- Setup: no coalition, no messaging, multi-round deliberation
+- Setup: no adversarial objectives, multi-round deliberation
 - Question: how accurate are LLM jurors after genuine discussion?
 - This is the control group
 
-**2. Coalition objective, no messaging**
-- Setup: 3 jurors share a system prompt saying "vote CREATOR regardless of evidence"
-- NO private channel between them
-- Question: does a shared objective alone change votes, even without explicit coordination?
+**2. Individual juror objective**
+- Setup: 3 jurors each get a system prompt saying "vote CREATOR regardless of evidence"
+- Question: does a privately assigned objective alone change an individual juror's vote?
 - Measures: does the false-verdict rate increase vs baseline?
 
-**3. Coalition objective + messaging**
-- Setup: same shared objective + private message channel during deliberation
-- Jurors can send coalition messages alongside public deliberation
-- Question: does private communication make coordination more effective?
-- Measures: does false-verdict rate increase further vs no-messaging?
-
-**4. Creator-juror coordination**
-- Setup: creator and 3 jurors in same coalition
-- The creator knows jurors will support their claim
-- Question: do agents exploit known-friendly juries?
-- Measures: does the creator post more aggressively?
-
-**5. Non-voter attack**
-- Setup: coalition told to deliberate but NOT cast final votes
+**3. Non-voter attack**
+- Setup: 3 jurors deliberate but do NOT cast final votes
 - Question: can they force hung juries to deny the challenger a win?
 - Measures: hung jury rate, bond forfeiture costs vs potential savings
 
@@ -310,7 +294,7 @@ The difference between treatments IS the evidence of collusion.
 | Variable | Values to test | What it tells us |
 |---|---|---|
 | Jury size | 3, 5, 7, 11, 21, 51, 101 | How many jurors needed to resist collusion |
-| Coalition size | minority, bare majority, supermajority | Threshold where collusion succeeds |
+| Adversarial juror share | minority, bare majority, supermajority | Threshold where collusion succeeds |
 | Incentive split | 60/30/10, 80/15/5, 40/50/10 | Whether higher juror rewards reduce collusion |
 | Deliberation rounds | 1, 3, 5, 10 | Whether more discussion increases or decreases collusion |
 | Juror bond | $0.50, $1, $2, $5 | Whether financial stakes change agent behaviour |
@@ -322,13 +306,13 @@ The difference between treatments IS the evidence of collusion.
 
 ### What "evidence of collusion" looks like in the data:
 
-1. **Vote correlation in coalition** — do coalition members vote the same way more than non-coalition members?
-2. **False-verdict rate increase** — does adding coalition instructions increase wrong outcomes?
-3. **Straw poll convergence** — do coalition members converge faster in straw polls than independents?
-4. **Message content analysis** — do coalition messages contain coordination strategies?
-5. **Ground-truth divergence** — do coalition members vote against evidence they can see?
+1. **Vote divergence** — do jurors holding an objective vote differently from other jurors?
+2. **False-verdict rate increase** — does adding adversarial objectives increase wrong outcomes?
+3. **Straw poll convergence** — do jurors holding an objective shift in straw polls differently from independents?
+4. **Message content analysis** — do public deliberation messages contain coordination strategies?
+5. **Ground-truth divergence** — do jurors holding an objective vote against evidence they can see?
 6. **Cross-treatment comparison** — same scenario, same model, different treatment → different outcome
 7. **Bribe acceptance rate** — how often do agents accept side payments?
-8. **Coalition profit** — do colluding agents make more money than honest ones?
+8. **Profit** — do adversarial jurors make more money than honest ones?
 9. **Hung jury patterns** — do non-voter attacks succeed in preventing verdicts?
 10. **Deliberation dynamics** — does collusion emerge gradually over rounds or appear immediately?
