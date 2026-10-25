@@ -1,0 +1,21 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Multi-agent evaluations ask how behavior changes when agents have different
+incentives, information, or opportunities to communicate. Answering that
+question requires a clear account of what the environment enforces, what the
+experiment varies, and which observations support the reported conclusion.
+The Veracity project supplies a reduced dispute game in which agents can create
+claims, challenge them, assess evidence, and vote under specified payment
+rules~\cite{project-spec}.
+
+A measurement choice arises before comparing treatments: should a rate include
+trials that fail before producing a verdict? A rate conditional on obtaining
+a verdict answers a different question from a rate over all assigned trials.
+Readers need both the denominator and the failure count to interpret either
+quantity. This report uses a fictional example to make that distinction visible.
+
+The sample describes the division of responsibility between the harness,
+service, and contract, then presents a descriptive comparison through a metric,
+table, and uncertainty plot. The comparison uses invented counts. Labels A and B
+do not identify executed configurations or actual experimental conditions.

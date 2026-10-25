@@ -12,6 +12,16 @@ Share [the API integration guide](docs/api.md) with the harness team. The runnin
 service exposes the same guide at `/v1/docs` and OpenAPI 3.1 at `/v1/openapi.json`.
 [Architecture and rule authority](docs/architecture.md) describes the boundaries.
 
+## Research reporting
+
+A LaTeX research report is a main deliverable. The
+[reporting guide and table of contents](docs/reporting/README.md) indexes the
+paper brief, writing standards, figures and tables, LaTeX conventions, venue
+requirements, review checks, source notes, and reusable examples. Agents should
+follow the reading order in [AGENTS.md](AGENTS.md#research-reports) before writing.
+The [sectioned sample report](report/README.md) uses the supplied preprint style;
+build it with `make -C report`. Its numerical comparison is explicitly fictional.
+
 ## Development
 
 Install Rust through rustup, uv, Bash, Git, curl, tar, jq, `sha256sum` or `shasum`, and a native C build toolchain

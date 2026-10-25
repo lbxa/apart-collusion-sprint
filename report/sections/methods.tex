@@ -1,0 +1,39 @@
+\section{Illustrative measurement design}
+\label{sec:methods}
+
+\subsection{Endpoint and denominator}
+The example asks how often an assigned trial reaches a prespecified target
+verdict. A real experiment must define that target before execution and justify
+its relationship to the research question. Here, it is simply the illustrative
+endpoint used to explain the rate.
+
+We need a denominator that retains unsuccessful assigned trials. For each
+treatment $t\in\{A,B\}$, let $n_t>0$ be the number of assigned trials, let
+$k_t\in\{0,\ldots,n_t\}$ count trials reaching the target, and let $f_t$ count
+infrastructure failures. Failed trials do not enter $k_t$, but remain in $n_t$.
+The assigned-trial target-verdict rate and descriptive contrast are
+\begin{align}
+  \assignedrate_t &= \frac{k_t}{n_t},
+  \label{eq:assigned-rate}\\
+  \ratecontrast &= \assignedrate_B - \assignedrate_A.
+  \label{eq:contrast}
+\end{align}
+The rate is dimensionless; multiplying it by 100 expresses it as a percentage.
+The corresponding contrast is reported in percentage points. When no trials
+are assigned, the rate is undefined rather than zero.
+
+The hypothetical setup contains 40 independently initialized trials per
+treatment, with no shared memory. Its invented counts have no associated model
+calls, executed backend, run identifiers, or deployment identity.
+
+\subsection{Uncertainty and interpretation}
+The figure uses marginal 95\% Wilson score intervals for each rate. These
+intervals illustrate uncertainty under an independent binomial-trial model.
+They do not establish that the hypothetical independence assumption holds in
+a real agent experiment. Repeated episodes, shared scenarios, or persistent
+agent memory may require a different analysis.
+
+The intervals describe individual rates. Their overlap is not a test of the
+treatment contrast in Equation~\eqref{eq:contrast}. A real comparison would
+need an analysis of that contrast consistent with the assignment procedure,
+sampling unit, and dependence structure.
