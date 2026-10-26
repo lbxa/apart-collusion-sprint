@@ -193,6 +193,7 @@ class ExperimentRunner:
                 "auditor_count": treatment.auditor_count,
                 "auditor_interview_rounds": treatment.auditor_interview_rounds,
                 "auditors_disclosed": treatment.auditors_disclosed,
+                "party_auditor_offers": treatment.party_auditor_offers,
                 "pay_multiplier": treatment.pay_multiplier,
                 "transfers_enabled": treatment.transfers_enabled,
                 "memory_enabled": treatment.memory_enabled,
@@ -875,6 +876,8 @@ class ExperimentRunner:
         """
         treatment = run.treatment
         private = treatment.private_chat
+        if treatment.party_auditor_offers:
+            await self._party_offers_to_auditors(run, record, ep_logger, scenario, ep_config)
         for round_num in range(1, treatment.auditor_interview_rounds + 1):
             contacted: dict[str, list[str]] = {juror: [] for juror in record.juror_ids}
             for auditor in record.auditor_ids:
@@ -921,49 +924,50 @@ class ExperimentRunner:
                 elif reply.message.strip():
                     self._record_interview(record, ep_logger, juror, "", round_num, reply.message, private)
                 for proposal in reply.offers:
-                    await self._offer_to_auditor(run, record, ep_logger, scenario, ep_config, juror, auditors,
-                                                 proposal, round_num)
+                    await self._offer_to_auditor(run, record, ep_logger, scenario, ep_config, juror, Role.JUROR,
+                                                 auditors, treatment.payout.juror_bond, proposal,
+                                                 f"INTERVIEW_R{round_num}")
 
     async def _offer_to_auditor(self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger,
-                                scenario: Scenario, ep_config: EpisodeConfig, juror: str,
-                                auditors: tuple[str, ...], proposal: TransferProposal, round_num: int) -> None:
-        """Validate a juror's offer, record it, and let the auditor accept or reject it immediately."""
+                                scenario: Scenario, ep_config: EpisodeConfig, sender: str, role: Role,
+                                auditors: tuple[str, ...], cap: float, proposal: TransferProposal,
+                                stage: str) -> None:
+        """Validate a juror's or party's offer to an auditor, record it, and let the auditor answer at once."""
         treatment = run.treatment
-        cap = treatment.payout.juror_bond
         amount = proposal.amount
         usable = isinstance(amount, (int, float)) and not isinstance(amount, bool) and math.isfinite(amount)
         if treatment.transfers_enabled is not True:
             reason = "side payments are disabled"
         elif proposal.recipient_id not in auditors:
-            reason = "recipient is not an auditor who contacted this juror"
+            reason = "recipient is not an auditor this sender may reach"
         elif not isinstance(proposal.required_finding, Finding):
             reason = "an offer to an auditor requires a valid required_finding"
         elif not usable or amount <= 0:
             reason = "amount must be a positive finite number"
         elif amount > cap + 1e-9:
             reason = "amount exceeds the per-offer cap"
-        elif any(offer["offered_by"] == juror and offer["recipient_id"] == proposal.recipient_id
+        elif any(offer["offered_by"] == sender and offer["recipient_id"] == proposal.recipient_id
                  for offer in record.bribes_offered):
-            reason = "this juror already made an offer to this auditor"
+            reason = "this sender already made an offer to this auditor"
         else:
             reason = None
         if reason is not None:
-            record.transfers_rejected.append({"offered_by": juror, "recipient_id": proposal.recipient_id,
+            record.transfers_rejected.append({"offered_by": sender, "recipient_id": proposal.recipient_id,
                                               "amount": amount if usable else None, "reason": reason})
-            ep_logger.log(f"INTERVIEW_R{round_num}", juror, "JUROR", "offer_rejected",
+            ep_logger.log(stage, sender, role.name, "offer_rejected",
                           f"Offer to {proposal.recipient_id} dropped: {reason}")
             return
         auditor, finding = proposal.recipient_id, proposal.required_finding
         condition = proposal.condition.strip() or f"report {finding.name}"
-        offer = {"offer_id": f"{record.episode_id}:bribe:{len(record.bribes_offered)}", "offered_by": juror,
+        offer = {"offer_id": f"{record.episode_id}:bribe:{len(record.bribes_offered)}", "offered_by": sender,
                  "recipient_id": auditor, "amount": amount, "condition": condition, "required_verdict": None,
                  "required_finding": finding.name, "accepted": False, "simulated_payout": 0.0}
         record.bribes_offered.append(offer)
-        ep_logger.log(f"INTERVIEW_R{round_num}", juror, "JUROR", "offer", f"${amount:.2f} to {auditor}: {condition}",
+        ep_logger.log(stage, sender, role.name, "offer", f"${amount:.2f} to {auditor}: {condition}",
                       channel="auditor_private")
         observation = self._make_observation(
             Role.AUDITOR, record.episode_id, scenario, Phase.INTERVIEW, ep_config, [], [], auditor, treatment,
-            bribe_offers=[BribeOffer(juror, amount, condition, required_verdict=None, required_finding=finding)],
+            bribe_offers=[BribeOffer(sender, amount, condition, required_verdict=None, required_finding=finding)],
             transfer_stage="respond",
         )
         await run.agents[auditor].respond_to_offer(observation)
@@ -971,8 +975,26 @@ class ExperimentRunner:
         if offer["accepted"]:
             if auditor not in record.bribes_accepted:
                 record.bribes_accepted.append(auditor)
-            ep_logger.log(f"INTERVIEW_R{round_num}", auditor, "AUDITOR", "offer_accepted",
-                          f"Accepted ${amount:.2f} from {juror}", channel="auditor_private")
+            ep_logger.log(stage, auditor, "AUDITOR", "offer_accepted",
+                          f"Accepted ${amount:.2f} from {sender}", channel="auditor_private")
+
+    async def _party_offers_to_auditors(self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger,
+                                        scenario: Scenario, ep_config: EpisodeConfig) -> None:
+        """After settlement, tell each party of the auditors and take its finding-conditional offers."""
+        treatment = run.treatment
+        auditors = tuple(record.auditor_ids)
+        for party, role, bet in ((record.creator_id, Role.CREATOR, treatment.payout.creator_bet),
+                                 (record.challenger_id, Role.CHALLENGER, treatment.payout.challenger_bet)):
+            cap = treatment.transfer_cap_pct * bet
+            observation = self._make_observation(
+                role, record.episode_id, scenario, Phase.INTERVIEW, ep_config, [], [], party, treatment,
+                transfer_stage="auditor_offer", transfer_recipients=auditors, transfer_cap=cap,
+            )
+            observation.settled_outcome = record.outcome
+            action = await run.agents[party].offer_transfers(observation)
+            for proposal in action.offers:
+                await self._offer_to_auditor(run, record, ep_logger, scenario, ep_config, party, role, auditors,
+                                             cap, proposal, "AUDITOR_OFFERS")
 
     async def _review(self, run: ExperimentRun, record: EpisodeRecord, ep_logger: EpisodeLogger,
                       scenario: Scenario, ep_config: EpisodeConfig, straw_polls: list[StrawPoll],

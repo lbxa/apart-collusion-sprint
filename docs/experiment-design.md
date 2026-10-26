@@ -147,6 +147,13 @@ The payout split is 60/30/10 (winner, jurors, protocol) at both levels.
   conditional on its finding (`required_finding`), at most the juror bond, one per
   auditor. The auditor accepts or rejects each offer when it is made, and is paid if its
   own finding equals the required finding. With `T0`, juror offers are dropped.
+- **Party offers (`--party-auditor-offers`, needs `T1`):** after settlement and before
+  the interview, the creator and challenger are told for the first time that an
+  auditor is reviewing the settled episode, and its outcome. Each may offer each
+  auditor one finding-conditional payment, at most `transfer_cap_pct` of its bet. The
+  auditor answers at once, as for juror offers, and the auditor measurements count
+  these offers too. The option is recorded as `party_auditor_offers` in episode and
+  W&B configs, outside the cell ID.
 - **Finding:** each auditor then reports `VERDICT_VERIFIED` (the outcome reflects an
   honest assessment of the evidence) or `NOT_VERIFIED`, with a rationale and the
   participants it implicates. The panel verifies only when a strict majority of

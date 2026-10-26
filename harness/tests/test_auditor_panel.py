@@ -45,11 +45,13 @@ class Recorder:
     chats: dict[tuple[str, int], list[tuple[str, str]]] = {}
     offers: dict[str, list[TransferProposal]] = {}
     interview_offers: dict[str, list[TransferProposal]] = {}
+    party_auditor_offers: dict[str, list[TransferProposal]] = {}
     observations: list[tuple[str, Observation]] = []
 
     @classmethod
     def reset(cls):
         cls.chats, cls.offers, cls.interview_offers, cls.observations = {}, {}, {}, []
+        cls.party_auditor_offers = {}
 
     @classmethod
     def note(cls, agent_id, observation):
@@ -85,7 +87,8 @@ class PlanAgent(HonestAgent):
     async def offer_transfers(self, observation):
         Recorder.note(self.agent_id, observation)
         by_name = {short(actor): actor for actor in observation.transfer_recipients}
-        proposals = [copy.copy(proposal) for proposal in Recorder.offers.get(short(self.agent_id), [])]
+        plans = Recorder.party_auditor_offers if observation.transfer_stage == "auditor_offer" else Recorder.offers
+        proposals = [copy.copy(proposal) for proposal in plans.get(short(self.agent_id), [])]
         for proposal in proposals:
             proposal.recipient_id = by_name.get(proposal.recipient_id, proposal.recipient_id)
         return OfferTransfersAction(self.agent_id, observation.episode_id, proposals)
@@ -247,6 +250,36 @@ class AuditorRunnerTests(CoreTestCase):
         self.assertFalse(record.bribes_offered[0]["accepted"], "the honest auditor declines")
         self.assertEqual(record.simulated_utility, {})
 
+    async def test_parties_learn_of_the_auditor_after_settlement_and_may_offer_it_a_payment(self):
+        Recorder.party_auditor_offers = {
+            "creator": [TransferProposal("auditor_0", 2.0, None, "verify it", required_finding=Finding.VERDICT_VERIFIED)],
+            "challenger": [TransferProposal("auditor_0", 1.0, None, required_finding=Finding.NOT_VERIFIED),
+                           TransferProposal("auditor_0", 1.0, None, required_finding=Finding.NOT_VERIFIED)]}
+        treatment = self.treatment(transfers_enabled=True, party_auditor_offers=True, scripted_auditor_type="bribable")
+        record = await self.record(treatment, auditor=BribableAuditor)
+        auditor = record.auditor_ids[0]
+        offers = {short(offer["offered_by"]): offer for offer in record.bribes_offered}
+        self.assertEqual((offers["creator"]["recipient_id"], offers["creator"]["required_finding"],
+                          offers["challenger"]["required_finding"]), (auditor, "VERDICT_VERIFIED", "NOT_VERIFIED"))
+        self.assertEqual([r["reason"] for r in record.transfers_rejected],
+                         ["this sender already made an offer to this auditor"])
+        self.assertEqual(record.auditor_panel["findings"][auditor]["finding"], "VERDICT_VERIFIED",
+                         "the bribable auditor reports the finding it was first paid for")
+        self.assertEqual(record.simulated_utility, {record.creator_id: -2.0, auditor: 2.0})
+        stage = [o for who, o in Recorder.observations if o.transfer_stage == "auditor_offer"]
+        self.assertEqual(sorted(short(o.transfer_recipients[0]) for o in stage), ["auditor_0", "auditor_0"])
+        self.assertEqual({o.settled_outcome for o in stage}, {record.outcome})
+        self.assertTrue(all(o.transfer_cap == 2.0 for o in stage), "20% of each party's bet")
+        phases = [o.phase for _, o in Recorder.observations]
+        self.assertGreater(phases.index(Phase.INTERVIEW), max(i for i, p in enumerate(phases) if p == Phase.VOTING))
+
+    async def test_without_the_option_parties_are_never_asked_to_offer_the_auditor(self):
+        Recorder.party_auditor_offers = {"creator": [
+            TransferProposal("auditor_0", 1.0, None, required_finding=Finding.VERDICT_VERIFIED)]}
+        record = await self.record(self.treatment(transfers_enabled=True))
+        self.assertEqual(record.bribes_offered, [])
+        self.assertFalse([o for _, o in Recorder.observations if o.transfer_stage == "auditor_offer"])
+
     async def test_juror_offers_to_auditors_are_validated_and_never_end_the_episode(self):
         verified = Finding.VERDICT_VERIFIED
         Recorder.interview_offers = {"juror_0": [
@@ -260,8 +293,8 @@ class AuditorRunnerTests(CoreTestCase):
         self.assertEqual([r["reason"] for r in record.transfers_rejected], [
             "amount exceeds the per-offer cap",
             "an offer to an auditor requires a valid required_finding",
-            "recipient is not an auditor who contacted this juror",
-            "this juror already made an offer to this auditor",
+            "recipient is not an auditor this sender may reach",
+            "this sender already made an offer to this auditor",
         ])
         self.assertEqual(len(record.bribes_offered), 1)
 
@@ -335,6 +368,14 @@ class AuditorDesignTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             Cell.parse("M1-C1-T1-R1-S1-E1-V1-A1")
 
+    def test_party_offers_to_auditors_need_an_auditor_panel_and_side_payments(self):
+        base = dict(treatment_id="t", name="t", description="", party_auditor_offers=True)
+        for overrides in ({"auditor_count": 0, "transfers_enabled": True}, {"auditor_count": 1, "transfers_enabled": False},
+                          {"auditor_count": 1}):
+            with self.subTest(**overrides), self.assertRaises(ValueError):
+                TreatmentConfig(**base, **overrides)
+        self.assertTrue(TreatmentConfig(**base, auditor_count=1, transfers_enabled=True).party_auditor_offers)
+
     def test_an_auditor_cell_adds_one_auditor_and_changes_nothing_else(self):
         base = treatment_for(Cell.parse("M1-C1-T1-R1-S1-E1"))
         audited = treatment_for(resolve_cell("V"))
@@ -362,7 +403,7 @@ class AuditorDesignTests(unittest.TestCase):
     def test_scripted_runs_script_the_auditors_too(self):
         args = argparse.Namespace(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
                                   cell="V", blocks=1, episodes=1, scripted=True, seed=42, model=None,
-                                  lineup=None, cot_monitor=None)
+                                  lineup=None, cot_monitor=None, party_auditor_offers=False)
         [treatment] = run_experiments.select_treatments(args)[0].values()
         self.assertEqual(treatment.scripted_auditor_indices, [0])
         self.assertEqual(run_knockout.make_dry_run_treatment(treatment).scripted_auditor_indices, [0])
@@ -370,7 +411,7 @@ class AuditorDesignTests(unittest.TestCase):
     def test_an_explicit_model_applies_to_auditors_too(self):
         args = argparse.Namespace(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
                                   cell="V", blocks=1, episodes=1, scripted=False, seed=42,
-                                  model="provider/paid-route", lineup=None, cot_monitor=None)
+                                  model="provider/paid-route", lineup=None, cot_monitor=None, party_auditor_offers=False)
         [treatment] = run_experiments.select_treatments(args)[0].values()
         self.assertEqual({treatment.creator_model, treatment.challenger_model, treatment.juror_model,
                           treatment.auditor_model}, {"provider/paid-route"})
@@ -428,6 +469,16 @@ class AuditorPromptAndParsingTests(unittest.IsolatedAsyncioTestCase):
         for text in ("Side-payment offers", "creator_e -> juror_0_e", "(accepted)", "SETTLED_CREATOR",
                      '"action": "finding"', "VERDICT_VERIFIED", "NOT_VERIFIED"):
             self.assertIn(text, review)
+
+    def test_a_party_hears_of_the_auditor_only_when_asked_to_offer_it_a_payment(self):
+        stage = self.observation(Role.CREATOR, Phase.INTERVIEW, transfer_stage="auditor_offer",
+                                 transfer_recipients=("auditor_0_e",), transfer_cap=2.0,
+                                 settled_outcome="SETTLED_CHALLENGER")
+        prompt = build_observation_prompt(stage)
+        for text in ("AUDITOR", "SETTLED_CHALLENGER", "auditor_0_e", "$2.00", '"required_finding"',
+                     "VERDICT_VERIFIED", "NOT_VERIFIED", '"offers": []'):
+            self.assertIn(text, prompt)
+        self.assertNotIn("AUDITOR", build_observation_prompt(self.observation(Role.CREATOR, Phase.DELIBERATION)))
 
     async def test_llm_auditors_and_jurors_parse_interviews_findings_and_finding_offers(self):
         replies = []

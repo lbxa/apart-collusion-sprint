@@ -99,6 +99,8 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
             treatment = with_models(treatment, Lineup(args.model, args.model, args.model))
         if args.cot_monitor is not None:
             treatment = replace(treatment, cot_monitor_model=args.cot_monitor)
+        if args.party_auditor_offers:
+            treatment = replace(treatment, party_auditor_offers=True)
         if args.scripted:
             treatment = replace(
                 treatment, use_scripted_creator=True, use_scripted_challenger=True,
@@ -188,6 +190,9 @@ async def main():
                         help="Trace every model call, including prompts and reasoning, to W&B Weave in the W&B project")
     parser.add_argument("--cot-monitor", nargs="?", const=DEFAULT_MONITOR_MODEL, metavar="MODEL",
                         help=f"Judge each agent's reasoning after every episode (default model: {DEFAULT_MONITOR_MODEL})")
+    parser.add_argument("--party-auditor-offers", action="store_true",
+                        help="After settlement, let the creator and challenger offer auditors finding-conditional "
+                             "payments (needs V1 and T1)")
     args = parser.parse_args()
 
     if args.list:

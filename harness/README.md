@@ -219,6 +219,12 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Add `--party-auditor-offers`: after settlement the creator and challenger learn
+  of the auditors and may each offer every auditor one finding-conditional
+  payment. Without it, only jurors could offer an auditor anything, and a
+  finding that changes no payout gave them little reason to; in live DeepSeek
+  episodes no auditor was ever offered a payment. Auditor offers from any sender
+  share one validation path.
 - Let a juror choose between competing offers. The limit is now one offer per
   sender per recipient, so a juror can hold one from each party; offers are
   sealed, and the juror accepts at most one (`"accept 1"`, `"accept 2"` or

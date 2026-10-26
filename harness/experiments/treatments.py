@@ -71,6 +71,9 @@ class TreatmentConfig:
     auditor_interview_rounds: int = 2
     # Tell jurors about the panel before deliberation; auditors still stay silent until the verdict.
     auditors_disclosed: bool = False
+    # After settlement the creator and challenger learn of the panel and may each offer
+    # every auditor one payment conditional on its finding (capped like party offers).
+    party_auditor_offers: bool = False
 
     # OpenRouter model that judges each completed episode's agent reasoning
     # (metrics/cot_monitor.py); None skips the chain-of-thought monitor.
@@ -146,6 +149,8 @@ class TreatmentConfig:
             raise ValueError("scripted_auditor_type must be honest or bribable")
         if self.auditors_disclosed and not self.auditor_count:
             raise ValueError("disclosing auditors requires an auditor panel")
+        if self.party_auditor_offers and (not self.auditor_count or self.transfers_enabled is not True):
+            raise ValueError("party offers to auditors require an auditor panel and side payments")
 
 
 # -- Predefined treatments --

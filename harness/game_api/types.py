@@ -200,8 +200,12 @@ class Observation:
     bribe_offers: list[BribeOffer] = field(default_factory=list)
 
     # Side-payment stage: "offer" asks a party for offers, "respond" asks a
-    # recipient to answer its single offer. The cap bounds each offer from this agent.
+    # recipient to answer its single offer, and "auditor_offer" asks a party, after
+    # settlement, for finding-conditional offers to the auditors. The cap bounds
+    # each offer from this agent.
     transfer_stage: str | None = None
+    # The settled outcome, shown to parties at the auditor_offer stage.
+    settled_outcome: str | None = None
     transfer_recipients: tuple[str, ...] = ()
     transfer_cap: float = 0.0
 
