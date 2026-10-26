@@ -8,3 +8,9 @@ max_depth = 2
 [mcp_servers.context7]
 command = "npx"
 args = ["-y", "@upstash/context7-mcp"]
+
+[mcp_servers.docs-langchain]
+url = "https://docs.langchain.com/mcp"
+
+[mcp_servers.reference-langchain]
+url = "https://reference.langchain.com/mcp"
