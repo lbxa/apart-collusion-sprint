@@ -51,6 +51,11 @@ the deleted headings were confirmed absent, and the changed end pages were
 rendered again. Build diagnostics are in `build/main.log`; rendered pages are
 in `build/pages/`. These outputs are ignored.
 
+The authorship update names Lucas Barbosa and Stefan Gazzana, in that order,
+in the title block and PDF metadata. `make -C report agentic` passed; the
+published `report.pdf` copy was refreshed. All six pages were rendered and
+inspected again, with no overfull boxes or undefined references in the log.
+
 Repository verification passed with `bash scripts/verify.sh`, including
 Foundry/Rust checks, 294 legacy harness tests and 64 harness-v2 tests with
 Docker/Anvil integration. The final Stop hook also returned `{}` after the
@@ -61,7 +66,8 @@ passed independently; `git diff --check` reported no whitespace errors.
 ## Open gaps
 
 - Human authors must review the semantic labels, source-to-claim links and
-  final manuscript. Named authors and affiliations are pending.
+  final manuscript. Lucas Barbosa and Stefan Gazzana are the named authors;
+  affiliations are pending.
 - Official Apart template text was inspected, but this article layout has not
   been certified against its visual layout. Final required disclosures and
   submission formatting remain an author decision. No submission was attempted.

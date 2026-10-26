@@ -46,6 +46,8 @@ reviews, and keep ambiguous cases distinct.
 
 ### 2026-10-26
 
+- Name Lucas Barbosa and Stefan Gazzana as authors, in that order, as supplied
+  by the user; affiliations remain unspecified.
 - Keep the clarified-case two-seed comparison separate from original-case
   discovery pilots and memory blocks. Adaptive model selection, semantic
   ambiguity and dependent episodes prevent pooling these into a collusion rate.

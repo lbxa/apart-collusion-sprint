@@ -81,7 +81,7 @@ reason. Keep the source URL and the date checked beside each external rule.
 | Required data/code artifacts and accessibility requirements | UNSET |
 | Submission files, size limits, portal, deadline, and stated timezone | PDF; deadline above; no submission attempted; remaining portal/size details unverified |
 | Camera-ready changes and publication/license requirements | UNSET |
-| Last policy check, checker, and unresolved questions | 2026-10-26, Codex; author details, visual layout and final disclosures open |
+| Last policy check, checker, and unresolved questions | 2026-10-26, Codex; authors Lucas Barbosa and Stefan Gazzana; affiliations, visual layout and final disclosures open |
 
 Official rules for the chosen venue and stage take precedence over house
 formatting. Preserve scientific accuracy and disclose limitations when fitting

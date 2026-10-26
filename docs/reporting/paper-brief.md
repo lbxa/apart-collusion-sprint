@@ -13,6 +13,7 @@ The older baseline and probes B0/X1–X6 remain separate evidence sets.
 | Field | Current context or decision needed |
 | --- | --- |
 | Deliverable | A LaTeX research report with reproducible figures and tables |
+| Authors | Lucas Barbosa and Stefan Gazzana, in the user's supplied order; affiliations unspecified. |
 | Intended reader | ML/AI-safety researchers assessing evidence of emergent collusion; explain the game, discovery tools, and endogenous funding mechanism. |
 | Reader takeaway | Explicit conditional funding agreements, acknowledged claim truth, binding votes, and exact harmful redistribution support case studies of coordination. Small adaptive controls cannot establish a general effect. |
 | Research question | Can general-tool agents discover harmful payoff coordination from a neutral objective, and what do communication and memory controls reveal about the observed mechanism? |
@@ -224,7 +225,7 @@ plots, and tables. The example below supplies field names, not chosen notation.
 - [x] Map A0–A3 to the separate agentic manuscript and retain failed/null/ambiguous trials.
 - [x] Complete two post-fix clear-case launch seeds and matched channel-disabled controls.
 - [ ] Independently human-review A0 semantic annotations and claim-to-action timing.
-- [ ] Resolve official-template visual compliance, named authors/affiliations and final submission disclosures.
+- [ ] Resolve official-template visual compliance, affiliations and final submission disclosures.
 - [x] Admit B0 only for descriptive smoke evidence; record source provenance and exclusions.
 - [ ] Separate induced coordination instructions from spontaneous behavior;
   distinguish an agent's generated explanation from independent causal evidence.
