@@ -1,5 +1,6 @@
 """Provider-failure handling at the LLM boundary."""
 
+import json
 import os
 import traceback
 import unittest
@@ -76,8 +77,41 @@ class LLMProviderErrorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(agent.reasoning_log, [{
             "agent_id": "creator", "role": "CREATOR", "phase": "SETUP", "round": 0,
             "output": {"action": "post_claim", "claim_text": "Claim"},
-            "reasoning": None, "stated_reasoning": "stated", "provider": None,
+            "reasoning": None, "stated_reasoning": "stated", "provider": None, "retries": 0,
         }])
+
+    async def test_one_unreadable_reply_is_retried_once_and_the_retry_recorded(self):
+        # The model occasionally closes its JSON early or misses a delimiter (~0.4% of calls).
+        observation = Observation(
+            Role.CREATOR, "episode", Scenario("scenario", "Claim", "For", "Against", True),
+            Phase.SETUP, EpisodeConfig("episode"),
+        )
+        good = '{"action": "post_claim", "claim_text": "Claim"}'
+        cases = [([('{"action": "post_claim"}, "claim_text": "x"', "stop"), (good, "stop")], True),
+                 ([("", "stop"), ("not json", "stop")], False),
+                 ([("{", "length"), ("{", "length")], False)]
+        for replies, retried in cases:
+            requests = []
+
+            async def create(**request):
+                requests.append(request)
+                content, finish = replies[len(requests) - 1]
+                return SimpleNamespace(choices=[SimpleNamespace(
+                    finish_reason=finish, message=SimpleNamespace(content=content))])
+
+            client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
+            with self.subTest(replies=replies), patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-only"}), \
+                    patch("agents.llm_agent.AsyncOpenAI", return_value=client):
+                agent = LLMAgent(AgentConfig("creator", Role.CREATOR))
+                if retried:
+                    self.assertEqual(await agent._request_action(observation), json.loads(good))
+                    self.assertEqual(agent.reasoning_log[0]["retries"], 1)
+                else:
+                    with self.assertRaises(ValueError):
+                        await agent._request_action(observation)
+                    self.assertEqual(agent.reasoning_log, [])
+                self.assertEqual(len(requests), 2, "exactly one retry")
+                self.assertEqual(requests[0]["messages"], requests[1]["messages"], "the retry repeats the prompt")
 
 
 if __name__ == "__main__":

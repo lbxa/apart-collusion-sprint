@@ -85,38 +85,26 @@ class LLMAgent(BaseAgent):
         self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
     async def _request_action(self, observation: Observation) -> dict[str, Any]:
-        try:
-            # Labels the call in Weave traces when `run_experiments.py --weave` is on.
-            with weave.attributes({"episode_id": observation.episode_id, "agent_id": self.agent_id,
-                                   "role": self.role.name, "phase": observation.phase.name,
-                                   "round": observation.current_round}):
-                response = await self._client.chat.completions.create(
-                    model=self.config.model,
-                    messages=[
-                        {"role": "system", "content": build_system_prompt(self.config, observation)},
-                        {
-                            "role": "user",
-                            "content": build_observation_prompt(
-                                observation, self.get_memory_context()
-                            ),
-                        },
-                    ],
-                    temperature=self.config.temperature,
-                    max_tokens=self.config.max_tokens,
-                    **({"extra_body": {"provider": OPENROUTER_PROVIDER}}
-                       if self.config.provider == "openrouter" else {}),
-                )
-        except RateLimitError as error:
-            raise LLMProviderError(self.config.provider, "rate_limited", error.status_code) from None
-        except APIError as error:
-            raise LLMProviderError(self.config.provider, "api_error", getattr(error, "status_code", None)) from None
-        choice = response.choices[0]
-        if choice.finish_reason == "length":
-            raise ValueError(f"Model reply for agent {self.agent_id} reached max_tokens={self.config.max_tokens}")
-        content = choice.message.content
-        if not content:
-            raise ValueError(f"Model returned an empty action for agent {self.agent_id}")
-        action = parse_json_reply(content, self.agent_id)
+        messages = [
+            {"role": "system", "content": build_system_prompt(self.config, observation)},
+            {"role": "user", "content": build_observation_prompt(observation, self.get_memory_context())},
+        ]
+        # One retry: the model occasionally writes malformed JSON (about 0.4% of
+        # live calls), which would otherwise fail the whole episode.
+        for retries in range(2):
+            response = await self._complete(observation, messages)
+            choice = response.choices[0]
+            try:
+                if choice.finish_reason == "length":
+                    raise ValueError(
+                        f"Model reply for agent {self.agent_id} reached max_tokens={self.config.max_tokens}")
+                if not choice.message.content:
+                    raise ValueError(f"Model returned an empty action for agent {self.agent_id}")
+                action = parse_json_reply(choice.message.content, self.agent_id)
+                break
+            except ValueError:
+                if retries:
+                    raise
         self.reasoning_log.append({
             "agent_id": self.agent_id, "role": self.role.name, "phase": observation.phase.name,
             "round": observation.current_round,
@@ -125,8 +113,26 @@ class LLMAgent(BaseAgent):
             "reasoning": getattr(choice.message, "reasoning", None),
             "stated_reasoning": action.get("reasoning"),
             "provider": getattr(response, "provider", None),
+            "retries": retries,
         })
         return action
+
+    async def _complete(self, observation: Observation, messages: list[dict[str, str]]) -> Any:
+        try:
+            # Labels the call in Weave traces when `run_experiments.py --weave` is on.
+            with weave.attributes({"episode_id": observation.episode_id, "agent_id": self.agent_id,
+                                   "role": self.role.name, "phase": observation.phase.name,
+                                   "round": observation.current_round}):
+                return await self._client.chat.completions.create(
+                    model=self.config.model, messages=messages,
+                    temperature=self.config.temperature, max_tokens=self.config.max_tokens,
+                    **({"extra_body": {"provider": OPENROUTER_PROVIDER}}
+                       if self.config.provider == "openrouter" else {}),
+                )
+        except RateLimitError as error:
+            raise LLMProviderError(self.config.provider, "rate_limited", error.status_code) from None
+        except APIError as error:
+            raise LLMProviderError(self.config.provider, "api_error", getattr(error, "status_code", None)) from None
 
     def _apply_bribe_decision(
         self, observation: Observation, action: dict[str, Any]

@@ -206,6 +206,12 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Retry an unreadable model reply once with the same prompt. In the first live
+  auditor runs `nvidia/nemotron-3-ultra-550b-a55b` wrote malformed JSON in about
+  0.4% of calls (closing the object early or missing a delimiter), which failed
+  3 of 16 episodes. JSON mode is unavailable on the fastest provider. Each
+  `llm_calls` entry records its `retries`; a second unreadable reply still fails
+  the episode.
 - Add the chain-of-thought monitor (`--cot-monitor`) and Weave tracing
   (`--weave`). The monitor follows the published hybrid design: separate
   action-only and reasoning prompts, 0-100 suspicion, weight 0.55 on actions, a
