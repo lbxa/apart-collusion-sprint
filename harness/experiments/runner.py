@@ -487,6 +487,10 @@ class ExperimentRunner:
                         channel="private",
                     )
 
+            # Acceptance is final once voting ends; auditors' case files read it per offer.
+            for entry in record.bribes_offered:
+                entry["accepted"] = held_by_id[entry["offer_id"]].accepted
+
             # ── Phase 6: Settlement ──
             withhold_reveals = frozenset(juror_ids[index] for index in treatment.withhold_reveal_indices)
             result = await run.game_api.settle(episode_id, withhold_reveals=withhold_reveals)
@@ -517,7 +521,6 @@ class ExperimentRunner:
                 if recipient in auditor_ids:
                     delivered = record.auditor_panel["findings"][recipient]["finding"] == offer["required_finding"]
                 else:
-                    offer["accepted"] = held_by_id[offer["offer_id"]].accepted
                     delivered = (settled_verdict is not None and settled_verdict.name == offer["required_verdict"]
                                  if recipient in (creator_id, challenger_id)
                                  else record.votes.get(recipient) == offer["required_verdict"])
@@ -838,9 +841,7 @@ class ExperimentRunner:
                              assessments: dict[str, str], **extra: Any) -> Observation:
         """Everything an auditor sees, from the harness record; no other role receives it."""
         case_file = CaseFile(
-            offers=[{**offer, "accepted": (offer["accepted"] if offer["recipient_id"] in record.auditor_ids
-                                           else offer["recipient_id"] in record.bribes_accepted)}
-                    for offer in record.bribes_offered],
+            offers=copy.deepcopy(record.bribes_offered),
             rejected_offers=copy.deepcopy(record.transfers_rejected),
             final_votes=dict(record.votes),
             assessments=dict(assessments),

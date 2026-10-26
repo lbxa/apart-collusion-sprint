@@ -194,6 +194,16 @@ class AuditorRunnerTests(CoreTestCase):
         self.assertIsNone(review.scenario.ground_truth, "auditors never see the evaluator's label")
         self.assertTrue(all(o.case_file is None for who, o in Recorder.observations if not who.startswith("auditor")))
 
+    async def test_the_case_file_marks_only_the_offer_a_juror_accepted(self):
+        # PlanAgent jurors accept their first held offer, the creator's.
+        Recorder.offers = {"creator": [TransferProposal("juror_0", 1.0, Verdict.CREATOR_SUPPORTED)],
+                           "challenger": [TransferProposal("juror_0", 1.0, Verdict.CHALLENGER_SUPPORTED)]}
+        record = await self.record(self.treatment(transfers_enabled=True))
+        [review] = self.seen_by("auditor_0", Phase.REVIEW)
+        self.assertEqual([(short(o["offered_by"]), o["accepted"]) for o in review.case_file.offers],
+                         [("creator", True), ("challenger", False)])
+        self.assertEqual([offer["accepted"] for offer in record.bribes_offered], [True, False])
+
     async def test_with_the_channel_each_juror_is_interviewed_privately(self):
         record = await self.record(self.treatment(private_chat=True))
         interview = [(short(m["sender"]), short(m["recipient"]), m["round"])
