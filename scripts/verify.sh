@@ -28,3 +28,4 @@ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 cargo test --workspace --all-features --locked
 cargo build --workspace --all-targets --all-features --locked
 bash "$repo_root/scripts/verify-harness.sh"
+bash "$repo_root/scripts/verify-harness-v2.sh"

@@ -6,6 +6,7 @@ trap 'rm -rf "$fixture"' EXIT
 mkdir -p "$fixture/repo with spaces/scripts" "$fixture/bin"
 cp "$repo_root/scripts/verify.sh" "$fixture/repo with spaces/scripts/verify.sh"
 cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/scripts/verify-harness.sh"
+cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/scripts/verify-harness-v2.sh"
 cp "$repo_root/scripts/agent-hooks/fixtures/cargo.sh" "$fixture/bin/cargo"
 chmod +x "$fixture/bin/cargo"
 export PATH="$fixture/bin:$PATH"

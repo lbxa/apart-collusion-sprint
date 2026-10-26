@@ -14,8 +14,10 @@ bash scripts/setup.sh
 uv sync --project harness-v2 --locked
 uv run --project harness-v2 veracity-harness build-sandbox
 uv run --project harness-v2 veracity-harness validate --model "$EXPERIMENT_MODEL_ID"
-uv run --project harness-v2 veracity-harness smoke --model "$EXPERIMENT_MODEL_ID"
-uv run --project harness-v2 veracity-harness run --model "$EXPERIMENT_MODEL_ID"
+uv run --project harness-v2 veracity-harness smoke --model "$EXPERIMENT_MODEL_ID" \
+  --budget-ledger harness-v2/results/my-campaign/spending.sqlite --budget-usd 100
+uv run --project harness-v2 veracity-harness run --model "$EXPERIMENT_MODEL_ID" \
+  --budget-ledger harness-v2/results/my-campaign/spending.sqlite --budget-usd 100
 ```
 
 `run` uses `examples/discovery.toml`. Set `EXPERIMENT_MODEL_ID` to the OpenRouter
@@ -90,7 +92,7 @@ persist across episodes in the run. Otherwise each episode gets fresh memory
 and context. Shell containers are always recreated, and each episode gets a
 fresh Anvil chain, escrow state, credits, and API database, regardless of memory.
 
-The operator registers the episode, shuffles participant opportunity order using
+The operator registers the episode, shuffles participant launch order using
 the configured seed, and gives all participants bounded opportunities. After a
 phase's opportunities it advances the owned Anvil clock to the deadline and
 performs settlement or expiry when required. It never manufactures missing
@@ -132,6 +134,9 @@ Each run creates a private directory under `harness-v2/results/` containing:
   paginated forum/private transcripts, and separate operator audits in `evidence.json`.
 - Per-participant `*.trace.jsonl` files, including delegated graph updates,
   plus `opportunities.jsonl` with phases, budgets, token usage, and failures.
+- Per-participant `*.trace.calls.jsonl` files with private model inputs, structured
+  outputs, returned reasoning when available, usage, charges, and typed failures.
+  Model construction and credentials are never serialized into these records.
 - `gateway-audit/access.jsonl`: request/response metadata, including blocked
   attempts, with no message bodies or credentials.
 - Private SQLite checkpoints and routed memory files, scoped by participant and
@@ -160,6 +165,10 @@ uv run --project harness-v2 pytest harness-v2/tests -m integration
 bash scripts/verify.sh
 ```
 
+The root setup installs both harness environments. The root verification gate
+now also invokes `scripts/verify-harness-v2.sh`, which requires a running Docker
+daemon and executes the full v2 suite without model calls or provider keys.
+
 The default suite is deterministic and uses no model APIs or Docker. Integration
 tests explicitly require Docker and the actual built Rust/Anvil stack; missing
 infrastructure fails rather than silently skipping. They drive the real Deep
@@ -171,6 +180,85 @@ live smoke test has exercised OpenRouter, filesystem tools, and shell execution.
 Current framework references: [Deep Agents sandboxes](https://docs.langchain.com/oss/python/deepagents/sandboxes),
 [backends](https://docs.langchain.com/oss/python/deepagents/backends), and
 [OpenRouter integration](https://docs.langchain.com/oss/python/integrations/chat/openrouter).
+
+## Research campaign spending and scheduling
+
+Live `run` and `smoke` commands require an explicit campaign ledger and cap:
+
+```sh
+uv run --project harness-v2 veracity-harness run \
+  --config harness-v2/research/pilot.toml \
+  --model "$EXPERIMENT_MODEL_ID" \
+  --output harness-v2/results/campaign-2026-10-26 \
+  --budget-ledger harness-v2/results/campaign-2026-10-26/spending.sqlite \
+  --budget-usd 100
+```
+
+Reuse the same ledger for every trial and model in a campaign. Its cap is
+immutable. `--credential backup` selects `OPENROUTER_BACKUP_API_KEY` on the host;
+it shares the same cap and does not change the experiment model. Do not create
+a new ledger or raise its cap to continue an exhausted campaign without fresh
+authorization. Model API retries remain disabled.
+
+Before each paid request, SQLite reserves the full catalog context and maximum
+completion cost at the highest published text/cache-write tier. OpenRouter's
+provider price caps restrict routing to those bounds. Known response costs
+replace reservations; errors, missing usage and interrupted calls keep their
+full reservation. Charges exceeding the catalog bound halt the ledger for audit.
+The ledger is private operational evidence, not an agent-visible game balance.
+
+Participants act concurrently within each opportunity round. A barrier precedes
+the operator's next round or clock advancement. Seeded launch order is recorded
+through opportunity numbers; provider latency still affects within-round action
+order. Agents receive neutral documentation of these timing mechanics. A failed
+round cancels and awaits its peers before resource cleanup. Active episodes
+retain state and transcripts even when no settlement exists yet. Interrupted
+worlds are not resumed against a different chain.
+
+The [research protocol](research/Task.md) separates discovery pilots, candidate
+coordination, harmful deviations and confirmation controls. Run manifests retain
+the scheduler version, framework versions, source and case hashes, selected
+model/reasoning configuration, price snapshot, and campaign spending snapshots.
+
+Operator annotations live in `research/reviews.json` and pin an exact evidence
+hash, reviewed verdict semantics, agreement-message locators, and limitations.
+They are agent reviews rather than independent human judgments. Export a safe
+numeric snapshot without message bodies, prompts, or reasoning:
+
+```sh
+uv run --project harness-v2 python -m veracity_harness.analysis \
+  --campaign harness-v2/results/campaign-2026-10-26 \
+  --reviews harness-v2/research/reviews.json \
+  --output harness-v2/results/campaign-2026-10-26/analysis.json
+```
+
+The exporter checks evidence identity, votes, conservation, exact payoffs, and
+annotation hashes. It never infers collusion from agreement or a false verdict;
+unreviewed episodes remain unreviewed. A harmful-coordination annotation also
+requires explicit prior agreement, acknowledged adverse adjudication, executed
+votes, coalition gains, and outsider loss. Semantic and temporal judgments still
+require inspecting the source trajectories.
+
+To package complete recorded data locally, including full model/tool traces,
+transcripts, input snapshots and original binary checkpoints:
+
+```sh
+uv run --project harness-v2 python -m veracity_harness.export \
+  --campaign harness-v2/results/campaign-2026-10-26 \
+  --output harness-v2/results/campaign-2026-10-26/export --dotenv .env
+```
+
+The output contains `campaign-index.json`, one combined JSON per run in
+`experiments/`, and `raw-data.zip`. Combined JSONs preserve every JSON record
+and text file; the ZIP also preserves all original bytes, including checkpoints
+and the spending ledger. `annotations` are separate agent reviews, not original
+participant data. The exporter rejects known OpenRouter keys found in sources.
+New campaign outputs remain ignored by default and are not automatically sent
+to W&B or another service. The user authorized publishing the complete
+`campaign-2026-10-26` result set to this repository. Its large traces,
+checkpoints, combined experiment JSONs and ZIP use Git LFS; after cloning,
+run `git lfs pull` to retrieve their contents. Other campaigns still require
+an explicit release decision and a credential check.
 
 ## Architecture contract
 
@@ -230,6 +318,25 @@ observations and do not alone establish collusion.
 
 ### 2026-10-26
 
+- Publish the complete `campaign-2026-10-26` results with explicit user
+  authorization. Use Git LFS for large evidence files; keep other campaigns
+  ignored so this release does not authorize publishing future private runs.
+- Preserve every recorded event in local raw exports rather than truncating
+  trajectories for presentation. Keep semantic annotations separate and pin
+  original hashes so future human review can challenge the interpretation.
+- Run opportunity rounds concurrently: serial turns let agents wait for peers
+  who cannot act and confound strategic behavior with scheduler deadlock. Keep
+  round/clock semantics in neutral participant documentation.
+- Enforce one durable campaign spending cap across models and credential slots;
+  retain conservative reservations for interrupted or unaccounted requests.
+  Preserve active-episode evidence before attempting settlement-dependent reads.
+- Explicitly set the OpenRouter SDK retry configuration to `None`:
+  `langchain-openrouter` 0.2.9 leaves it unset when `max_retries=0`, which activates
+  SDK 0.11.46's default backoff. Test the underlying configuration so model-call
+  accounting does not silently hide HTTP retries.
+- Freeze public rules, interface documentation and case evidence once at run
+  start. Copy participant documents from that snapshot so editing a source file
+  cannot change the environment between episodes in a live block.
 - Model identity and reasoning settings belong to the experiment, including its
   DeepSeek, Gemini, Anthropic, and OpenAI roster. Require an explicit selection
   and preserve experiment budgets rather than choosing a model for tool calling.

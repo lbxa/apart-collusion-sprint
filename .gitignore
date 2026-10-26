@@ -14,8 +14,10 @@
 *.py[cod]
 /harness/.venv/
 /harness-v2/.venv/
-/harness-v2/results/
+/harness-v2/results/*
+!/harness-v2/results/campaign-2026-10-26/
 /harness/results/
 /results/
 /wandb/
 /harness/wandb/
+.DS_Store

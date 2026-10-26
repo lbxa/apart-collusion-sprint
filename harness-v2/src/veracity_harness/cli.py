@@ -5,6 +5,7 @@ import asyncio
 import json
 import logging
 import os
+from decimal import Decimal
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ from pydantic import ValidationError
 from .config import load_experiment
 from .runner import ROOT, run_experiment
 from .sandbox import DockerArena
+from .spending import CampaignSpending
 
 
 def main():
@@ -22,6 +24,12 @@ def main():
     parser.add_argument("--output", type=Path, default=ROOT / "harness-v2/results")
     parser.add_argument("--dotenv", type=Path, default=ROOT / ".env")
     parser.add_argument("--model", help="OpenRouter model ID selected by the experiment")
+    parser.add_argument("--seed", type=int, help="Recorded participant-launch seed override")
+    parser.add_argument(
+        "--budget-ledger", type=Path, help="Shared SQLite ledger for all campaign runs"
+    )
+    parser.add_argument("--budget-usd", type=Decimal, help="Total authorized cap for this ledger")
+    parser.add_argument("--credential", choices=["primary", "backup"], default="primary")
     args = parser.parse_args()
     os.umask(0o077)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -37,7 +45,7 @@ def main():
         print("Sandbox image ready")
         return
     try:
-        experiment = load_experiment(args.config, model_name=args.model)
+        experiment = load_experiment(args.config, model_name=args.model, seed=args.seed)
     except ValidationError as error:
         missing_model = any(
             item["type"] == "missing" and item["loc"] in {("model",), ("model", "name")}
@@ -52,8 +60,19 @@ def main():
         print(json.dumps(experiment.model_dump(mode="json"), indent=2))
         return
     load_dotenv(args.dotenv, override=False)
+    if args.credential == "backup":
+        backup = os.environ.get("OPENROUTER_BACKUP_API_KEY")
+        if not backup:
+            parser.error("OPENROUTER_BACKUP_API_KEY is missing")
+        os.environ["OPENROUTER_API_KEY"] = backup
     if not os.environ.get("OPENROUTER_API_KEY"):
         parser.error(f"OPENROUTER_API_KEY is missing from the environment and {args.dotenv}")
+    if args.budget_ledger is None or args.budget_usd is None:
+        parser.error("Live runs require --budget-ledger and --budget-usd")
+    try:
+        spending = CampaignSpending(args.budget_ledger.resolve(), args.budget_usd)
+    except ValueError as error:
+        parser.error(str(error))
     smoke = args.command == "smoke"
     if smoke:
         experiment = experiment.model_copy(
@@ -68,7 +87,9 @@ def main():
             }
         )
     try:
-        directory = asyncio.run(run_experiment(experiment, args.output, smoke=smoke))
+        directory = asyncio.run(
+            run_experiment(experiment, args.output, smoke=smoke, spending=spending)
+        )
     except Exception as error:
         logging.error(
             "run failed error_type=%s; inspect the run manifest in %s",

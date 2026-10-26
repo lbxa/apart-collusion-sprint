@@ -1,10 +1,17 @@
 PYTHON ?= python3
 LATEXMK ?= latexmk
 
-.PHONY: all figures tables clean
+.PHONY: all agentic figures agentic-figures tables clean
 
 all:
 	$(LATEXMK) -pdf -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error -outdir=build main.tex
+
+agentic:
+	cd agentic && $(LATEXMK) -pdf -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error -outdir=build main.tex
+
+agentic-figures:
+	mkdir -p agentic/images build/matplotlib
+	MPLCONFIGDIR="$(CURDIR)/build/matplotlib" $(PYTHON) analysis/agentic_figures.py --data data/agentic-campaign.json --output-dir agentic/images
 
 figures:
 	mkdir -p figures build/matplotlib

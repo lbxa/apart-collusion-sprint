@@ -1,12 +1,15 @@
 """Operator orchestration; participants alone choose and submit strategic actions."""
 
 import asyncio
+import hashlib
+import importlib.metadata
 import json
 import logging
 import os
 import random
 import secrets
 import shutil
+import subprocess
 from collections.abc import Awaitable, Callable
 from contextlib import AsyncExitStack
 from dataclasses import asdict
@@ -16,7 +19,7 @@ from tempfile import TemporaryDirectory
 from urllib.parse import urlsplit
 
 from aiohttp import web
-from game_api import CoreClient
+from game_api import CoreClient, CoreHTTPError
 from game_api.generated import (
     BalancesView,
     ChatAuditReport,
@@ -34,6 +37,7 @@ from .agents import ParticipantAgent
 from .config import Experiment
 from .gateway import GatewayPolicy, Identity, create_loopback_relay
 from .sandbox import RESOURCES, DockerArena
+from .spending import CampaignSpending, ModelPrice, fetch_model_price
 
 ROOT = Path(__file__).resolve().parents[3]
 LOG = logging.getLogger(__name__)
@@ -65,22 +69,17 @@ async def play_episode(
         nonlocal opportunity
         order = list(agents)
         rng.shuffle(order)
-        for actor in order:
-            if actor in disabled:
-                continue
-            opportunity += 1
+
+        async def act(actor: str, number: int):
             current_phase = (await client.get_episode(episode_id)).phase
-            result = await agents[actor].act(
-                episode_id, opportunity, directory / f"{actor}.trace.jsonl"
-            )
+            result = await agents[actor].act(episode_id, number, directory / f"{actor}.trace.jsonl")
             record = {
                 "actor_id": actor,
                 "phase_at_start_of_round": phase,
                 "phase_at_start_of_opportunity": current_phase,
-                "opportunity": opportunity,
+                "opportunity": number,
                 **asdict(result),
             }
-            records.append(record)
             with (directory / "opportunities.jsonl").open("a") as file:
                 file.write(json.dumps(record) + "\n")
             LOG.info(
@@ -94,6 +93,15 @@ async def play_episode(
                 disabled.add(actor)
             if agents[actor].budget.calls >= experiment.model.calls_per_episode:
                 disabled.add(actor)
+            return record
+
+        tasks = []
+        async with asyncio.TaskGroup() as group:
+            for actor in order:
+                if actor not in disabled:
+                    opportunity += 1
+                    tasks.append(group.create_task(act(actor, opportunity)))
+        records.extend(task.result() for task in tasks)
 
     for _ in range(8):  # The protocol has four active phases; no phase can recur.
         episode = await client.get_episode(episode_id)
@@ -143,12 +151,20 @@ async def retain_pages(
 
 async def retain_evidence(client: CoreClient, episode_id: str, directory: Path) -> dict:
     """Store operator-only bodies separately from routine lifecycle logs."""
-    evidence = {
-        "episode": (await client.get_episode(episode_id)).model_dump(mode="json"),
-        "settlement": (await client.get_settlement(episode_id)).model_dump(mode="json"),
-        "balances": (await client.get_balances(episode_id)).model_dump(mode="json"),
-    }
+    evidence = {"episode": (await client.get_episode(episode_id)).model_dump(mode="json")}
+    path = directory / "evidence.json"
+    path.write_text(json.dumps(evidence, indent=2) + "\n")
+    try:
+        evidence["settlement"] = (await client.get_settlement(episode_id)).model_dump(mode="json")
+    except CoreHTTPError as error:
+        if evidence["episode"]["phase"] not in DEADLINES:
+            raise
+        evidence["settlement"] = None
+        evidence["settlement_unavailable_http_status"] = error.status
+    evidence["balances"] = (await client.get_balances(episode_id)).model_dump(mode="json")
+    path.write_text(json.dumps(evidence, indent=2) + "\n")
     evidence["forum_transcript"] = await retain_pages(client.get_forum_transcript, episode_id)
+    path.write_text(json.dumps(evidence, indent=2) + "\n")
     chats, after_chat = [], None
     while True:
         page = await client.list_chats(episode_id, after=after_chat, limit=100)
@@ -164,11 +180,13 @@ async def retain_evidence(client: CoreClient, episode_id: str, directory: Path) 
             "chat": chat.model_dump(mode="json"),
             "pages": await retain_pages(client.get_transcript, chat.chat_id),
         }
+        evidence["private_transcripts"] = transcripts
+        path.write_text(json.dumps(evidence, indent=2) + "\n")
     evidence["private_transcripts"] = transcripts
     # Capture operator transcript reads in the final audit snapshots.
     evidence["chat_audit"] = await retain_pages(client.get_chat_audit, episode_id)
     evidence["forum_audit"] = await retain_pages(client.get_forum_audit, episode_id)
-    (directory / "evidence.json").write_text(json.dumps(evidence, indent=2) + "\n")
+    path.write_text(json.dumps(evidence, indent=2) + "\n")
     return evidence
 
 
@@ -216,17 +234,58 @@ def summarize(experiment: Experiment, evidence: dict, records: list[dict]) -> di
 
 
 async def run_experiment(
-    experiment: Experiment, output: Path, model: BaseChatModel | None = None, *, smoke: bool = False
+    experiment: Experiment,
+    output: Path,
+    model: BaseChatModel | None = None,
+    *,
+    smoke: bool = False,
+    spending: CampaignSpending | None = None,
 ) -> Path:
+    if model is None and spending is None:
+        raise ValueError("Live experiments require a shared campaign spending cap")
+    price: ModelPrice | None = (
+        await fetch_model_price(experiment.model.name) if model is None else None
+    )
     run_id = f"v2-{secrets.token_hex(6)}"
     directory = (await asyncio.to_thread(output.resolve)) / run_id
     directory.mkdir(mode=0o700, parents=True)
+    inputs = directory / "inputs"
+    inputs.mkdir(mode=0o700)
+    for filename in ("rules.md", "interface.md"):
+        shutil.copyfile(RESOURCES / filename, inputs / filename)
+    shutil.copyfile(experiment.case.document, inputs / "case.md")
     manifest = {
         "run_id": run_id,
         "kind": "smoke" if smoke else "experiment",
+        "agent_backend": "injected_test_model" if model is not None else "openrouter",
         "status": "running",
         "config": experiment.model_dump(mode="json"),
         "episodes": [],
+        "scheduler": "concurrent-opportunity-rounds-v1",
+        "model_call_evidence_version": 2,
+        "price": price.model_dump(mode="json") if price else None,
+        "spending_before": spending.snapshot() if spending else None,
+        "provenance": {
+            "git_revision": (
+                await asyncio.to_thread(
+                    subprocess.check_output, ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+                )
+            ).strip(),
+            "source_sha256": {
+                str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted((ROOT / "harness-v2/src").rglob("*"))
+                if path.is_file() and path.suffix in {".py", ".md"}
+            },
+            "case_sha256": hashlib.sha256((inputs / "case.md").read_bytes()).hexdigest(),
+            "input_sha256": {
+                path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(inputs.iterdir())
+            },
+            "versions": {
+                name: importlib.metadata.version(name)
+                for name in ("deepagents", "langchain", "langchain-core", "langchain-openrouter")
+            },
+        },
     }
     manifest_path = directory / "run.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
@@ -302,8 +361,8 @@ async def run_experiment(
                                     # Only public material is mounted into the participant.
                                     os.chmod(episode_dir / "documents", 0o755)
                                     for filename in ("rules.md", "interface.md"):
-                                        shutil.copyfile(RESOURCES / filename, docs / filename)
-                                    shutil.copyfile(experiment.case.document, docs / "case.md")
+                                        shutil.copyfile(inputs / filename, docs / filename)
+                                    shutil.copyfile(inputs / "case.md", docs / "case.md")
                                     public = {
                                         "actor_id": actor,
                                         "episode_id": episode_id,
@@ -336,6 +395,8 @@ async def run_experiment(
                                         checkpoint,
                                         experiment.model,
                                         model=model,
+                                        spending=spending,
+                                        price=price,
                                     )
                                     stack.push_async_callback(agents[actor].aclose)
                                 policy = GatewayPolicy(
@@ -417,6 +478,7 @@ async def run_experiment(
         manifest.update(status="failed", error_type=type(error).__name__)
         raise
     finally:
+        manifest["spending_after"] = spending.snapshot() if spending else None
         manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
         LOG.info("run finished run=%s status=%s", run_id, manifest["status"])
     return directory

@@ -5,6 +5,8 @@ import json
 import threading
 import time
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Literal
 
@@ -21,6 +23,7 @@ from langchain_openrouter import ChatOpenRouter
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
 from .config import ModelSettings
+from .spending import CampaignSpending, ModelPrice, SpendingLimitReached
 
 SYSTEM_PROMPT = (
     "Your objective is to maximize your final payoff in the game. "
@@ -39,36 +42,90 @@ class ModelBudget(BaseCallbackHandler):
 
     raise_error = True
 
-    def __init__(self, settings: ModelSettings):
+    def __init__(
+        self,
+        settings: ModelSettings,
+        spending: CampaignSpending | None = None,
+        price: ModelPrice | None = None,
+    ):
         self.settings = settings
         self.calls = 0
         self.turn_calls = 0
         self.input_tokens = 0
         self.output_tokens = 0
         self.lock = threading.Lock()
+        self.spending = spending
+        self.price = price
+        self.audit_path: Path | None = None
+
+    def audit(self, event: str, **fields):
+        if self.audit_path is not None:
+            with self.audit_path.open("a", encoding="utf-8") as file:
+                file.write(
+                    json.dumps(
+                        {
+                            "format_version": 2,
+                            "event": event,
+                            "time": datetime.now(UTC).isoformat(),
+                            **fields,
+                        }
+                    )
+                    + "\n"
+                )
 
     def begin_turn(self):
         with self.lock:
             self.turn_calls = 0
 
-    def on_chat_model_start(self, serialized, messages, **kwargs):
+    def on_chat_model_start(self, serialized, messages, *, run_id=None, **kwargs):
         with self.lock:
             if (
                 self.calls >= self.settings.calls_per_episode
                 or self.turn_calls >= self.settings.calls_per_turn
             ):
                 raise BudgetExceeded("Model call budget exhausted")
+            if self.spending is not None:
+                if self.price is None or run_id is None:
+                    raise ValueError("Paid requests require catalog pricing and a request identity")
+                self.spending.reserve(str(run_id), self.price, self.settings.max_tokens)
             self.calls += 1
             self.turn_calls += 1
+            self.audit(
+                "model_start",
+                request_id=str(run_id),
+                model=self.settings.name,
+                messages=dumpd(messages),
+            )
 
-    def on_llm_end(self, response: LLMResult, **kwargs):
+    def on_llm_end(self, response: LLMResult, *, run_id=None, **kwargs):
         with self.lock:
+            costs = []
             for generation in response.generations:
                 for item in generation:
                     message = item.message if isinstance(item, ChatGeneration) else None
-                    if isinstance(message, AIMessage) and message.usage_metadata:
-                        self.input_tokens += message.usage_metadata["input_tokens"]
-                        self.output_tokens += message.usage_metadata["output_tokens"]
+                    if isinstance(message, AIMessage):
+                        if message.usage_metadata:
+                            self.input_tokens += message.usage_metadata["input_tokens"]
+                            self.output_tokens += message.usage_metadata["output_tokens"]
+                        cost = message.response_metadata.get("cost")
+                        costs.append(Decimal(str(cost)) if cost is not None else None)
+            self.audit(
+                "model_end",
+                request_id=str(run_id),
+                response=response.model_dump(mode="json", serialize_as_any=True),
+            )
+            if self.spending is not None:
+                known = bool(costs) and all(cost is not None for cost in costs)
+                self.spending.reconcile(str(run_id), sum(costs, Decimal(0)) if known else None)
+
+    def on_llm_error(self, error: BaseException, *, run_id=None, **kwargs):
+        with self.lock:
+            self.audit(
+                "model_error",
+                request_id=str(run_id),
+                error_type=type(error).__name__,
+                status_code=getattr(error, "status_code", None),
+            )
 
 
 @dataclass(frozen=True)
@@ -92,12 +149,14 @@ class ParticipantAgent:
         checkpointer: BaseCheckpointSaver,
         settings: ModelSettings,
         model: BaseChatModel | None = None,
+        spending: CampaignSpending | None = None,
+        price: ModelPrice | None = None,
     ):
         memory.mkdir(parents=True, exist_ok=True)
         self.actor_id = actor_id
         self.sandbox = sandbox
         self.settings = settings
-        self.budget = ModelBudget(settings)
+        self.budget = ModelBudget(settings, spending, price)
         self.provider_client = None
         if model is None:
             model = ChatOpenRouter(
@@ -105,6 +164,16 @@ class ParticipantAgent:
                 max_tokens=settings.max_tokens,
                 timeout=settings.turn_timeout_seconds * 1000,
                 max_retries=0,
+                openrouter_provider=(
+                    {
+                        "max_price": {
+                            key: float(rate * (1 if key == "request" else 1_000_000))
+                            for key, rate in price.maximum_rates.items()
+                        }
+                    }
+                    if price is not None
+                    else None
+                ),
                 reasoning=(
                     settings.reasoning.model_dump(exclude_none=True)
                     if settings.reasoning is not None
@@ -112,6 +181,9 @@ class ParticipantAgent:
                 ),
             )
             self.provider_client = model.client
+            # langchain-openrouter 0.2.9 leaves SDK retries UNSET when max_retries=0;
+            # SDK 0.11.46 otherwise defaults to an hour of hidden backoff retries.
+            self.provider_client.sdk_configuration.retry_config = None
         self.graph = create_deep_agent(
             name=actor_id,
             model=model,
@@ -135,6 +207,7 @@ class ParticipantAgent:
         before = self.budget.calls
         before_input, before_output = self.budget.input_tokens, self.budget.output_tokens
         self.budget.begin_turn()
+        self.budget.audit_path = trace_path.with_suffix(".calls.jsonl")
         started = time.monotonic()
         status, error_type = "completed", None
         prompt = (
@@ -169,6 +242,8 @@ class ParticipantAgent:
                         trace.flush()
         except BudgetExceeded:
             status = "budget_exhausted"
+        except SpendingLimitReached:
+            raise
         except TimeoutError:
             status = "timeout"
         except Exception as error:

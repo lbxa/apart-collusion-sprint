@@ -11,6 +11,7 @@ from pydantic import Field
 
 from veracity_harness.agents import SYSTEM_PROMPT, BudgetExceeded, ModelBudget, ParticipantAgent
 from veracity_harness.config import ModelSettings
+from veracity_harness.spending import CampaignSpending, ModelPrice
 
 
 def test_aggregate_budget_includes_delegated_calls_and_rejects_before_provider_request():
@@ -166,3 +167,65 @@ def test_openrouter_receives_experiment_model_and_reasoning_unchanged(monkeypatc
     assert received["model"] == settings.name
     assert received["max_tokens"] == 65536
     assert received["reasoning"] == {"effort": "high", "exclude": False}
+
+
+def test_paid_call_is_reserved_and_private_response_is_structured(tmp_path):
+    import json
+    from decimal import Decimal
+
+    from langchain_core.outputs import LLMResult
+
+    spending = CampaignSpending(tmp_path / "spending.sqlite", Decimal(1))
+    price = ModelPrice(
+        id="fixture/paid",
+        context_length=1000,
+        pricing={"prompt": "0.000001", "completion": "0.000002"},
+    )
+    budget = ModelBudget(ModelSettings(name=price.id), spending, price)
+    budget.audit_path = tmp_path / "calls.jsonl"
+    budget.on_chat_model_start(
+        {"credentials": "never serialize model construction"},
+        [[HumanMessage(content="Private observation")]],
+        run_id="call-1",
+    )
+    budget.on_llm_end(
+        LLMResult(
+            generations=[
+                [
+                    ChatGeneration(
+                        message=AIMessage(
+                            content="Private answer",
+                            tool_calls=[
+                                {"name": "execute", "args": {"command": "true"}, "id": "tool-1"}
+                            ],
+                            response_metadata={"cost": 0.001},
+                            usage_metadata={
+                                "input_tokens": 10,
+                                "output_tokens": 5,
+                                "total_tokens": 15,
+                            },
+                        )
+                    )
+                ]
+            ]
+        ),
+        run_id="call-1",
+    )
+    events = [json.loads(line) for line in budget.audit_path.read_text().splitlines()]
+    assert events[1]["response"]["generations"][0][0]["message"]["content"] == "Private answer"
+    assert events[1]["response"]["generations"][0][0]["message"]["tool_calls"][0]["id"] == "tool-1"
+    assert "never serialize" not in budget.audit_path.read_text()
+    assert spending.snapshot()["charged_usd"] == "0.001"
+    assert (budget.input_tokens, budget.output_tokens) == (10, 5)
+
+
+async def test_underlying_openrouter_sdk_retries_are_actually_disabled(monkeypatch, tmp_path):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "fixture-not-a-real-credential")
+    monkeypatch.setattr("veracity_harness.agents.create_deep_agent", lambda **kwargs: None)
+    participant = ParticipantAgent(
+        "creator", UnusedSandbox(), tmp_path, InMemorySaver(), ModelSettings(name="fixture/model")
+    )
+    try:
+        assert participant.provider_client.sdk_configuration.retry_config is None
+    finally:
+        await participant.aclose()

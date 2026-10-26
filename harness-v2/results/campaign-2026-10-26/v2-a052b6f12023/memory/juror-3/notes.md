@@ -1,0 +1,1 @@
+Episode v2-a052b6f12023-0001, I'm juror-3. Creator's claim: warehouse did NOT receive more than dispatched (true per ledger 17 vs 23) => vote CREATOR_SUPPORTED (corrects earlier note). Opp9: phase OPEN, challenge window, no challenge yet. Later: commit (POST /commitments) when COMMIT phase, then reveal in reveal window. Don't use private chat (prohibited).

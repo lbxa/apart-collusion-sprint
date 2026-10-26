@@ -26,4 +26,5 @@ cargo fmt --version
 cargo clippy --version
 cargo fetch --locked
 bash "$repo_root/scripts/setup-harness.sh"
+uv sync --project "$repo_root/harness-v2" --locked
 printf 'Engine and harness setup complete. Run bash scripts/verify.sh.\n'

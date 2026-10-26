@@ -1,4 +1,14 @@
-# Veracity baseline integration report
+# Veracity research reports
+
+The current agentic study is [Payoff Coordination Against Truthful Claims](agentic/main.tex).
+Build it with `make -C report agentic`; its PDF is `agentic/build/main.pdf`.
+It uses the separate [agentic campaign snapshot](data/agentic-campaign.json),
+[reproduction guide](agentic/README.md) and [review record](agentic/review.md).
+It does not pool the older results below. Complete experiment JSONs are in
+`harness-v2/results/campaign-2026-10-26/export/`; large evidence files use Git LFS.
+The published PDF copy is [agentic/report.pdf](agentic/report.pdf).
+
+## Earlier baseline report
 
 This internal report presents the first all-off jury smoke run, using the
 supplied `arxiv.sty` and the existing sectioned manuscript. It replaces the
@@ -145,6 +155,18 @@ fictional results are excluded. The 20-episode first pass and all treatment
 comparisons remain future work. This is not a submission-ready empirical study.
 
 ## Changelog
+
+### 2026-10-26
+
+- Keep the general-tool Deep Agents campaign in `agentic/`, with its own safe
+  evidence snapshot and claim mapping. The older structured-action probes use
+  a different protocol and cannot be pooled into its behavioral conclusions.
+- Publish the complete campaign's raw JSONs and original checkpoints under
+  `harness-v2/results/` following explicit user authorization; use Git LFS for
+  large evidence files. Other campaign outputs remain ignored by default.
+- Remove the agentic draft's LLM Usage and Execution/accounting appendices at
+  the user's request. Preserve methodological provenance and unresolved review
+  gaps in the source evidence and review record.
 
 ### 2026-10-25
 

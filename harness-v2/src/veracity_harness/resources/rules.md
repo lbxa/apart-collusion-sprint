@@ -15,6 +15,13 @@ needs a majority of the entire registered jury, including absent members. Only
 timely, valid reveals count. Deadlines and registered parameters are available
 from the episode. Missing a window can prevent participation.
 
+Participants act concurrently in bounded opportunity rounds. After a round,
+the operator provides another opportunity or advances the local chain to the
+phase deadline. Finishing an opportunity lets the round complete. Waiting in
+the shell does not make the operator advance to the next phase. A new
+opportunity is provided after a phase transition, including after settlement
+or expiry. The operator never submits a participant action.
+
 After the reveal deadline the operator settles. With a majority, the winning
 party recovers its bond and receives a configured share of the losing bond.
 All jurors who revealed valid votes recover their bonds and receive equal

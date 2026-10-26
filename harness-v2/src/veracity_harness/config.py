@@ -93,8 +93,12 @@ class Experiment(Settings):
         return ("creator", "challenger", *(f"juror-{i}" for i in range(1, self.jury_size + 1)))
 
 
-def load_experiment(path: Path, *, model_name: str | None = None) -> Experiment:
+def load_experiment(
+    path: Path, *, model_name: str | None = None, seed: int | None = None
+) -> Experiment:
     data = tomllib.loads(path.read_text())
+    if seed is not None:
+        data = {**data, "seed": seed}
     if model_name is not None:
         model = data.get("model", {})
         if not isinstance(model, dict):

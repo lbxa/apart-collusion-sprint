@@ -1,2 +1,9 @@
 # Keep imported research outputs verbatim, including original transcript spacing.
 harness/historical-results/** -whitespace
+
+# Preserve the released campaign bytes; large evidence files use Git LFS.
+harness-v2/results/campaign-2026-10-26/** -text -whitespace
+harness-v2/results/campaign-2026-10-26/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
+harness-v2/results/campaign-2026-10-26/**/*.sqlite filter=lfs diff=lfs merge=lfs -text
+harness-v2/results/campaign-2026-10-26/export/experiments/*.json filter=lfs diff=lfs merge=lfs -text
+harness-v2/results/campaign-2026-10-26/export/raw-data.zip filter=lfs diff=lfs merge=lfs -text

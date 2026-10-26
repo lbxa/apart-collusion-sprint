@@ -24,7 +24,7 @@ def test_smoke_preserves_experiment_reasoning_and_completion_budget(monkeypatch,
     )
     received = {}
 
-    async def run(experiment, output, *, smoke):
+    async def run(experiment, output, *, smoke, spending):
         received.update(model=experiment.model, smoke=smoke)
         (tmp_path / "run.json").write_text(json.dumps({"status": "complete"}))
         return tmp_path
@@ -35,7 +35,18 @@ def test_smoke_preserves_experiment_reasoning_and_completion_budget(monkeypatch,
     monkeypatch.setattr(
         sys,
         "argv",
-        ["veracity-harness", "smoke", "--config", str(config), "--model", "fixture/selected"],
+        [
+            "veracity-harness",
+            "smoke",
+            "--config",
+            str(config),
+            "--model",
+            "fixture/selected",
+            "--budget-ledger",
+            str(tmp_path / "campaign.sqlite"),
+            "--budget-usd",
+            "100",
+        ],
     )
     main()
     assert received["model"].name == "fixture/selected"

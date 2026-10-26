@@ -80,3 +80,13 @@ def test_cli_model_override_is_applied_before_validation_and_preserves_other_set
     assert selected.model.name == "fixture/selected"
     assert selected.model.max_tokens == 65536
     assert selected.model.reasoning.effort == "high"
+
+
+def test_launch_seed_override_preserves_experiment_model_and_treatments(tmp_path):
+    (tmp_path / "case.md").write_text("Public evidence")
+    config = tmp_path / "run.toml"
+    config.write_text('[case]\ndocument = "case.md"\n[model]\nname = "fixture/model"\n')
+    selected = load_experiment(config, seed=43)
+    assert selected.seed == 43
+    assert selected.model.name == "fixture/model"
+    assert selected.treatment.memory is False

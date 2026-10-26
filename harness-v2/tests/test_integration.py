@@ -4,13 +4,15 @@ import json
 import shlex
 
 import pytest
+from game_api.generated import RegisterEpisode
+from game_api.local_engine import LocalEngine
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from pydantic import Field
 
 from veracity_harness.config import load_experiment
-from veracity_harness.runner import ROOT, run_experiment
+from veracity_harness.runner import ROOT, retain_evidence, run_experiment
 
 
 class ProtocolFixtureModel(BaseChatModel):
@@ -78,6 +80,7 @@ class ProtocolFixtureModel(BaseChatModel):
 
 class PassiveModel(BaseChatModel):
     fail: bool = False
+    replace_case: str | None = None
 
     @property
     def _llm_type(self):
@@ -87,11 +90,64 @@ class PassiveModel(BaseChatModel):
         return self
 
     def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+        if self.replace_case is not None:
+            from pathlib import Path
+
+            Path(self.replace_case).write_text("Changed external fixture after the run started.")
         if self.fail:
             raise RuntimeError("Private provider failure detail")
         return ChatResult(
             generations=[ChatGeneration(message=AIMessage(content="I take no action."))]
         )
+
+
+@pytest.mark.integration
+async def test_public_inputs_are_frozen_before_any_agent_runs(tmp_path):
+    case = tmp_path / "case.md"
+    case.write_text("Original public fixture.")
+    experiment = load_experiment(
+        ROOT / "harness-v2/examples/discovery.toml", model_name="fixture/protocol"
+    ).model_copy(update={"episodes": 2, "opportunities_per_phase": 1})
+    experiment = experiment.model_copy(
+        update={"case": experiment.case.model_copy(update={"document": case})}
+    )
+    directory = await run_experiment(
+        experiment, tmp_path / "results", model=PassiveModel(replace_case=str(case))
+    )
+    manifest = json.loads((directory / "run.json").read_text())
+    assert manifest["agent_backend"] == "injected_test_model"
+    assert case.read_text().startswith("Changed external fixture")
+    for episode in manifest["episodes"]:
+        for document in (directory / episode["episode_id"] / "documents").glob("*/case.md"):
+            assert document.read_text() == "Original public fixture."
+
+
+@pytest.mark.integration
+async def test_active_episode_keeps_evidence_when_no_settlement_exists_yet(tmp_path):
+    experiment = load_experiment(
+        ROOT / "harness-v2/examples/discovery.toml", model_name="fixture/protocol"
+    )
+    async with LocalEngine(ROOT) as engine:
+        client = engine.client
+        operation = await client.register_episode(
+            RegisterEpisode(
+                episode_id="active-evidence",
+                creator_id="creator",
+                challenger_id="challenger",
+                juror_ids=list(experiment.actor_ids[2:]),
+                treasury_id="treasury",
+                parameters=experiment.parameters,
+            ),
+            idempotency_key="register-active",
+        )
+        await client.wait_operation(operation)
+        evidence = await retain_evidence(client, "active-evidence", tmp_path)
+    assert evidence["episode"]["phase"] == "REGISTERED"
+    assert evidence["settlement"] is None
+    assert evidence["settlement_unavailable_http_status"] == 409
+    assert "forum_transcript" in evidence
+    assert "private_transcripts" in evidence
+    assert json.loads((tmp_path / "evidence.json").read_text()) == evidence
 
 
 @pytest.mark.integration

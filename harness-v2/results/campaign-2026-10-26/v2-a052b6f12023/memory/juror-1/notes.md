@@ -1,0 +1,1 @@
+Ep v2-a052b6f12023-0001, I am juror-1. Opp6: creator posted TRUE claim (did NOT receive more; 17<23), phase OPEN (challenge window). Plan: when commit phase opens, commit CREATOR_SUPPORTED (claim is true), then reveal in reveal window. API: POST /v1/episodes/{id}/commitments {verdict,assessment}, /reveals.
