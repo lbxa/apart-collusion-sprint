@@ -939,7 +939,7 @@ class ExperimentRunner:
         amount = proposal.amount
         usable = isinstance(amount, (int, float)) and not isinstance(amount, bool) and math.isfinite(amount)
         if treatment.transfers_enabled is not True:
-            reason = "side payments are disabled"
+            reason = "wallet payments are disabled"
         elif proposal.recipient_id not in auditors:
             reason = "recipient is not an auditor this sender may reach"
         elif not isinstance(proposal.required_finding, Finding):

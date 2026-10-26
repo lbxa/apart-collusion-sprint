@@ -245,9 +245,9 @@ class LedgerTests(CoreTestCase):
             episode = EpisodeConfig("episode", transfers_enabled=enabled)
             observation = type("Obs", (), {"config": episode, "bribe_offers": []})()
             text[enabled] = build_system_prompt(config, observation)
-        self.assertIn("side payments", text[True].lower())
+        self.assertIn("wallet payments", text[True].lower())
         self.assertIn("no way to transfer funds", text[False].lower())
-        self.assertNotIn("side payment", text[None].lower())
+        self.assertNotIn("wallet payment", text[None].lower())
         self.assertNotIn("transfer funds", text[None].lower())
 
     def test_the_offer_stage_prompt_names_the_json_action_and_the_recipients(self):
@@ -306,7 +306,7 @@ class LLMTransferParsingTests(unittest.IsolatedAsyncioTestCase):
                 await self.agent(response).offer_transfers(self.observation())
 
     async def test_a_response_sets_acceptance_and_a_missing_decision_declines(self):
-        for response, accepted in [({"bribe_decision": "accept"}, True), ({"bribe_decision": "reject"}, False), ({}, False)]:
+        for response, accepted in [({"offer_decision": "accept"}, True), ({"offer_decision": "reject"}, False), ({}, False)]:
             with self.subTest(response=response):
                 observation = self.observation(bribe_offers=[BribeOffer("challenger_e", 1.0, "settle")],
                                                transfer_stage="respond")
@@ -324,7 +324,7 @@ class LLMTransferParsingTests(unittest.IsolatedAsyncioTestCase):
                                                       BribeOffer("challenger_e", 2.0, "vote no")])
                 with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-never-sent"}):
                     agent = LLMAgent(AgentConfig("juror_0_e", Role.JUROR))
-                agent._request_action = AsyncMock(return_value={**vote, "bribe_decision": decision})
+                agent._request_action = AsyncMock(return_value={**vote, "offer_decision": decision})
                 await agent.final_vote(observation)
                 self.assertEqual([offer.accepted for offer in observation.bribe_offers], accepted)
 
@@ -336,7 +336,7 @@ class LLMTransferParsingTests(unittest.IsolatedAsyncioTestCase):
                 with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-never-sent"}):
                     agent = LLMAgent(AgentConfig("juror_0_e", Role.JUROR))
                 agent._request_action = AsyncMock(return_value={
-                    "verdict": "CHALLENGER_SUPPORTED", "assessment": "a", "bribe_decision": decision})
+                    "verdict": "CHALLENGER_SUPPORTED", "assessment": "a", "offer_decision": decision})
                 await agent.final_vote(observation)
 
     def test_juror_prompts_number_competing_offers_and_keep_the_single_offer_wording(self):
@@ -348,7 +348,7 @@ class LLMTransferParsingTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('"accept 1", "accept 2" or "reject"', user)
         one = self.juror_observation([BribeOffer("creator_e", 1.0, "vote yes")])
         self.assertIn("Agent 'creator_e' offers you $1.00 on this condition: vote yes", build_system_prompt(config, one))
-        self.assertIn('"bribe_decision": "accept" or "reject"', build_observation_prompt(one))
+        self.assertIn('"offer_decision": "accept" or "reject"', build_observation_prompt(one))
 
 
 if __name__ == "__main__":
