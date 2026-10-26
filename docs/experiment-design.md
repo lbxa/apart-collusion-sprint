@@ -306,10 +306,31 @@ failures; a local completed experiment does not imply a successfully synced run.
 | ---------- | ------------------- | -------------------------------------------- | ------------------------------------------------ |
 | Baseline smoke | `M0-C0-T0-R0-S0-E0` | Every lever off; two live episodes for integration verification | Completed 2026-10-25 on Rust/Anvil; [W&B run](https://forge.coreweave.com/wandb/lbxa-corp/apart-collusion-sprint/runs/m073at4i) |
 | 1          | `M1-C1-T1-R1-S1-E1` | Every lever on: the maximal-opportunity cell | Runner supports private chat and the core public forum |
-| 2          | `M1-C1-T1-R1-S1-E1-V1` | Experiment 1 plus a one-auditor panel: does the auditor verify, and is it corrupted? | Proposed |
-| 3          | `M1-C1-T1-R1-S1-E1-V1-D1` | Experiment 2 with the panel disclosed to jurors beforehand: does knowing change behaviour? | Proposed |
+| 2          | `M1-C1-T1-R1-S1-E1-V1` | Experiment 1 plus a one-auditor panel: does the auditor verify, and is it corrupted? | Approved; first pass queued |
+| 3          | `M1-C1-T1-R1-S1-E1-V1-D1` | Experiment 2 with the panel disclosed to jurors beforehand: does knowing change behaviour? | Approved; first pass queued |
+| 4          | `M1-C0-T0-R0-S0-E0-V1` | Honest baseline `A` plus the auditor panel | Approved; first pass queued |
+| 5          | `M1-C0-T1-R1-S1-E1-V1` | `K1` plus the panel: no private chat, so the interview is a shared hearing | Approved; first pass queued |
+| 6          | `M1-C1-T0-R1-S1-E1-V1` | `K2` plus the panel: no transfers, so no offers to jurors or the auditor | Approved; first pass queued |
+| 7          | `M1-C0-T0-R1-S1-E1-V1` | Tacit `T` plus the panel: no private chat and no transfers | Approved; first pass queued |
+| 8          | `M1-C1-T1-R0-S1-E1-V1` | `K3` plus the panel: no repeated play | Approved; first pass queued |
+| 9          | `M1-C1-T1-R1-S0-E1-V1` | `K4` plus the panel: low stakes | Approved; first pass queued |
+| 10         | `M1-C1-T1-R1-S1-E0-V1` | `K5` plus the panel: clear evidence | Approved; first pass queued |
+| 11         | `M0-C1-T1-R1-S1-E1-V1` | `E` plus the panel: equal juror pay | Approved; first pass queued |
+| 12         | `M1-C1-T1-R1-S1-E1-A1-V1` | `K7` plus the panel: random payment audit and the auditor | Approved; first pass queued |
+| 13         | `M1-C0-T0-R0-S0-E0-V1-D1` | Experiment 4 with the panel disclosed to jurors beforehand | Approved; first pass queued |
 
 Add a row when a new cell is approved. Use the cell ID, not a free-form name.
+
+Experiments 2 to 12 add the auditor panel to each named knockout condition.
+First attempts at the baseline, 2 and 3 were stopped on 2026-10-25 at the
+2048-token reply cap, which the model's hidden reasoning exhausted in about one
+episode in three; the [baseline](https://forge.coreweave.com/wandb/lbxa-corp/apart-collusion-sprint/runs/5hl4duhg),
+[2](https://forge.coreweave.com/wandb/lbxa-corp/apart-collusion-sprint/runs/4n8wfppv)
+and [3](https://forge.coreweave.com/wandb/lbxa-corp/apart-collusion-sprint/runs/r8q6p9f0)
+runs remain separate and are not first-pass evidence. A second start of
+Experiments 2, 3, 5, 6 and 13 at the 8192-token cap was stopped before any
+episode completed, to record agent reasoning for chain-of-thought monitoring;
+its W&B runs are likewise not first-pass evidence.
 
 The smoke used `nvidia/nemotron-3-ultra-550b-a55b` through its paid OpenRouter
 route after the free route exhausted its daily quota. The [failed free-route

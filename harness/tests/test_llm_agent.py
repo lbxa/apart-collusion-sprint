@@ -40,6 +40,44 @@ class LLMProviderErrorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(str(raised.exception), "LLM provider openrouter request failed: rate_limited (HTTP 429)")
         self.assertNotIn(marker, rendered)
 
+    async def test_a_reply_cut_off_at_the_token_cap_is_reported_as_truncated(self):
+        # Reasoning models spend max_tokens on hidden reasoning, so the visible
+        # reply can stop mid-JSON or before it starts.
+        observation = Observation(
+            Role.CREATOR, "episode", Scenario("scenario", "Claim", "For", "Against", True),
+            Phase.SETUP, EpisodeConfig("episode"),
+        )
+        for content in ("", '{"action": "post_claim", "claim_text": "unfini'):
+            async def create(**_):
+                return SimpleNamespace(choices=[SimpleNamespace(
+                    finish_reason="length", message=SimpleNamespace(content=content))])
+
+            client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
+            with self.subTest(content=content), patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-only"}), \
+                    patch("agents.llm_agent.AsyncOpenAI", return_value=client):
+                agent = LLMAgent(AgentConfig("creator", Role.CREATOR))
+                with self.assertRaisesRegex(ValueError, "reached max_tokens=8192"):
+                    await agent._request_action(observation)
+
+    async def test_models_without_hidden_reasoning_record_only_the_stated_reasoning(self):
+        async def create(**_):
+            return SimpleNamespace(choices=[SimpleNamespace(finish_reason="stop", message=SimpleNamespace(
+                content='{"action": "post_claim", "claim_text": "Claim", "reasoning": "stated"}'))])
+
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
+        observation = Observation(
+            Role.CREATOR, "episode", Scenario("scenario", "Claim", "For", "Against", True),
+            Phase.SETUP, EpisodeConfig("episode"),
+        )
+        with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-only"}), \
+                patch("agents.llm_agent.AsyncOpenAI", return_value=client):
+            agent = LLMAgent(AgentConfig("creator", Role.CREATOR))
+            await agent.decide(observation)
+        self.assertEqual(agent.reasoning_log, [{
+            "agent_id": "creator", "role": "CREATOR", "phase": "SETUP", "round": 0,
+            "action": "post_claim", "reasoning": None, "stated_reasoning": "stated",
+        }])
+
 
 if __name__ == "__main__":
     unittest.main()

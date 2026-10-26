@@ -81,9 +81,12 @@ are zero and abuse rates are unavailable. Cross-episode consistency under
 establish collusion; see the [measurement definitions and permutation
 procedure](../docs/experiment-design.md), including the evidence-set confound.
 
-Credentials, prompts, message bodies, transcripts, private observations, raw
-failure payloads, source code, git diffs, console capture, and system metadata
-are excluded. Detailed evidence stays in local experiment exports. The SDK's
+Credentials, prompts, message bodies, transcripts, agent reasoning, private
+observations, raw failure payloads, source code, git diffs, console capture, and
+system metadata are excluded. Detailed evidence stays in local experiment exports.
+Each episode's `llm_calls` there holds one entry per model call: the model's
+hidden reasoning when it returns any, and the `reasoning` the agent wrote in its
+JSON reply. Agents never see each other's reasoning. The SDK's
 working files live below the selected output directory, and `wandb_runs.jsonl`
 records the dashboard links before model execution. Initialization or upload
 errors fail the command; recorded infrastructure failures mark the W&B run
@@ -180,6 +183,16 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Record each model call's reasoning in the episode's `llm_calls` for
+  post-hoc chain-of-thought monitoring. Capture leaves the request unchanged, so
+  agent behaviour is as before. Reasoning stays in local `episodes.jsonl`
+  exports: not in transcripts, summaries, prompts to other agents, or W&B.
+- Raise the agent `max_tokens` default from 2048 to 8192. Reasoning models such
+  as `nvidia/nemotron-3-ultra-550b-a55b` count hidden reasoning against the cap;
+  at 2048 about one live auditor-cell episode in three failed with an empty or
+  truncated creator reply. A reply stopped at the cap now fails as
+  `reached max_tokens` instead of as invalid JSON or an empty action. W&B runs
+  record the cap, so runs before and after the change stay distinguishable.
 - Keep jury measurement denominators in local exports and W&B: valid reveals
   from completed aborted games still count toward vote alignment, while verdict
   accuracy requires settlement. Preserve per-actor prohibited-message audit

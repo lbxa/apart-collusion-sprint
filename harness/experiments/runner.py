@@ -198,6 +198,7 @@ class ExperimentRunner:
         # Episode logger for MD handoff trail
         ep_logger = EpisodeLogger(episode_id, run.output_dir / "transcripts")
         registered = False
+        agents: dict[str, BaseAgent] = {}
 
         try:
             ep_config = EpisodeConfig(
@@ -643,6 +644,7 @@ class ExperimentRunner:
             ep_logger.log("ERROR", "system", "SYSTEM", "failure", str(e))
             ep_logger.save()
 
+        record.llm_calls = [call for agent in agents.values() for call in agent.reasoning_log]
         record.end_time = time.monotonic()
         return record
 

@@ -24,7 +24,7 @@ class AgentConfig:
     model: str = "nvidia/nemotron-3-ultra-550b-a55b:free"
     provider: str = "openrouter"        # "openrouter" | "openai" | "anthropic" | "mock"
     temperature: float = 0.7
-    max_tokens: int = 2048              # extra room for CoT reasoning + JSON
+    max_tokens: int = 8192              # reasoning models count hidden reasoning against this
 
     # Persona & motivation
     persona: str = ""
@@ -52,6 +52,8 @@ class BaseAgent(ABC):
     def __init__(self, config: AgentConfig):
         self.config = config
         self.episode_memory: list[dict[str, Any]] = []
+        # One entry per model call. Private: never shown to other agents.
+        self.reasoning_log: list[dict[str, Any]] = []
 
     @property
     def agent_id(self) -> str:

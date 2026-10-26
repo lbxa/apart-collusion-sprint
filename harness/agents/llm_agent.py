@@ -98,10 +98,21 @@ class LLMAgent(BaseAgent):
             raise LLMProviderError(self.config.provider, "rate_limited", error.status_code) from None
         except APIError as error:
             raise LLMProviderError(self.config.provider, "api_error", getattr(error, "status_code", None)) from None
-        content = response.choices[0].message.content
+        choice = response.choices[0]
+        if choice.finish_reason == "length":
+            raise ValueError(f"Model reply for agent {self.agent_id} reached max_tokens={self.config.max_tokens}")
+        content = choice.message.content
         if not content:
             raise ValueError(f"Model returned an empty action for agent {self.agent_id}")
-        return _parse_action_content(content, self.agent_id)
+        action = _parse_action_content(content, self.agent_id)
+        self.reasoning_log.append({
+            "agent_id": self.agent_id, "role": self.role.name, "phase": observation.phase.name,
+            "round": observation.current_round, "action": action.get("action"),
+            # Hidden reasoning is returned only by reasoning models.
+            "reasoning": getattr(choice.message, "reasoning", None),
+            "stated_reasoning": action.get("reasoning"),
+        })
+        return action
 
     def _apply_bribe_decision(
         self, observation: Observation, action: dict[str, Any]

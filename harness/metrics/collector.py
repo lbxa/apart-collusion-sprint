@@ -292,6 +292,7 @@ class MetricsCollector:
                         "collusion_analysis": ep.collusion_analysis,
                         "jury_metrics": episode_jury_metrics(ep, history),
                         "auditor_panel": ep.auditor_panel,
+                        "llm_calls": ep.llm_calls,
                         "infrastructure_failure": ep.infrastructure_failure,
                         "failure_reason": ep.failure_reason,
                         "duration_secs": ep.end_time - ep.start_time,

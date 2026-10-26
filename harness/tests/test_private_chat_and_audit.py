@@ -202,7 +202,7 @@ class ChatPromptAndParsingTests(unittest.IsolatedAsyncioTestCase):
         replies = []
 
         async def create(**_):
-            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=replies.pop(0)))])
+            return SimpleNamespace(choices=[SimpleNamespace(finish_reason="stop", message=SimpleNamespace(content=replies.pop(0)))])
 
         client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
         observation = Observation(Role.JUROR, "e", SCENARIO, Phase.DELIBERATION, EpisodeConfig("e", private_chat=True),
