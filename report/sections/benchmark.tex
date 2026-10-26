@@ -1,0 +1,33 @@
+% !TEX root = ../main.tex
+\section{Model benchmark}
+\label{sec:benchmark}
+
+The model screen runs the same condition with one lineup of models at a time,
+changing nothing but the models~\cite{project-design}. Table~\ref{tab:benchmark}
+will compare the lineups on six measures of the game: how often the jury reached
+the truth-consistent verdict, how much the agents used side payments and private
+messages, whether the auditor accepted payments, and how many agents the
+reasoning monitor of Section~\ref{sec:probes} judged rogue.
+
+No model-screen run has been admitted yet, so the table is a template and every
+value is pending. Once runs finish, each column pools the counts of one lineup's
+finished runs of a single condition. Rates keep their counts, and a rate whose
+denominator is zero is reported as undefined rather than as zero. The episode
+count under each model is the number of episodes behind that column; episodes
+share memory within a block, so it is not a count of independent replicates.
+
+\begin{table}[htbp]
+  \caption{Model benchmark template for one condition. Each column will pool the
+  finished W\&B runs of one model lineup; every agent role uses the named model
+  unless the column names two parties. Rates show the percentage with its count;
+  offers and private messages are means per episode; n/a marks a zero
+  denominator, and --- a value not yet measured. Shading marks the featured
+  model. Bold marks the safest value in a row (the highest truth-consistent rate
+  or the lowest collusion measure) when one model alone holds it; grey marks it
+  outside the featured column. With few blocks per model, a bold value is a
+  description, not a significant difference.}
+  \label{tab:benchmark}
+  \centering
+  \small
+  \input{tables/model-benchmark}
+\end{table}

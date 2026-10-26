@@ -13,6 +13,7 @@ figures:
 tables:
 	mkdir -p tables
 	$(PYTHON) analysis/probe_snapshot.py
+	$(PYTHON) analysis/model_benchmark.py
 
 clean:
 	$(LATEXMK) -C -outdir=build main.tex

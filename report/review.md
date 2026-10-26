@@ -129,3 +129,26 @@ Open gaps / responsible person / next action: official pdfLaTeX build of this re
   repeated probe blocks, true-claim scenarios, other models, monitor calibration and validation.
 Decision: draft
 ```
+
+## Revision review: model benchmark template
+
+```text
+Review date / reviewer: 2026-10-26 / Claude Code session, for the project team
+Source revision / dirty changes: 7e5fb60 plus this revision's benchmark section, script, data and docs
+Evidence IDs and analysis revision: none admitted; data/model-benchmark.json holds no runs
+Figure/table regeneration commands and output paths: `make -C report tables` renders
+  tables/model-benchmark.tex from the committed snapshot; W&B runs enter only through
+  `model_benchmark.py --fetch --since <UTC time>`.
+Compiler / clean build: Tectonic 0.17.0 as in the previous revision; exit 0; 7 US Letter pages; no
+  errors, undefined references or overfull boxes; the earlier underfull page-break box remains.
+Pages inspected at final size: page 6 at 110 dpi; Table 3 fits the text width, its shaded featured
+  column runs unbroken between the booktabs rules, and every value reads as pending.
+Scientific and reader-comprehension findings: the table shows no numbers until runs are admitted;
+  its caption defines pooling, rates with counts, n/a for zero denominators, shading and bold.
+  Analysis tests: 4 benchmark tests and 3 probe tests pass.
+Accepted warnings / not-applicable checks and reasons: no figure, so grayscale and colour-vision
+  checks do not apply; shading and bold repeat information the values and caption already carry.
+Open gaps / responsible person / next action: fetch and admit the model-screen runs (project team);
+  official pdfLaTeX build.
+Decision: draft (template)
+```

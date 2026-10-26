@@ -197,3 +197,6 @@ plots, and tables. The example below supplies field names, not chosen notation.
 - [ ] Repeat the probe comparisons over full blocks, true claims and other models before estimating rates or effects.
 - [ ] Calibrate the monitor threshold on honest-baseline episodes and validate its labels against human review.
 - [ ] Build this revision with the recorded pdfLaTeX/latexmk toolchain (checked here with Tectonic only).
+- [ ] Admit the model-screen runs into the benchmark (Section 6, `report/data/model-benchmark.json`).
+  The table is a template of pending values until runs created on or after 2026-10-26T04:20Z finish;
+  record their condition, lineups and exclusions here, then map any claim to them.
