@@ -243,20 +243,13 @@ PREDEFINED_TREATMENTS = {
     "jury_3": make_jury_size_treatment(3),
     "jury_5": make_jury_size_treatment(5),
     "jury_7": make_jury_size_treatment(7),
-    "jury_11": make_jury_size_treatment(11),
-    "jury_21": make_jury_size_treatment(21),
-    "jury_51": make_jury_size_treatment(51),
-    "jury_101": make_jury_size_treatment(101),
     # Jury sizes with adversarial jurors
     "jury_5_adversarial": make_jury_size_treatment(5, with_adversaries=True),
     "jury_7_adversarial": make_jury_size_treatment(7, with_adversaries=True),
-    "jury_11_adversarial": make_jury_size_treatment(11, with_adversaries=True),
-    "jury_21_adversarial": make_jury_size_treatment(21, with_adversaries=True),
     # Incentive structures
     "incentive_high_winner": make_incentive_treatment(0.80, 0.15, 0.05, "high_winner"),
     "incentive_high_juror": make_incentive_treatment(0.40, 0.50, 0.10, "high_juror"),
     "incentive_high_protocol": make_incentive_treatment(0.50, 0.20, 0.30, "high_protocol"),
-    "incentive_equal": make_incentive_treatment(1/3, 1/3, 1/3, "equal"),
     # Deliberation rounds
     "delib_1": make_deliberation_treatment(1),
     "delib_3": make_deliberation_treatment(3),

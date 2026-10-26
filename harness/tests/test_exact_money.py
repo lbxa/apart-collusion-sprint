@@ -61,7 +61,7 @@ class ExactMoneyTests(unittest.TestCase):
         self.assertEqual(format(amount, "f"), units[:-2] + "." + units[-2:])
         self.assertEqual(base_units_to_tokens("9007199254740993"), Decimal("90071992547409.93"))
 
-    def test_exact_inputs_and_prompt_estimates_do_not_round_large_amounts(self):
+    def test_exact_inputs_and_prompt_parameters_do_not_round_large_amounts(self):
         from game_api.money import integer_units
         from game_api.types import PayoutConfig
 
@@ -71,11 +71,22 @@ class ExactMoneyTests(unittest.TestCase):
             self.assertEqual(integer_units(amount, 100, "bet"), 9007199254740993123456789012345678910)
             payout = PayoutConfig(creator_bet=amount, challenger_bet=amount)
             self.assertIn("90071992547409931234567890123456789.10", payout.describe())
-            self.assertEqual(payout.total_pot, Decimal("180143985094819862469135780246913578.20"))
-            self.assertEqual(payout.winner_payout(), Decimal("144115188075855889975308624197530862.5600"))
+            self.assertIn("Winner share of losing bet: 60.00%", payout.describe())
         for value in (Decimal("0.001"), Decimal("-0.01"), Decimal("NaN"), float("inf")):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 integer_units(value, 100, "bet")
+
+    def test_payout_prompt_states_parameters_without_simulating_settlement(self):
+        from game_api.types import PayoutConfig
+
+        description = PayoutConfig().describe()
+        self.assertIn("Winner share of losing bet: 60.00%", description)
+        self.assertIn("Juror pool share of losing bet: 30.00%", description)
+        self.assertIn("Protocol share of losing bet: 10.00%", description)
+        self.assertIn("deposited with commitment", description)
+        self.assertNotIn("Total pot:", description)
+        self.assertNotIn("$6.00", description)
+        self.assertNotIn("$3.00", description)
 
     def test_exported_financial_strings_restore_as_exact_decimals(self):
         amount = Decimal("900719925474099312345678901234567890.11")

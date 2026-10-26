@@ -1,111 +1,98 @@
-# Sample report review
+# Baseline report review
 
-Reviewed **2026-10-25** against [the reporting checklist](../docs/reporting/review.md).
-Decision: **ready as an illustrative sample**; not an empirical submission.
+Reviewed **2026-10-25** against the [reporting checklist](../docs/reporting/review.md).
+Decision: **reviewed internal smoke report**, not a submission-ready treatment study.
 
-## Artifact and toolchain
+## Evidence and scope
 
-| Field | Recorded value |
+- **Admitted evidence:** B0 in the [paper brief](../docs/reporting/paper-brief.md),
+  W&B run `m073at4i`, cell `M0-C0-T0-R0-S0-E0`, two live-model episodes in one
+  block, seven jurors and three public rounds, core backend on local Anvil.
+- **Observed counts:** 2/2 correct settled verdicts, 14/14 valid and truth-aligned
+  reveals, 42/42 agreeing within-episode juror pairs, 42 public messages and zero
+  private messages. Same-side repetition is 0/7 and repeated correctness is 7/7
+  across one episode pair. No collusion or treatment-effect inference is admitted.
+- **Exclusions:** free-route run `2vu0jc3u` failed both assigned episodes after
+  quota exhaustion. It remains an operational failure record and is not pooled
+  into the successful retry's behavioral means. Scripted, historical, mock, and
+  the former fictional teaching results are excluded.
+- **Failed-attempt audit:** separately reconciled the free run's two failed,
+  zero-completed records and HTTP 429 daily-quota reasons. Summary source:
+  `.harness/experiments/jury-baseline-smoke-2026-10-25/all_results.json`, SHA256
+  `e4506bf95f27f19849892f44c165c1341368d09e434a5f5f97f79817e7ab3124`.
+  Episode source under that directory:
+  `exp_exp_m0c0t0r0s0e0_f62b0414/episodes.jsonl`, SHA256
+  `e5a917a45202172e32d4174afa9123d71fd63e95ae2c2e1d120f9d12fb1ed325`.
+  This exclusion is manually audited here, not recalculated by the plot renderer.
+- **Observation unit:** means and sample SD use episode values, with denominator
+  `n - 1` for SD. The rate and runtime samples have `n = 2`; votes and pairs are
+  measurement denominators, not independent experimental replicates. The single
+  cross-episode pair has no estimable sample SD. Disabled-channel abuse rates
+  remain unavailable, not measured zeros.
+- **Numerical reconciliation:** each reported rate is 100% in both episodes,
+  yielding observed SD zero. Episode durations are 76.3070654579 and
+  79.0901371250 seconds, with mean 77.6986012915 and sample SD 1.9679288483
+  seconds. This descriptive spread is neither a confidence interval nor a
+  controlled latency benchmark.
+- **Provenance:** the execution recorded `e0a5c68` with a dirty working tree;
+  integration changes were subsequently committed as `47636e9`. The committed
+  safe snapshot records source SHA256 hashes, recorded configuration, local
+  deployment identity, and a separately labeled prompt hash at analysis time.
+  The snapshot excludes content, credentials and unrevealed votes.
+
+## Reproduction and toolchain
+
+| Check | Recorded result |
 | --- | --- |
-| Source | [main.tex](main.tex), [preamble.tex](preamble.tex), and `sections/*.tex` |
-| Repository baseline | `bd79b5c` plus the reporting-guide and sample-report commits; refreshed against the private-chat API, generated Python client, and current collector before merge |
-| PDF | [build/main.pdf](build/main.pdf), 3 pages on US Letter |
-| Stage and venue | Internal illustrative sample; venue unselected |
-| Template | Uploaded `arxiv.sty`, unchanged; hashes and attribution in [template provenance](template/README.md) |
-| TeX engine | pdfTeX 3.141592653-2.6-1.40.26, TeX Live 2025/dev/Debian |
-| Build driver | Latexmk 4.86, December 11, 2024 |
-| Figure environment | Python 3.12.14; Matplotlib 3.10.8 |
+| Manuscript | `main.tex`, `preamble.tex`, and `sections/*.tex` |
+| PDF | `build/main.pdf`, five US Letter pages; editor build also writes `main.pdf` |
+| Stage | Internal report; no submission venue, page limit, anonymity claim or final author list |
+| Template | Supplied `arxiv.sty` unchanged; attribution in `template/README.md` |
+| Python | 3.12.11 in `.harness/report-venv`; separate from the harness runtime |
+| Figure packages | Matplotlib 3.11.2, NumPy 2.5.4, PyYAML 6.0.3; transitive versions pinned in `requirements.lock` |
+| Figure regeneration | `make -C report figures PYTHON="$PWD/.harness/report-venv/bin/python"`; exit 0; `.harness/report-figures.log` |
+| Source audit | Regenerated `build/baseline-snapshot-audit.json` with `--source --config --snapshot-only`; byte-identical to `data/baseline-smoke.json` |
+| Analysis tests | Ten tests for sample SD, missing/one-observation SD, zero spread, admission, channel controls, revealed-vote counts and settled-verdict correctness; all passed |
+| TeX | pdfTeX 3.141592653-2.6-1.40.27, TeX Live 2025; Latexmk 4.86a |
 | Bibliography | Keyed `thebibliography`; no external backend |
-| Package versions | Recorded by `\listfiles` in `build/main.log` |
-| Clean TeX build | `make -C report clean`, then `make -C report`; exit status 0 |
-| Figure regeneration | `make -C report figures`; canonical script `docs/reporting/templates/figure-example.py` |
-| Figure provenance | `build/figures/figure-example.json`; 3.35-inch width; counts 12/40 and 18/40; failures 2 and 1 |
+| Clean build | `make -C report clean`, then `make -C report`; exit 0; `.harness/report-build.log` |
+| Editor build | `latexmk -pdf -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error main.tex` from `report/`; `.harness/report-editor-build.log` |
+| Compilation diagnostics | No errors, undefined references/citations, missing glyphs, overfull or underfull boxes in the final clean-build log |
+| Repository gate | `bash scripts/verify.sh`; exit 0 with local Anvil permitted. Hooks, 32 Solidity tests, Rust checks/tests/builds, 216 Python tests and harness acceptance suite passed; `.harness/verification-report-figures-2026-10-25.log` |
 
-## Review findings
+The normal figure command reads only the committed safe snapshot. A report-only
+checkout can therefore regenerate charts without the ignored original transcripts
+or any model credentials. Ordinary TeX builds use the included vector PDFs and
+do not need Python. Execution nondeterminism and the dirty original source state
+prevent claiming exact replay of the model experiment from a pristine revision.
 
-- **Scientific scope — pass for a sample.** Every quantitative comparison is
-  explicitly fictional. The local system references support the architecture
-  description; none is presented as evidence for the invented counts. The
-  method defines its endpoint, assigned-trial denominator, notation, failure
-  treatment, and illustrative independence assumption. The text makes no
-  significance, causal, or actual-collusion claim.
-- **Argument and consistency — pass.** The question, numerical comparison, and
-  limitations agree across abstract, methods, results, table, plot, and
-  conclusion. The arithmetic difference is 15 percentage points. Uncertainty
-  bars are identified as marginal 95% Wilson intervals, not a contrast test.
-- **Template and organization — pass.** Only `main.tex` is a standalone
-  document. Each paper section is a separate TeX input. The supplied style and
-  README match their attachment hashes. Template content was used as reference
-  material; its sample authors, subject matter, and old submission advice were
-  not adopted as project requirements.
-- **Build and references — pass.** A fresh TeX build stabilized cross-references
-  and citations. The final log has no LaTeX/package warnings, overfull/underfull
-  boxes, undefined references/citations, or missing glyphs. All PDF fonts are
-  embedded; the preamble selects vector Courier for monospace paths.
-- **Rendered pages — pass.** Inspected all three final pages for clipping,
-  equation alignment, heading breaks, float order, tables, captions, and
-  reference placement. The bibliography fits on the final page. Inspected the
-  plot at its final 3.35-inch width and in grayscale; shapes preserve treatment
-  distinctions and labels remain readable.
-- **Independent source review — pass.** A separate agent reviewed paths, style
-  compatibility, provenance, and scientific scope, finding no unresolved issue.
-- **Repository verification — pass.** After sourcing `.tools/cloud-env.sh`,
-  `bash scripts/verify.sh` exited 0. Hook checks, 32 Solidity tests including
-  fuzz/invariants, Rust formatting/Clippy/tests/builds, generated schema/client
-  drift checks, Python regressions, and the harness scenario suite passed. Run log:
-  `/tmp/veracity-report-merge-verification.log`.
+## Figure and rendered-page acceptance
 
-## TeXShop compatibility recheck — 2026-10-25
+- **Physical sizes:** outcomes 6.5 by 3.05 inches; process 6.5 by 2.75 inches.
+  Figures are included at text width, with minimum 8.5-point labels, serif STIX
+  typography, explicit marker shapes and direct role labels.
+- **Uncertainty:** blue means use pale solid blue SD regions, opacity 1. Zero-SD
+  regions collapse without an artificial minimum width. Runtime shows a genuine
+  mean-plus/minus-SD interval. Captions identify sample size, units, exclusions,
+  dependence and the difference between descriptive spread and uncertainty.
+- **Outputs:** vector PDFs plus 300-dpi PNGs. Pypdf checks confirmed embedded
+  font streams for every chart font and all 17 fonts in the compiled manuscript.
+- **Accessibility:** both figures were inspected in grayscale and simulated
+  severe deuteranomaly. Circle/square episode marks, mean diamonds, and `Cr`/`Ch`
+  matrix labels preserve distinctions without relying on color alone. QA images
+  are retained under `/tmp/baseline-*-grayscale.png` and
+  `/tmp/baseline-*-deuteranomaly.png`.
+- **Page review:** inspected all five pages rendered at 110 dpi, including both
+  figures at final width, the architecture diagram, equations, result table,
+  captions and references. An initial outcome xlabel/footer overlap was fixed;
+  a long-path bibliography spacing warning was resolved. Final renders are in
+  `build/pages/`; no clipped marks, overlapping labels or broken references found.
 
-Source baseline: `641b5c0` plus the report compatibility changes. Scientific
-content and the supplied style are unchanged. The original review above
-records the earlier Linux build; the following checks cover the local Mac.
+## Open gaps
 
-- **Reproduction.** A fresh copy of the saved sources failed direct pdfLaTeX
-  compilation because `figure-example.pdf` existed only after running the
-  Make figure target. The reported disappearing `main.aux` was not reproduced
-  from those saved sources. The old TeXShop run was stopped at its filename
-  prompt before retesting.
-- **Package fix.** The generated vector figure is now included in `figures/`.
-  Ordinary builds need only TeX; `make figures` explicitly regenerates the
-  included asset and saves provenance in `build/figures/figure-example.json`.
-  `main.tex` selects `pdflatexmk`; all included TeX files declare their root.
-- **Local toolchain.** TeXShop 5.49; pdfTeX
-  3.141592653-2.6-1.40.27 (TeX Live 2025); Latexmk 4.86a. Figure regenerated
-  with Python 3.12.11 and Matplotlib 3.11.2 using
-  `make -C report figures PYTHON=/path/to/python`. The asset remains a
-  3.35-inch vector figure with the same fictional counts and Wilson intervals.
-- **Editor build — pass.** Opened `main.tex` in TeXShop and used Cmd-T. The
-  installed `pdflatexmk` engine completed, recreated `main.aux` and SyncTeX,
-  resolved all references, and displayed the three-page `main.pdf`. The final
-  `main.log` contains no warnings, overfull/underfull boxes, or missing glyphs.
-- **Clean and portable builds — pass.** `make -C report` completed with exit
-  status 0; log: `/tmp/veracity-texshop-make.log`. A fresh report-only copy in
-  a directory containing spaces compiled with the installed TeXShop engine
-  without a figure-generation step; log: `/tmp/veracity-texshop-portable.log`.
-  In that copy, `make clean` removed editor/build outputs and retained the
-  figure, then `make PYTHON=/nonexistent/python` succeeded; logs:
-  `/tmp/veracity-texshop-clean.log` and
-  `/tmp/veracity-texshop-clean-rebuild.log`. The LaTeX compile skill also
-  resolved `sections/results.tex` to `main.tex` and compiled successfully;
-  result: `/tmp/veracity-texshop-section-build.json`.
-- **Rendered pages — pass.** Re-rendered and inspected all three local PDF
-  pages at 90 dpi, including the diagram, equations, table, figure at its
-  retained width, and bibliography. No clipping, overlap, broken references,
-  or unreadable labels found. Page images: `/tmp/veracity-texshop-pages/`.
-- **Repository verification — pass.** `bash scripts/verify.sh` exited 0 after
-  rerunning with local test execution permitted. The sandboxed attempt timed
-  out starting Anvil; no chain tests were skipped. Successful run log:
-  `/tmp/veracity-texshop-repository-verification-unrestricted.log`.
-
-Decision: ready for local TeXShop editing as an illustrative sample. The
-empirical manuscript gaps below remain open.
-
-## Open work for the empirical manuscript
-
-No real experiment is admitted here. Treatment definitions, run evidence,
-model and prompt settings, statistical analysis, actual authors, and a submission
-venue remain to be established in the [paper brief](../docs/reporting/paper-brief.md)
-and [venue record](../docs/reporting/venue.md). Venue-specific page limits,
-anonymity, and submission disclosures are not applicable to this internal sample.
-Re-run this review after replacing its teaching content or changing its layout.
+The 20-episode first pass, independent additional blocks, matched evidence
+variants, factor contrasts, power and multiplicity planning, auditor-agent
+implementation, final author list and submission venue remain open. Two selected
+clear scenarios cannot establish population accuracy, a treatment effect or an
+absence of collusion. This review supersedes the earlier fictional-sample review;
+that sample's counts remain available only as reporting-guide examples.

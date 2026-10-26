@@ -115,8 +115,8 @@ harness. Episode exports retain `forum_audit` with all audit-event pages and an
 the runner still attempts to capture partial audit evidence. If that is
 unavailable, `forum_audit_error` records the missing evidence without replacing
 the original episode failure. Operator audit metadata never enters agent
-observations. Explicit `--mock` runs emulate
-the forum locally and continue to identify their backend as a simulation.
+observations. Scripted tests and demos use this same engine-owned forum; the
+harness does not emulate forum persistence or authorization locally.
 
 Forum records survive service restarts. Existing databases migrate atomically
 while retaining private chats and their audit records. Forum traffic remains

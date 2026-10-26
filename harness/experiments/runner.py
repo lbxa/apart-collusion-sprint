@@ -340,18 +340,8 @@ class ExperimentRunner:
                 money_in=payout.challenger_bet,
             )
 
-            # ── Phase 3: Jurors post bonds ──
-            for jid in juror_ids:
-                if await run.game_api.post_juror_bond(episode_id, jid):
-                    record.bonds_deposited[jid] = payout.juror_bond
-                    ep_logger.log(
-                        "BONDING", jid, "JUROR", "post_bond",
-                        f"Bond deposited: ${payout.juror_bond:.2f}",
-                        money_in=payout.juror_bond,
-                    )
-
-            # ── Phase 4: DELIBERATION (multi-round) ──
-            await run.game_api.start_deliberation(episode_id)
+            # Deliberation is an experiment schedule, not a chain transition.
+            # Juror bonds are deposited only with confirmed commitments below.
 
             bribe_offers = self._create_bribe_offers(
                 treatment, creator_id, challenger_id, juror_ids
@@ -451,8 +441,6 @@ class ExperimentRunner:
                 })
 
             # ── Phase 5: FINAL VOTING ──
-            await run.game_api.start_voting(episode_id)
-
             assessments: dict[str, str] = {}
             for jid in juror_ids:
                 # Check if this agent is a NonVotingAgent (strategic non-voter)
@@ -718,13 +706,15 @@ class ExperimentRunner:
         # Jurors
         for j_idx, jid in enumerate(juror_ids):
             if j_idx in treatment.scripted_juror_indices:
+                scripted_type = treatment.juror_overrides.get(j_idx, {}).get(
+                    "scripted_type", treatment.scripted_juror_type)
                 agent_cls = {
                     "honest": HonestAgent,
                     "adversarial": AdversarialAgent,
                     "random": RandomAgent,
                     "non_voting": NonVotingAgent,
                     "bribable": BribableAgent,
-                }.get(treatment.scripted_juror_type, HonestAgent)
+                }.get(scripted_type, HonestAgent)
                 config = AgentConfig(agent_id=jid, role=Role.JUROR,
                                      memory_enabled=treatment.memory_enabled, memory_window=treatment.memory_window)
                 if agent_cls is RandomAgent:

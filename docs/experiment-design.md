@@ -249,7 +249,7 @@ These hold in every cell. Changing one makes that experiment a different design.
 | Episodes per cell         | 20 (two blocks of 10, run as separate fresh-memory blocks) for a first pass |
 | Scenario order            | Scenario `i % 10` for episode `i`, identical in every cell                  |
 | Seed                      | 42, identical in every cell                                                 |
-| Backend for reported runs | Rust core on isolated Anvil. The mock is for development only               |
+| Backend for all runs | Rust core on isolated Anvil, including scripted checks and demos |
 
 Reuse scenario and role assignments across cells so comparisons are paired (SPEC 10).
 The current `E0` and `E1` libraries contain different claims, not two evidence
@@ -428,7 +428,7 @@ From `harness/`:
 ```sh
 python run_experiments.py --cell M0-C0-T0-R0-S0-E0 --blocks 1 --episodes 2 --live --model nvidia/nemotron-3-ultra-550b-a55b --wandb --run-purpose smoke
 python run_experiments.py --cell M1-C0-T1-R1-S1-E1 --blocks 2          # live agents
-python run_experiments.py --cell M1-C0-T1-R1-S1-E1 --scripted --mock    # dry run
+python run_experiments.py --cell M1-C0-T1-R1-S1-E1 --scripted         # real engine, no model calls
 ```
 
 `--blocks` sets the number of fresh-memory blocks (default 2); `--episodes` overrides

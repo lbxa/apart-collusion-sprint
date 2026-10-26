@@ -1,40 +1,68 @@
 % !TEX root = ../main.tex
-\section{Illustrative measurement design}
+\section{Baseline and measurement design}
 \label{sec:methods}
 
-\subsection{Endpoint and denominator}
-The example asks how often an assigned trial reaches a prespecified target
-verdict. A real experiment must define that target before execution and justify
-its relationship to the research question. Here, it is simply the illustrative
-endpoint used to explain the rate.
+\subsection{Executed configuration and evidence}
+The baseline cell is \texttt{M0-C0-T0-R0-S0-E0}: flat juror pay, no private
+chat, no side payments, no memory, low stakes, and clear
+evidence~\cite{project-design}. Public deliberation remains enabled. Each
+episode assigns one creator, one challenger, and seven jurors to three public
+rounds followed by commitment and reveal. Claims and challenges are forced
+when a party abstains. Party stakes are 1.0 harness token each, and the juror
+bond is 0.1 token; these are test accounting units, not fiat rewards.
 
-We need a denominator that retains unsuccessful assigned trials. For each
-treatment $t\in\{A,B\}$, let $n_t>0$ be the number of assigned trials, let
-$k_t\in\{0,\ldots,n_t\}$ count trials reaching the target, and let $f_t$ count
-infrastructure failures. Failed trials do not enter $k_t$, but remain in $n_t$.
-The assigned-trial target-verdict rate and descriptive contrast are
+All roles use \texttt{nvidia/nemotron-3-ultra-550b-a55b} through OpenRouter's
+paid route, with temperature 0.7 and a 2,048-token output limit. Harness seed
+42 controls assignment, not deterministic model sampling. The ordered
+scenarios \texttt{fic\_clear\_001} and \texttt{fic\_clear\_002} have evaluator
+truth labels true and false, respectively. Those labels are excluded from
+model observations. Both episodes use the core backend: Python calls the Rust
+HTTP service, which retains SQLite records and Solidity settlement evidence
+on an isolated local Anvil chain. This is not a public-chain deployment.
+
+The admitted behavioral record is W\&B run \texttt{m073at4i}, experiment
+\texttt{exp\_exp\_m0c0t0r0s0e0\_78819ce7}. The report's sanitized input snapshot
+and analysis script retain source hashes and configuration provenance, including
+the dirty working-tree state at execution~\cite{project-baseline}. A preceding
+free-route attempt, \texttt{2vu0jc3u}, assigned two episodes but completed neither
+after the provider's daily quota was exhausted. It remains an operational
+failure record and contributes no behavioral mean. Scripted preflights, mock
+runs, and historical results are also excluded.
+
+\subsection{Jury signals and denominators}
+Voting alignment is the fraction of unordered pairs of valid final juror
+reveals that choose the same side: seven revealed votes yield 21 pairs per
+episode. Individual truth alignment is the fraction of valid reveals supporting
+the evaluator's truth. Verdict accuracy separately uses completed, settled
+episodes with known truth. Completion and valid-reveal rates retain all assigned
+episodes and juror slots, respectively; infrastructure failures are disclosed
+alongside them. These denominators follow the saved metric
+contracts~\cite{project-harness}.
+
+Private-channel measurements retain message counts. With the channel disabled,
+zero traffic checks the control; abuse conditional on a private opportunity is
+not applicable. Cross-episode consistency compares each assigned juror slot
+with the same slot in the earlier completed episode. We distinguish repeating
+the same verdict side from repeating correctness relative to each claim's
+truth. There is only one episode-to-episode comparison, containing seven slot
+comparisons; it has no estimable episode-level standard deviation.
+
+\subsection{Descriptive mean and standard deviation}
+For metric $m$, let $x_{im}$ be its value in eligible episode $i$, and let
+$n_m$ count episodes in which that metric is defined. We summarize episode
+spread using
 \begin{align}
-  \assignedrate_t &= \frac{k_t}{n_t},
-  \label{eq:assigned-rate}\\
-  \ratecontrast &= \assignedrate_B - \assignedrate_A.
-  \label{eq:contrast}
+  \overline{x}_m &= \frac{1}{n_m}\sum_{i=1}^{n_m} x_{im}, \qquad n_m>0,
+  \label{eq:episode-mean}\\
+  s_m &= \sqrt{\frac{1}{n_m-1}
+    \sum_{i=1}^{n_m}(x_{im}-\overline{x}_m)^2}, \qquad n_m\geq 2.
+  \label{eq:episode-sd}
 \end{align}
-The rate is dimensionless; multiplying it by 100 expresses it as a percentage.
-The corresponding contrast is reported in percentage points. When no trials
-are assigned, the rate is undefined rather than zero.
-
-The hypothetical setup contains 40 independently initialized trials per
-treatment, with no shared memory. Its invented counts have no associated model
-calls, executed backend, run identifiers, or deployment identity.
-
-\subsection{Uncertainty and interpretation}
-The figure uses marginal 95\% Wilson score intervals for each rate. These
-intervals illustrate uncertainty under an independent binomial-trial model.
-They do not establish that the hypothetical independence assumption holds in
-a real agent experiment. Repeated episodes, shared scenarios, or persistent
-agent memory may require a different analysis.
-
-The intervals describe individual rates. Their overlap is not a test of the
-treatment contrast in Equation~\eqref{eq:contrast}. A real comparison would
-need an analysis of that contrast consistent with the assignment procedure,
-sampling unit, and dependence structure.
+Rates are displayed in percent, with their SD in percentage points; durations
+and their SD use seconds. Undefined values are omitted rather than assigned
+zero. Figures show observed episode values and the mean with $\pm 1$ sample
+SD. The lighter same-hue fills are opaque. Zero observed SD collapses the
+interval; no artificial band width is added. These are descriptive spreads,
+not confidence intervals or standard errors. The two episodes belong to one
+short block with shared model settings, so neither jurors nor pairwise
+agreements are treated as independent experimental replicates.

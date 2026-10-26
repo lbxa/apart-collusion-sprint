@@ -16,17 +16,12 @@ from game_api.types import (
     EpisodeConfig,
     Message,
     Observation,
-    PayoutConfig,
     Phase,
     Role,
     Scenario,
     StrawPoll,
     Verdict,
 )
-
-
-def _payout_block(payout: PayoutConfig) -> str:
-    return payout.describe()
 
 
 ROLE_PROMPTS = {
@@ -107,7 +102,7 @@ def build_system_prompt(config: "AgentConfig", observation: Observation) -> str:
     payout = ep_cfg.payout
 
     # 1. Base role prompt
-    payout_block = _payout_block(payout)
+    payout_block = payout.describe()
 
     prompt = ROLE_PROMPTS[cfg.role].format(
         creator_bet=payout.creator_bet,

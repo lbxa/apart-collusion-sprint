@@ -179,7 +179,8 @@ details deliberately, since the server's message may contain application data.
 Wire amounts remain validated decimal integer strings, so `int(payouts.winner_payout)`
 is exact. `CoreEngineAPI` retains its legacy experiment interface using exact
 `Decimal` token amounts (100 base units per token), including in metrics and
-decimal-string financial exports. Explicit `MockGameAPI` behavior retains floats.
+decimal-string financial exports. Historical numeric exports remain readable;
+there is no in-process game backend or Python settlement calculator.
 
 For local experiments, `LocalEngine` owns the Rust process, development credentials,
 and Anvil clock. Its `advance_to_deadline`, `finish_voting`, and `expire_episode`

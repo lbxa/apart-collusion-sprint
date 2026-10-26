@@ -22,7 +22,7 @@ class AgentConfig:
 
     # Model — default to Nemotron Ultra 550B (free) via OpenRouter
     model: str = "nvidia/nemotron-3-ultra-550b-a55b:free"
-    provider: str = "openrouter"        # "openrouter" | "openai" | "anthropic" | "mock"
+    provider: str = "openrouter"        # "openrouter" | "openai"
     temperature: float = 0.7
     max_tokens: int = 8192              # reasoning models count hidden reasoning against this
 

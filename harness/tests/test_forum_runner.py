@@ -3,18 +3,18 @@
 import copy
 import json
 import tempfile
-import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from agents.scripted import HonestAgent
 from experiments.runner import ExperimentRunner
 from experiments.treatments import TreatmentConfig
-from game_api.mock import MockGameAPI
-from game_api.types import DeliberateAction, Message, Scenario, Verdict
+from game_api.core_engine import CoreEngineAPI
+from game_api.types import DeliberateAction, Scenario, Verdict
+from tests.core_test_case import CoreTestCase
 
 
-class ForumGame(MockGameAPI):
+class ForumGame(CoreEngineAPI):
     def __init__(self, *, fail_send=False, fail_after_first=False, fail_audit=False):
         super().__init__()
         self.calls = []
@@ -27,7 +27,7 @@ class ForumGame(MockGameAPI):
         self.calls.append(("send", sender_id))
         if self.fail_send:
             raise RuntimeError("forum publication failed")
-        message = Message(sender_id, "ENGINE: " + content, round_num)
+        message = await super().send_forum_message(episode_id, sender_id, "ENGINE: " + content, round_num)
         self.posts.append(message)
         return message
 
@@ -35,14 +35,13 @@ class ForumGame(MockGameAPI):
         self.calls.append(("read", participant_id))
         if self.fail_after_first and self.posts:
             raise RuntimeError("later forum read failed")
-        return copy.deepcopy(self.posts)
+        return await super().get_forum_messages(episode_id, participant_id)
 
     async def get_forum_audit(self, episode_id):
         self.calls.append(("audit", episode_id))
         if self.fail_audit:
             raise RuntimeError("unavailable")
-        return {"episode_id": episode_id, "message_count": len(self.posts), "events": [],
-                "forum_used": bool(self.posts), "communication_used": bool(self.posts)}
+        return await super().get_forum_audit(episode_id)
 
 
 class ForumAgent(HonestAgent):
@@ -58,7 +57,7 @@ class ForumAgent(HonestAgent):
         return await super().final_vote(observation)
 
 
-class ForumRunnerTests(unittest.IsolatedAsyncioTestCase):
+class ForumRunnerTests(CoreTestCase):
     async def run_forum(self, game, enabled=True):
         treatment = TreatmentConfig("forum", "Forum", "No models", jury_size=3,
             deliberation_rounds=2, num_episodes=1, public_messaging=enabled,
@@ -72,7 +71,7 @@ class ForumRunnerTests(unittest.IsolatedAsyncioTestCase):
         return metrics.episodes[0]
 
     async def test_publication_and_each_agents_observations_use_game_history_including_final_vote(self):
-        game = ForumGame()
+        game = self.new_game(ForumGame)
         record = await self.run_forum(game)
         self.assertEqual(record.status, "completed", record.failure_reason)
         self.assertEqual(len(game.posts), 6)
@@ -87,7 +86,7 @@ class ForumRunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.exported["messages"], record.messages)
 
     async def test_disabled_public_messaging_does_not_send_or_read_forum_and_exports_nonuse(self):
-        game = ForumGame()
+        game = self.new_game(ForumGame)
         record = await self.run_forum(game, enabled=False)
         self.assertEqual(record.status, "completed", record.failure_reason)
         self.assertEqual([kind for kind, _ in game.calls], ["audit"])
@@ -98,7 +97,7 @@ class ForumRunnerTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(observation.straw_polls, [])
 
     async def test_failed_publication_fails_episode_without_local_message_fallback(self):
-        game = ForumGame(fail_send=True)
+        game = self.new_game(lambda: ForumGame(fail_send=True))
         with self.assertLogs("experiments.runner", level="ERROR"):
             record = await self.run_forum(game)
         self.assertEqual(record.status, "failed")
@@ -108,7 +107,7 @@ class ForumRunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(ForumAgent.observations), 1)
 
     async def test_failure_after_accepted_post_exports_partial_audit_without_observing_it(self):
-        game = ForumGame(fail_after_first=True)
+        game = self.new_game(lambda: ForumGame(fail_after_first=True))
         with self.assertLogs("experiments.runner", level="ERROR"):
             record = await self.run_forum(game)
         self.assertEqual(record.status, "failed")
@@ -119,7 +118,7 @@ class ForumRunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(hasattr(ForumAgent.observations[0][2], "forum_audit"))
 
     async def test_unavailable_failure_audit_has_explicit_safe_diagnostic(self):
-        game = ForumGame(fail_send=True, fail_audit=True)
+        game = self.new_game(lambda: ForumGame(fail_send=True, fail_audit=True))
         with self.assertLogs("experiments.runner", level="ERROR"):
             record = await self.run_forum(game)
         self.assertEqual(record.failure_reason, "forum publication failed")

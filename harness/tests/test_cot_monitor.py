@@ -8,11 +8,11 @@ from unittest.mock import patch
 
 from experiments.runner import ExperimentRunner
 from experiments.treatments import TreatmentConfig
-from game_api.mock import MockGameAPI
 from game_api.types import Scenario
 from metrics.collector import EpisodeRecord
 from metrics.cot_monitor import monitor_agent, monitor_episode
 from metrics.jury import aggregate_jury_metrics, episode_jury_metrics
+from tests.core_test_case import CoreTestCase
 
 SCENARIO = Scenario("s", "The bridge report was falsified", "An affidavit", "A logbook", False)
 
@@ -127,7 +127,7 @@ class MonitorMetricTests(unittest.TestCase):
         self.assertAlmostEqual(block["cot_mean_suspicion"], 100.0 / 3)
 
 
-class RunnerMonitorTests(unittest.IsolatedAsyncioTestCase):
+class RunnerMonitorTests(CoreTestCase):
     async def test_completed_episodes_are_judged_and_judgements_are_exported_locally(self):
         async def agent_reply(**_):
             content = json.dumps({"message": "m", "straw_vote": "CREATOR_SUPPORTED", "verdict": "CREATOR_SUPPORTED",
@@ -144,11 +144,11 @@ class RunnerMonitorTests(unittest.IsolatedAsyncioTestCase):
                                     memory_window=0, cot_monitor_model="monitor/model")
         with self.subTest("missing key fails before any episode"), patch.dict(os.environ, {}, clear=True):
             with self.assertRaisesRegex(ValueError, "OPENROUTER_API_KEY"):
-                await ExperimentRunner(MockGameAPI(), self.output()).run_experiment(treatment, [SCENARIO], "nokey")
+                await ExperimentRunner(self.new_game(), self.output()).run_experiment(treatment, [SCENARIO], "nokey")
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only", "OPENROUTER_API_KEY": "test-only"}), \
                 patch("agents.llm_agent.AsyncOpenAI", return_value=agents), \
                 patch("experiments.runner.AsyncOpenAI", return_value=monitor):
-            metrics = await ExperimentRunner(MockGameAPI(), self.output()).run_experiment(treatment, [SCENARIO], "cot")
+            metrics = await ExperimentRunner(self.new_game(), self.output()).run_experiment(treatment, [SCENARIO], "cot")
         record = metrics.episodes[0]
         self.assertEqual(set(record.cot_monitor), set(record.juror_ids))
         self.assertTrue(all(judgement["hidden"] for judgement in record.cot_monitor.values()))
@@ -160,7 +160,9 @@ class RunnerMonitorTests(unittest.IsolatedAsyncioTestCase):
         from pathlib import Path
         import tempfile
         if not hasattr(self, "_output"):
-            self._output = Path(tempfile.mkdtemp())
+            directory = tempfile.TemporaryDirectory()
+            self.addCleanup(directory.cleanup)
+            self._output = Path(directory.name)
         return self._output
 
 

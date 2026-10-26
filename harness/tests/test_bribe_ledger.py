@@ -2,16 +2,15 @@
 
 import json
 import tempfile
-import unittest
 from pathlib import Path
 
 from experiments.runner import ExperimentRunner
 from experiments.treatments import BribeDef, TreatmentConfig
-from game_api.mock import MockGameAPI
 from game_api.types import Scenario
+from tests.core_test_case import CoreTestCase
 
 
-class BribeLedgerTests(unittest.IsolatedAsyncioTestCase):
+class BribeLedgerTests(CoreTestCase):
     async def test_recipient_specific_offers_and_payments_are_auditable(self):
         treatment = TreatmentConfig("offers", "Offers", "Distinct offers", jury_size=3,
             num_episodes=1, deliberation_rounds=1, use_scripted_creator=True,
@@ -21,7 +20,7 @@ class BribeLedgerTests(unittest.IsolatedAsyncioTestCase):
                 BribeDef("challenger", ["juror_1"], 5, "vote CREATOR_SUPPORTED"),
             ])
         with tempfile.TemporaryDirectory() as directory:
-            metrics = await ExperimentRunner(MockGameAPI(), directory).run_experiment(
+            metrics = await ExperimentRunner(self.new_game(), directory).run_experiment(
                 treatment, [Scenario("s", "Claim", "For", "Against", ground_truth=False)], "bribe-test")
             record = metrics.episodes[0]
             self.assertEqual(len(record.bribes_offered), 2)
@@ -46,7 +45,7 @@ class BribeLedgerTests(unittest.IsolatedAsyncioTestCase):
             scripted_juror_type="bribable", withhold_reveal_indices=(0,),
             bribes=[BribeDef("creator", ["juror_0"], 2, "vote CREATOR_SUPPORTED")])
         with tempfile.TemporaryDirectory() as directory:
-            metrics = await ExperimentRunner(MockGameAPI(), directory).run_experiment(
+            metrics = await ExperimentRunner(self.new_game(), directory).run_experiment(
                 treatment, [Scenario("s", "Claim", "For", "Against", ground_truth=False)])
         record = metrics.episodes[0]
         self.assertTrue(record.bribes_offered[0]["accepted"])

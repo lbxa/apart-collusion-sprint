@@ -4,18 +4,17 @@ import contextlib
 import io
 import json
 import tempfile
-import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 
 from experiments.runner import ExperimentRunner
 from experiments.treatments import TreatmentConfig
-from game_api.mock import MockGameAPI
 from game_api.types import Scenario
 from run_knockout import run_conditions
+from tests.core_test_case import CoreTestCase
 
 
-class ResearchExportTests(unittest.IsolatedAsyncioTestCase):
+class ResearchExportTests(CoreTestCase):
     async def test_episode_export_includes_jury_measurements_with_prior_history(self):
         treatment = TreatmentConfig(
             "jury_export", "Jury export", "Independent opposite-truth episodes",
@@ -28,7 +27,7 @@ class ResearchExportTests(unittest.IsolatedAsyncioTestCase):
             Scenario("false", "False claim", "For", "Against", False),
         ]
         with tempfile.TemporaryDirectory() as directory:
-            await ExperimentRunner(MockGameAPI(), directory).run_experiment(
+            await ExperimentRunner(self.new_game(), directory).run_experiment(
                 treatment, scenarios, "jury_export")
             records = [json.loads(line) for line in
                        (Path(directory) / "jury_export/episodes.jsonl").read_text().splitlines()]
@@ -46,7 +45,7 @@ class ResearchExportTests(unittest.IsolatedAsyncioTestCase):
             use_scripted_creator=True, use_scripted_challenger=True,
             scripted_juror_indices=[0, 1, 2], scripted_juror_type="adversarial")
         with tempfile.TemporaryDirectory() as directory:
-            await ExperimentRunner(MockGameAPI(), directory).run_experiment(
+            await ExperimentRunner(self.new_game(), directory).run_experiment(
                 treatment, [Scenario("s", "Claim", "For", "Against", False)], "history")
             lines = (Path(directory) / "history/episodes.jsonl").read_text().splitlines()
             second = json.loads(lines[1])
@@ -60,12 +59,14 @@ class ResearchExportTests(unittest.IsolatedAsyncioTestCase):
                                        "verdict_accuracy": None, "hung_jury_rate": 1.0}
         runner = Mock()
         runner.run_experiment = AsyncMock(return_value=metrics)
+        game = Mock(start=AsyncMock(), stop=AsyncMock())
         output = io.StringIO()
         with tempfile.TemporaryDirectory() as directory, \
              patch("run_knockout.ExperimentRunner", return_value=runner), \
+             patch("run_knockout.CoreEngineAPI", return_value=game), \
              contextlib.redirect_stdout(output):
             await run_conditions({"x": TreatmentConfig("x", "X", "Unknown truth")},
-                                 Path(directory), use_core_engine=False)
+                                 Path(directory))
             text = (Path(directory) / "knockout_results.json").read_text()
         self.assertIn("n/a", output.getvalue())
         self.assertNotIn("NaN", text)

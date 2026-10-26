@@ -90,6 +90,22 @@ map and make the necessary connections visible in the report:
 - Cite sources at the claim they support. Distinguish prior work from this
   project's contribution and describe relevant limitations fairly.
 
+## Write figures with their results
+
+Plan each chart with the paragraph it supports. State the question, observation
+unit, metric, and warranted conclusion before choosing a display. Use the
+[publication chart style](visuals.md#publication-chart-style) for Matplotlib
+figures and the [mean and SD rules](visuals.md#mean-standard-deviation-and-small-samples)
+for descriptive summaries. Keep detailed chart rules in that guide so prose and
+plotting conventions have one source of truth.
+
+Introduce every figure in the text and explain the observation the reader should
+take from it. Captions must stand on their own: name the setting, panels, units,
+sample size, denominators, mean/spread encoding, and relevant exclusions. With
+small samples, distinguish the observed result from generalization; explain
+zero or unavailable SD without implying certainty. Check numbers and labels
+against the same admitted inputs used by the plot and results table.
+
 ## Annotated examples
 
 All examples below are **fictional teaching examples**, written for this guide.

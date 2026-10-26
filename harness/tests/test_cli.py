@@ -16,6 +16,9 @@ from unittest.mock import AsyncMock, Mock, patch
 import run_experiments
 import run_knockout
 from experiments.design import LINEUPS
+import run_demo
+from agents.scripted import AdversarialAgent, HonestAgent
+from experiments.runner import ExperimentRunner
 
 
 def metrics(failure_rate=0.0):
@@ -41,13 +44,10 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
         )
         core_factory = Mock(return_value=engine)
         core_factory.validate_config = Mock(side_effect=validation_error)
-        mock_api = SimpleNamespace(backend="mock")
-        mock_factory = Mock(return_value=mock_api)
         runner = Mock()
         runner.run_experiment = AsyncMock(return_value=metrics(failure_rate), side_effect=runner_error)
         with tempfile.TemporaryDirectory() as directory, \
              patch.object(module, "CoreEngineAPI", core_factory, create=True), \
-             patch.object(module, "MockGameAPI", mock_factory), \
              patch.object(module, "ExperimentRunner", return_value=runner), \
              patch.object(sys, "argv", [module.__file__, *arguments, "--output", directory]), \
              patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-never-sent"}, clear=True), \
@@ -55,13 +55,12 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
             result = await module.main()
             output_exists = any(Path(directory).glob("*results.json"))
         return SimpleNamespace(result=result, engine=engine, core=core_factory,
-                               mock=mock_factory, runner=runner, output_exists=output_exists)
+                               runner=runner, output_exists=output_exists)
 
     async def test_knockout_dry_run_defaults_to_real_engine_and_honors_episode_override(self):
         run = await self.invoke(run_knockout, ["--condition", "knockout_full", "--dry-run", "--episodes", "2"])
         self.assertEqual(run.result, 0)
         run.core.assert_called_once_with(core_engine_dir=None)
-        run.mock.assert_not_called()
         run.engine.start.assert_awaited_once()
         run.engine.stop.assert_awaited_once()
         treatment = run.runner.run_experiment.await_args.args[0]
@@ -74,7 +73,6 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
         run = await self.invoke(run_experiments, ["--treatment", "baseline", "--scripted", "--episodes", "2"])
         self.assertEqual(run.result, 0)
         run.core.assert_called_once_with(core_engine_dir=None)
-        run.mock.assert_not_called()
         run.engine.start.assert_awaited_once()
         run.engine.stop.assert_awaited_once()
         treatment = run.runner.run_experiment.await_args.args[0]
@@ -179,16 +177,18 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
         core.assert_not_called()
         self.assertIn("--model must not be blank", errors.getvalue())
 
-    async def test_mock_requires_an_explicit_flag_in_both_entrypoints(self):
+    async def test_removed_mock_mode_is_rejected_before_engine_startup(self):
         for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
                                  (run_experiments, ["--treatment", "baseline"])]:
             with self.subTest(module=module.__name__):
-                run = await self.invoke(module, [*selector, "--mock", "--dry-run", "--episodes", "1"])
-                self.assertEqual(run.result, 0)
-                run.mock.assert_called_once_with()
-                run.core.assert_not_called()
-                run.engine.start.assert_not_awaited()
-                run.engine.stop.assert_not_awaited()
+                errors = io.StringIO()
+                with patch.object(module, "CoreEngineAPI") as core, \
+                     patch.object(sys, "argv", [module.__file__, *selector, "--mock", "--dry-run"]), \
+                     contextlib.redirect_stderr(errors), self.assertRaises(SystemExit) as raised:
+                    await module.main()
+                self.assertEqual(raised.exception.code, 2)
+                core.assert_not_called()
+                self.assertIn("unrecognized arguments: --mock", errors.getvalue())
 
     async def test_explicit_core_engine_flag_and_directory_override_remain_supported(self):
         for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
@@ -197,7 +197,6 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
                 run = await self.invoke(module, [*selector, "--core-engine", "--core-engine-dir", "/tmp/test-engine", "--scripted", "--episodes", "1"])
                 self.assertEqual(run.result, 0)
                 run.core.assert_called_once_with(core_engine_dir="/tmp/test-engine")
-                run.mock.assert_not_called()
 
     async def test_engine_stops_on_experiment_error_and_cancellation(self):
         for error in [RuntimeError("experiment failed"), asyncio.CancelledError()]:
@@ -227,15 +226,13 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
                 run = await self.invoke(module, [*selector, "--dry-run"], startup_error=RuntimeError("binary unavailable"))
                 self.assertEqual(run.result, 1)
                 run.engine.stop.assert_awaited_once()
-                run.mock.assert_not_called()
                 run.runner.run_experiment.assert_not_awaited()
 
     async def test_preflight_failure_is_visible_before_engine_startup(self):
-        run = await self.invoke(run_experiments, ["--treatment", "jury_11", "--scripted"],
+        run = await self.invoke(run_experiments, ["--treatment", "baseline", "--scripted"],
                                 validation_error=ValueError("unsupported jury size"))
         self.assertEqual(run.result, 1)
         run.core.assert_not_called()
-        run.mock.assert_not_called()
         run.runner.run_experiment.assert_not_awaited()
 
     async def test_jury_comparison_uses_only_supported_core_sizes(self):
@@ -244,12 +241,6 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
         treatments = [call.args[0] for call in run.runner.run_experiment.await_args_list]
         self.assertEqual([t.jury_size for t in treatments], [3, 3, 5, 5, 7, 7])
         self.assertTrue(all(t.scripted_juror_indices == list(range(t.jury_size)) for t in treatments))
-
-    async def test_mock_jury_comparison_retains_larger_scientific_conditions(self):
-        run = await self.invoke(run_experiments, ["--compare-jury-sizes", "--mock", "--scripted", "--episodes", "1"])
-        self.assertEqual(run.result, 0)
-        sizes = [call.args[0].jury_size for call in run.runner.run_experiment.await_args_list]
-        self.assertEqual(sizes, [3, 3, 5, 5, 7, 7, 11, 11, 21, 21])
 
     async def test_infrastructure_failures_are_saved_but_return_nonzero(self):
         for module, selector in [(run_knockout, ["--condition", "knockout_full"]),
@@ -294,25 +285,36 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((original.num_episodes, original.use_scripted_creator,
                           original.use_scripted_challenger, original.scripted_juror_indices), before)
 
-    async def test_mock_incentive_comparison_preserves_the_equal_thirds_treatment(self):
-        run = await self.invoke(run_experiments, ["--compare-incentives", "--mock", "--scripted", "--episodes", "1"])
+    async def test_incentive_comparison_selects_only_exactly_representable_splits(self):
+        run = await self.invoke(run_experiments, ["--compare-incentives", "--scripted", "--episodes", "1"])
         self.assertEqual(run.result, 0)
         treatments = [call.args[0] for call in run.runner.run_experiment.await_args_list]
-        self.assertEqual(len(treatments), 5)
-        equal = treatments[-1].payout
-        self.assertEqual((equal.winner_pct, equal.juror_pool_pct, equal.protocol_pct), (1 / 3, 1 / 3, 1 / 3))
+        self.assertEqual(len(treatments), 4)
+        self.assertEqual([t.payout.winner_pct for t in treatments], [0.60, 0.80, 0.40, 0.50])
 
 
 class ProcessExitTests(unittest.TestCase):
-    def test_unsupported_real_configurations_exit_nonzero_without_launching_a_model(self):
-        for treatment, reason in [("jury_11", "jury"), ("incentive_equal", "payout")]:
+    def test_removed_unsupported_treatments_exit_nonzero_without_launching_a_model(self):
+        for treatment in ("jury_11", "incentive_equal"):
             with self.subTest(treatment=treatment), tempfile.TemporaryDirectory() as directory:
                 result = subprocess.run([
                     sys.executable, str(Path(run_experiments.__file__)), "--treatment", treatment,
                     "--scripted", "--episodes", "1", "--output", directory,
                 ], capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 1)
-            self.assertIn(reason, (result.stdout + result.stderr).lower())
+            self.assertIn(f"Unknown treatment: {treatment}", result.stdout + result.stderr)
+
+
+class DemoTreatmentTests(unittest.TestCase):
+    def test_demo_declares_four_adversarial_and_three_honest_jurors(self):
+        treatment = run_demo.make_collusion_treatment()
+        jurors = [f"juror-{index}" for index in range(7)]
+        with tempfile.TemporaryDirectory() as directory:
+            runner = ExperimentRunner(Mock(), Path(directory))
+            agents = runner._create_agents(treatment, "creator", "challenger", jurors, 0,
+                                           oracle_ground_truth=False)
+        self.assertEqual(sum(isinstance(agents[juror], AdversarialAgent) for juror in jurors), 4)
+        self.assertEqual(sum(isinstance(agents[juror], HonestAgent) for juror in jurors), 3)
 
 
 if __name__ == "__main__":

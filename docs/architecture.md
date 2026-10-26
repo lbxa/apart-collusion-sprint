@@ -52,6 +52,14 @@ Integration documentation must explain these differences explicitly.
   `CoreEngineAPI` adapts these to the experiment interface. See
   [the integration contract](integration.md).
 
+The harness contains no alternative game engine. Scripted agents and demos use
+the same Rust/Solidity path as live agents. Experiment configuration describes
+stakes and payout shares without computing a verdict, payout, refund, or bond
+forfeiture. Deliberation rounds and simulated side-payment/bonus utility remain
+harness policy; their ledger never changes contract entitlements. Read-only
+historical export conversion preserves recorded settlements without executing
+the protocol.
+
 Keep one crate and one process. Create modules for these real ownership
 boundaries; do not introduce generic repository or service hierarchies.
 

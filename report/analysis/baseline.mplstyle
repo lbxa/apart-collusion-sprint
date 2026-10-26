@@ -1,0 +1,22 @@
+# Final-size typography for the supplied 6.5-inch single-column report.
+font.family: serif
+font.serif: STIXGeneral
+font.size: 9
+mathtext.fontset: stix
+axes.labelsize: 9
+axes.titlesize: 10
+xtick.labelsize: 8.5
+ytick.labelsize: 8.5
+legend.fontsize: 8
+axes.linewidth: 0.65
+axes.spines.top: False
+axes.spines.right: False
+lines.linewidth: 1.35
+lines.markersize: 5
+xtick.direction: out
+ytick.direction: out
+pdf.fonttype: 42
+ps.fonttype: 42
+savefig.dpi: 300
+savefig.facecolor: white
+figure.facecolor: white

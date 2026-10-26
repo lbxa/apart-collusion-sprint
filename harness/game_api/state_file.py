@@ -1,8 +1,8 @@
-"""Game state file adapter.
+"""Read-only conversions for historical state files and saved episode exports.
 
-Instead of calling a live API, the game can dump its state as a markdown
-or JSON file after each phase. This adapter reads those files and provides
-the same interface to the harness.
+This module is not a game backend: it cannot execute actions, advance phases,
+calculate settlement, or replace the live engine. It preserves recorded results
+for offline analysis.
 
 Expected file format (markdown):
 

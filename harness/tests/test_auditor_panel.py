@@ -19,11 +19,12 @@ from agents.scripted import BribableAuditor, HonestAgent, HonestAuditor
 from experiments.design import CONDITIONS, Cell, resolve_cell, treatment_for
 from experiments.runner import ExperimentRunner, panel_finding
 from experiments.treatments import TreatmentConfig
-from game_api.mock import MockGameAPI
+from game_api.core_engine import CoreEngineAPI
 from game_api.types import (
     CaseFile, EpisodeConfig, Finding, InterviewAction, Observation, OfferTransfersAction, Phase,
     PrivateMessage, Role, Scenario, TransferProposal, Verdict,
 )
+from tests.core_test_case import CoreTestCase
 
 SCENARIO = Scenario("scenario", "Claim", "For", "Against", True)
 JURY, ROUNDS = 3, 2
@@ -110,7 +111,7 @@ class RecordingAuditor(HonestAuditor):
         return await super().review(observation)
 
 
-class AuditorRunnerTests(unittest.IsolatedAsyncioTestCase):
+class AuditorRunnerTests(CoreTestCase):
     def setUp(self):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
@@ -127,7 +128,7 @@ class AuditorRunnerTests(unittest.IsolatedAsyncioTestCase):
 
     async def record(self, treatment, game=None, auditor=RecordingAuditor):
         with patch("experiments.runner.HonestAgent", PlanAgent), patch("experiments.runner.HonestAuditor", auditor):
-            metrics = await ExperimentRunner(game or MockGameAPI(), self.output).run_experiment(
+            metrics = await ExperimentRunner(game or self.new_game(), self.output).run_experiment(
                 treatment, [SCENARIO], "panel")
         [record] = metrics.episodes
         self.assertEqual(record.status, "completed", record.failure_reason)
@@ -170,12 +171,12 @@ class AuditorRunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertGreater(phases.index(Phase.INTERVIEW), max(i for i, p in enumerate(phases) if p == Phase.VOTING))
 
     async def test_auditors_are_never_registered_with_the_game(self):
-        class SpyGame(MockGameAPI):
+        class SpyGame(CoreEngineAPI):
             async def register_episode(self, config, creator_id, challenger_id, juror_ids, treasury_id):
                 self.roster = (creator_id, challenger_id, *juror_ids, treasury_id)
                 return await super().register_episode(config, creator_id, challenger_id, juror_ids, treasury_id)
 
-        game = SpyGame()
+        game = self.new_game(SpyGame)
         record = await self.record(self.treatment(), game)
         self.assertFalse(set(record.auditor_ids) & set(game.roster))
 
@@ -275,7 +276,7 @@ class AuditorRunnerTests(unittest.IsolatedAsyncioTestCase):
         treatment = self.treatment(juror_motivation="Always support the creator", juror_persona="Greedy",
                                    creator_motivation="Win at any cost", scripted_auditor_indices=[])
         with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-never-sent"}):
-            agents = ExperimentRunner(MockGameAPI(), self.output)._create_agents(
+            agents = ExperimentRunner(self.new_game(), self.output)._create_agents(
                 treatment, "creator_e", "challenger_e", ["juror_0_e", "juror_1_e", "juror_2_e"], 0,
                 auditor_ids=["auditor_0_e"])
         auditor = agents["auditor_0_e"]
@@ -350,7 +351,7 @@ class AuditorDesignTests(unittest.TestCase):
 
     def test_scripted_runs_script_the_auditors_too(self):
         args = argparse.Namespace(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
-                                  cell="V", blocks=1, episodes=1, scripted=True, mock=True, seed=42, model=None,
+                                  cell="V", blocks=1, episodes=1, scripted=True, seed=42, model=None,
                                   lineup=None, cot_monitor=None)
         [treatment] = run_experiments.select_treatments(args)[0].values()
         self.assertEqual(treatment.scripted_auditor_indices, [0])
@@ -358,7 +359,7 @@ class AuditorDesignTests(unittest.TestCase):
 
     def test_an_explicit_model_applies_to_auditors_too(self):
         args = argparse.Namespace(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
-                                  cell="V", blocks=1, episodes=1, scripted=False, mock=True, seed=42,
+                                  cell="V", blocks=1, episodes=1, scripted=False, seed=42,
                                   model="provider/paid-route", lineup=None, cot_monitor=None)
         [treatment] = run_experiments.select_treatments(args)[0].values()
         self.assertEqual({treatment.creator_model, treatment.challenger_model, treatment.juror_model,

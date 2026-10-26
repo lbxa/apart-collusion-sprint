@@ -5,11 +5,13 @@ deliverable; this guide does not commit the project to ICLR or any other venue.
 Complete this record for the actual report before fixing its layout. Until
 then, use the provisional [LaTeX defaults](latex.md).
 
-## Current sample layout
+## Current internal report layout
 
 The editable sample is [report/main.tex](../../report/main.tex), using the
 user-supplied `arxiv.sty` unchanged as a general starting guide. This is an
-**internal illustrative sample**, with no chosen submission venue or page limit.
+**internal baseline integration report**, with no chosen submission venue or
+page limit. Its two-episode live smoke evidence replaces the earlier fictional
+teaching comparison; no conference submission is being prepared.
 The supplied style is not evidence of arXiv acceptance or compliance with a
 conference's current requirements. Its attribution and attachment hashes are
 recorded in [template provenance](../../report/template/README.md).
@@ -19,8 +21,8 @@ with its selected `pdflatexmk` engine: pdfLaTeX through `latexmk -pdf`, on US
 Letter with 6.5-inch text width and 9-inch text height from the style. The sample uses a
 small keyed `thebibliography` in its own section file, with no external
 bibliography pass. The document date is fixed in `report/preamble.tex`.
-The vector figure is included in `report/figures/`; regenerate it explicitly
-with `make -C report figures` when its source changes.
+The vector figures are included in `report/figures/`; regenerate them explicitly
+with `make -C report figures` when their sources change.
 The [review record](../../report/review.md) records the tested toolchain and PDF
 inspection. The submission fields below remain open for the actual venue.
 

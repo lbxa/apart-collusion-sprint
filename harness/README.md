@@ -26,8 +26,9 @@ Use `--list` to inspect conditions. `--pilot`, `--minimum`, and `--full` select
 knockout suites. `run_experiments.py` provides the original treatment catalog
 and comparisons, and `--cell` runs one cell of the factorial design in
 [`docs/experiment-design.md`](../docs/experiment-design.md), by cell ID or named
-condition (`--cell K2`). `smoke_llm.py --cell F` is a one-round live-model check. Both entrypoints default to the real engine; `--mock` explicitly
-selects a harness-only simulation. `run_demo.py` is a mock-only illustration.
+condition (`--cell K2`). `smoke_llm.py --cell F` is a one-round live-model check.
+Every entrypoint uses the real engine. `run_demo.py` uses scripted agents against
+that same Rust/Anvil stack; there is no in-process game backend or `--mock` mode.
 `--core-engine-dir` or `CORE_ENGINE_DIR` optionally selects another built checkout.
 
 To use model agents, omit `--dry-run` and supply the provider credentials through
@@ -124,15 +125,15 @@ records the provider that served it.
 
 ## Protocol and units
 
-- Supported real juries have 3, 5, or 7 distinct members. Rules and rosters freeze
-  at registration. Larger mock juries are simulations of a different protocol.
+- Supported juries have 3, 5, or 7 distinct members. Rules and rosters freeze
+  at registration. The treatment catalog and jury-size comparisons use these sizes.
 - One harness token maps to **100 integer native base units**. Historical `$`
   labels in prompts describe simulated utility, not fiat or valuable currency.
   Decimal conversion rejects fractional base units and inexact basis points.
   Equal party stakes, juror bond, and all payout shares come from the treatment.
-- The explicit mock preserves the earlier harness simulation, including
-  independent juror bonds, larger juries, and floating payouts. Its metrics
-  describe a different protocol and must not be pooled with real engine results.
+- Imported historical simulations used independent juror bonds, larger juries,
+  and floating payouts. Their saved evidence remains available, but that game
+  implementation has been removed and its results must not be pooled with core runs.
 - Juror deposits occur with confirmed commitments. A juror who never commits
   deposits nothing. A committed juror who withholds a reveal forfeits the bond.
   Treatments can set `withhold_reveal_indices` explicitly to test the latter.
@@ -146,7 +147,10 @@ records the provider that served it.
   Scripted honest baselines receive explicit oracle labels as test doubles;
   their accuracy is plumbing evidence, not evidence about model ability.
 - Settlement and per-episode balances come from the engine. No cached vote or
-  mock calculation can substitute for a failed or unconfirmed chain operation.
+  local calculation can substitute for a failed or unconfirmed chain operation.
+- Agent prompts describe configured stakes and payout percentages, without
+  predicting contract-rounded reward amounts. Deliberation and voting turns are
+  experiment scheduling; they do not expose synthetic game-phase transitions.
 
 See [the API guide](../docs/api.md) and [integration contract](../docs/integration.md).
 `GAME_API_CONTRACT.md` and `GAME_BUILDER_HANDOFF.md` are historical proposals.
@@ -205,6 +209,8 @@ bash scripts/verify-harness.sh
 
 Unittest regressions exercise HTTP failures, confirmation status, unit
 conversion, CLI defaults, channel controls, memory, metrics, and exports.
+Runner policy and export tests use the real engine through a shared test lifecycle
+fixture that registers cleanup before startup; they do not implement game rules.
 Actual process tests drive Python → Rust → SQLite → Solidity → Anvil, including
 both winners, minority rewards, integer dust, nonparticipation/withholding,
 expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
@@ -238,10 +244,9 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 - Route OpenRouter requests by throughput. Default cheapest-first routing sent
   `nvidia/nemotron-3-ultra-550b-a55b` to a provider at about 23 tokens/s
   (30-second calls); the fastest served about 101 tokens/s for ~10% more.
-- Weave's dependency `cint` installs a top-level `tests` package, which shadows
-  `harness/tests` for dotted imports such as `python -m unittest tests.test_x`.
-  Run tests with `PYTHONPATH=harness python -m unittest discover -s harness/tests`
-  as `scripts/verify-harness.sh` does.
+- Keep `harness/tests` an explicit Python package so Weave's dependency `cint`
+  cannot shadow its shared fixtures with an installed top-level `tests` package.
+  Run with `PYTHONPATH=harness` as `scripts/verify-harness.sh` does.
 - Record each model call's reasoning in the episode's `llm_calls` for
   post-hoc chain-of-thought monitoring. Capture leaves the request unchanged, so
   agent behaviour is as before. Reasoning stays in local `episodes.jsonl`
@@ -252,6 +257,25 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
   truncated creator reply. A reply stopped at the cap now fails as
   `reached max_tokens` instead of as invalid JSON or an empty action. W&B runs
   record the cap, so runs before and after the change stay distinguishable.
+- Remove the duplicate Python game, settlement calculators, and `--mock` path.
+  All experiment/demo execution and runner regressions use Rust/Solidity, so
+  floating payouts or synthetic phases cannot drift from the measured protocol.
+- Keep payout configuration as primitive input and prompt percentages; actual
+  verdicts, rewards, refunds, forfeitures, chat persistence, and audits come from
+  the engine. Remove mock-only bond/phase commands; bonds enter with commitments.
+  This updates prompt text, so subsequent model runs must retain that prompt
+  revision when compared with earlier baseline evidence.
+- Restrict the executable catalog to 3/5/7 jurors and exactly representable payout
+  shares. The old equal-thirds entry is removed rather than silently rounded into
+  a different incentive treatment.
+- Treat `E0` versus `E1` as a scenario-set comparison until the libraries contain
+  matched claims with the same evaluator truth; current evidence-factor results
+  cannot isolate evidence ambiguity from claim differences.
+- Keep simulated audit `A1` distinct from auditor panel `V1`. `A1` changes
+  simulated side-payment enforcement; `V1` adds post-verdict observations and
+  nonbinding findings. They are separate interventions with separate evidence.
+- Preserve W&B's SDK-returned dashboard URLs in run manifests; hosted accounts
+  can use a different domain, so links must retain the SDK's dashboard origin.
 - Keep jury measurement denominators in local exports and W&B: valid reveals
   from completed aborted games still count toward vote alignment, while verdict
   accuracy requires settlement. Preserve per-actor prohibited-message audit
