@@ -25,6 +25,8 @@ import uuid
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import weave
+
 from experiments.design import resolve_cell, scenarios_for, treatment_for
 from experiments.runner import ExperimentRunner
 from experiments.tracking import WandbTracker
@@ -37,6 +39,7 @@ from experiments.treatments import (
 from game_api.core_engine import CoreEngineAPI
 from game_api.mock import MockGameAPI
 from game_api.types import EpisodeConfig
+from metrics.cot_monitor import DEFAULT_MONITOR_MODEL
 from scenarios.examples import ALL_SCENARIOS, FALSE_CLAIMS_FOR_ATTACK
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -98,6 +101,8 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
                 juror_overrides={index: {**override, "model": args.model}
                                  for index, override in treatment.juror_overrides.items()},
             )
+        if args.cot_monitor is not None:
+            treatment = replace(treatment, cot_monitor_model=args.cot_monitor)
         if args.scripted:
             treatment = replace(
                 treatment, use_scripted_creator=True, use_scripted_challenger=True,
@@ -185,6 +190,10 @@ async def main():
     parser.add_argument("--wandb-group", help="Shared group for this invocation's blocks (default: unique ID)")
     parser.add_argument("--run-purpose", choices=("smoke", "exploratory", "first-pass"), default="exploratory",
                         help="Label infrastructure checks separately from research batches")
+    parser.add_argument("--weave", action="store_true",
+                        help="Trace every model call, including prompts and reasoning, to W&B Weave in the W&B project")
+    parser.add_argument("--cot-monitor", nargs="?", const=DEFAULT_MONITOR_MODEL, metavar="MODEL",
+                        help=f"Judge each agent's reasoning after every episode (default model: {DEFAULT_MONITOR_MODEL})")
     args = parser.parse_args()
 
     if args.list:
@@ -210,11 +219,16 @@ async def main():
         from dotenv import load_dotenv
         load_dotenv(args.env_file, override=False)
         treatments, scenarios = select_treatments(args)
+        project = args.wandb_project or os.environ.get("WANDB_PROJECT") or "apart-collusion-sprint"
+        entity = args.wandb_entity or os.environ.get("WANDB_ENTITY")
+        if args.weave:
+            weave.init(f"{entity}/{project}" if entity else project,
+                       attributes={"wandb_group": args.wandb_group, "run_purpose": args.run_purpose})
         results = await run_treatments(
             treatments, scenarios, output_dir=Path(args.output), mock=args.mock,
             core_engine_dir=args.core_engine_dir,
-            wandb_project=(args.wandb_project or os.environ.get("WANDB_PROJECT") or "apart-collusion-sprint") if args.wandb else None,
-            wandb_entity=args.wandb_entity or os.environ.get("WANDB_ENTITY"),
+            wandb_project=project if args.wandb else None,
+            wandb_entity=entity,
             wandb_group=args.wandb_group,
             run_purpose=args.run_purpose,
             block_count=args.blocks if args.cell else None,
@@ -222,6 +236,9 @@ async def main():
     except Exception as error:
         logger.error("Experiment run failed: %s", error)
         return 1
+    finally:
+        if args.weave:
+            weave.finish()
     if any(result.get("infrastructure_failure_rate", 0) > 0 for result in results.values()):
         logger.error("One or more episodes failed because of infrastructure; inspect the saved results.")
         return 1

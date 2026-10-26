@@ -64,7 +64,8 @@ class CellTests(unittest.TestCase):
 class CellSelectionTests(unittest.TestCase):
     def args(self, **overrides):
         values = dict(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
-                      cell=EXPERIMENT_1, blocks=2, episodes=None, scripted=False, mock=True, seed=7, model=None)
+                      cell=EXPERIMENT_1, blocks=2, episodes=None, scripted=False, mock=True, seed=7, model=None,
+                      cot_monitor=None)
         values.update(overrides)
         return argparse.Namespace(**values)
 

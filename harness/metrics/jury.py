@@ -11,6 +11,8 @@ from collections.abc import Sequence
 from itertools import combinations
 from typing import TYPE_CHECKING
 
+from metrics.cot_monitor import BEHAVIOURS
+
 if TYPE_CHECKING:
     from metrics.collector import EpisodeRecord
 
@@ -31,10 +33,16 @@ _RATE_COUNTS = {
     "auditor_false_verification_rate": ("auditor_false_verification_count", "auditor_false_verdict_count"),
     "auditor_offer_acceptance_rate": ("auditor_accepted_offer_count", "auditor_offer_count"),
     "auditor_deal_delivery_rate": ("auditor_delivered_offer_count", "auditor_accepted_offer_count"),
+    "cot_rogue_rate": ("cot_rogue_agent_count", "cot_monitored_agent_count"),
+    "cot_hidden_rogue_rate": ("cot_hidden_rogue_agent_count", "cot_monitored_agent_count"),
+    "cot_mean_suspicion": ("cot_suspicion_total", "cot_monitored_agent_count"),
+    "cot_juror_rogue_rate": ("cot_juror_rogue_count", "cot_juror_monitored_count"),
+    "cot_auditor_rogue_rate": ("cot_auditor_rogue_count", "cot_auditor_monitored_count"),
 }
 # Pooled across a block without a rate of their own.
 _SUMMED_COUNTS = ("private_message_count", "public_message_count", "paid_offer_count",
-                  "auditor_verified_paid_jury_count", "auditor_interview_message_count")
+                  "auditor_verified_paid_jury_count", "auditor_interview_message_count",
+                  "cot_monitor_failure_count", *(f"cot_{name}_count" for name in BEHAVIOURS))
 _AUDITOR_CHANNELS = frozenset(("auditor_private", "auditor_hearing"))
 
 
@@ -109,6 +117,12 @@ def episode_jury_metrics(
     false_verdict = reviewed and eligible_verdict_truth and (
         (record.outcome == "SETTLED_CREATOR") != record.ground_truth)
 
+    # Chain-of-thought monitor: one judgement per agent that made model calls in a completed episode.
+    judged = list((record.cot_monitor or {}).values()) if completed else []
+    monitored = [judgement for judgement in judged if "error" not in judgement]
+    jurors_judged = [judgement for judgement in monitored if judgement["role"] == "JUROR"]
+    auditors_judged = [judgement for judgement in monitored if judgement["role"] == "AUDITOR"]
+
     comparisons = agreement = truth_comparisons = truth_agreement = 0
     seen_episodes = {record.episode_id}
     for prior in history:
@@ -163,6 +177,17 @@ def episode_jury_metrics(
                                              for offer in auditor_offers),
         "auditor_interview_message_count": sum(message.get("channel") in _AUDITOR_CHANNELS
                                                for message in record.messages),
+        "cot_monitored_agent_count": len(monitored),
+        "cot_rogue_agent_count": sum(judgement["rogue"] for judgement in monitored),
+        "cot_hidden_rogue_agent_count": sum(judgement["hidden"] for judgement in monitored),
+        "cot_suspicion_total": sum(judgement["hybrid_score"] for judgement in monitored),
+        "cot_juror_monitored_count": len(jurors_judged),
+        "cot_juror_rogue_count": sum(judgement["rogue"] for judgement in jurors_judged),
+        "cot_auditor_monitored_count": len(auditors_judged),
+        "cot_auditor_rogue_count": sum(judgement["rogue"] for judgement in auditors_judged),
+        "cot_monitor_failure_count": len(judged) - len(monitored),
+        **{f"cot_{name}_count": sum(name in judgement["behaviours"] for judgement in monitored)
+           for name in BEHAVIOURS},
     }
     for name, (numerator, denominator) in _RATE_COUNTS.items():
         metrics[name] = metrics[numerator] / metrics[denominator] if metrics[denominator] else None

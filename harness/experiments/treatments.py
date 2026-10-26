@@ -72,6 +72,10 @@ class TreatmentConfig:
     # Tell jurors about the panel before deliberation; auditors still stay silent until the verdict.
     auditors_disclosed: bool = False
 
+    # OpenRouter model that judges each completed episode's agent reasoning
+    # (metrics/cot_monitor.py); None skips the chain-of-thought monitor.
+    cot_monitor_model: str | None = None
+
     # Per-juror overrides (index -> config)
     juror_overrides: dict[int, dict[str, Any]] = field(default_factory=dict)
 

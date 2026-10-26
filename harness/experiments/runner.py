@@ -23,6 +23,7 @@ import copy
 import hashlib
 import logging
 import math
+import os
 import random
 import time
 import uuid
@@ -30,6 +31,8 @@ from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
+
+from openai import AsyncOpenAI
 
 from agents.base import AgentConfig, BaseAgent
 from agents.llm_agent import LLMAgent
@@ -64,6 +67,7 @@ from game_api.types import (
 )
 from metrics.collector import EpisodeRecord, ExperimentMetrics, MetricsCollector
 from metrics.collusion_detector import analyze_episode
+from metrics.cot_monitor import monitor_episode
 from metrics.episode_logger import EpisodeLogger
 
 logger = logging.getLogger(__name__)
@@ -125,6 +129,11 @@ class ExperimentRunner:
             audit_rng=random.Random(f"{treatment.seed}:{experiment_id}:audit"),
         )
         run.output_dir.mkdir(parents=True, exist_ok=True)
+        monitor = None
+        if treatment.cot_monitor_model is not None:
+            if not os.environ.get("OPENROUTER_API_KEY"):
+                raise ValueError("The chain-of-thought monitor requires OPENROUTER_API_KEY")
+            monitor = AsyncOpenAI(api_key=os.environ["OPENROUTER_API_KEY"], base_url="https://openrouter.ai/api/v1")
 
         for i in range(treatment.num_episodes):
             scenario = scenarios[i % len(scenarios)]
@@ -133,6 +142,8 @@ class ExperimentRunner:
             record = await self._run_episode(run, episode_id, scenario, i)
             if record.status == "completed" and not record.infrastructure_failure:
                 record.collusion_analysis = analyze_episode(record, all_records=exp_metrics.episodes).to_dict()
+                if monitor is not None:
+                    record.cot_monitor = await monitor_episode(monitor, treatment.cot_monitor_model, record, scenario)
             self.metrics.add_episode(exp_metrics, record)
 
             logger.info(

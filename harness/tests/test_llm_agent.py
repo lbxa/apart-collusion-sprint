@@ -75,7 +75,8 @@ class LLMProviderErrorTests(unittest.IsolatedAsyncioTestCase):
             await agent.decide(observation)
         self.assertEqual(agent.reasoning_log, [{
             "agent_id": "creator", "role": "CREATOR", "phase": "SETUP", "round": 0,
-            "action": "post_claim", "reasoning": None, "stated_reasoning": "stated",
+            "output": {"action": "post_claim", "claim_text": "Claim"},
+            "reasoning": None, "stated_reasoning": "stated", "provider": None,
         }])
 
 

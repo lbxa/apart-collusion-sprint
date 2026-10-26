@@ -44,7 +44,10 @@ class WandbTrackingTests(unittest.TestCase):
             votes={f"j{i}": "CREATOR_SUPPORTED" for i in range(7)},
             ground_truth=True, outcome="SETTLED_CREATOR", verdict_correct=True, status="completed",
             messages=[{"channel": "public", "content": "SECRET_TRANSCRIPT"}],
-            llm_calls=[{"prompt": "SECRET_PROMPT", "response": "SECRET_RESPONSE"}],
+            llm_calls=[{"prompt": "SECRET_PROMPT", "response": "SECRET_RESPONSE", "reasoning": "SECRET_REASONING"}],
+            cot_monitor={"j0": {"role": "JUROR", "action_score": 10, "cot_score": 80, "hybrid_score": 41.5,
+                                "rogue": False, "hidden": True, "behaviours": ["payment"],
+                                "evidence": "SECRET_EVIDENCE"}},
             start_time=1, end_time=3,
         )
         metrics = ExperimentMetrics("exp0", "baseline", [record])
@@ -65,6 +68,7 @@ class WandbTrackingTests(unittest.TestCase):
         uploaded = str(init) + str(self.run.log.call_args_list) + str(self.run.summary)
         self.assertNotIn("SECRET_", uploaded)
         self.assertIn("voting_alignment", uploaded)
+        self.assertEqual(self.run.summary["block/cot_hidden_rogue_agent_count"], 1, "counts cross; evidence does not")
         self.assertEqual(self.run.summary["total_episodes"], 1)
         self.run.finish.assert_called_once_with(exit_code=0)
         manifest = [json.loads(line) for line in (self.output / "wandb_runs.jsonl").read_text().splitlines()]

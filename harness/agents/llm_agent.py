@@ -6,6 +6,7 @@ import json
 import os
 from typing import Any
 
+import weave
 from openai import APIError, AsyncOpenAI, RateLimitError
 
 from agents.base import AgentConfig, BaseAgent
@@ -30,7 +31,12 @@ from game_api.types import (
 )
 
 
-def _parse_action_content(content: str, agent_id: str) -> dict[str, Any]:
+# Route each OpenRouter request to the fastest provider serving the model; the
+# default cheapest-first routing ran at a quarter of the speed.
+OPENROUTER_PROVIDER = {"sort": "throughput"}
+
+
+def parse_json_reply(content: str, agent_id: str) -> dict[str, Any]:
     text = content.strip()
     if text.startswith("```"):
         lines = text.splitlines()
@@ -80,20 +86,26 @@ class LLMAgent(BaseAgent):
 
     async def _request_action(self, observation: Observation) -> dict[str, Any]:
         try:
-            response = await self._client.chat.completions.create(
-                model=self.config.model,
-                messages=[
-                    {"role": "system", "content": build_system_prompt(self.config, observation)},
-                    {
-                        "role": "user",
-                        "content": build_observation_prompt(
-                            observation, self.get_memory_context()
-                        ),
-                    },
-                ],
-                temperature=self.config.temperature,
-                max_tokens=self.config.max_tokens,
-            )
+            # Labels the call in Weave traces when `run_experiments.py --weave` is on.
+            with weave.attributes({"episode_id": observation.episode_id, "agent_id": self.agent_id,
+                                   "role": self.role.name, "phase": observation.phase.name,
+                                   "round": observation.current_round}):
+                response = await self._client.chat.completions.create(
+                    model=self.config.model,
+                    messages=[
+                        {"role": "system", "content": build_system_prompt(self.config, observation)},
+                        {
+                            "role": "user",
+                            "content": build_observation_prompt(
+                                observation, self.get_memory_context()
+                            ),
+                        },
+                    ],
+                    temperature=self.config.temperature,
+                    max_tokens=self.config.max_tokens,
+                    **({"extra_body": {"provider": OPENROUTER_PROVIDER}}
+                       if self.config.provider == "openrouter" else {}),
+                )
         except RateLimitError as error:
             raise LLMProviderError(self.config.provider, "rate_limited", error.status_code) from None
         except APIError as error:
@@ -104,13 +116,15 @@ class LLMAgent(BaseAgent):
         content = choice.message.content
         if not content:
             raise ValueError(f"Model returned an empty action for agent {self.agent_id}")
-        action = _parse_action_content(content, self.agent_id)
+        action = parse_json_reply(content, self.agent_id)
         self.reasoning_log.append({
             "agent_id": self.agent_id, "role": self.role.name, "phase": observation.phase.name,
-            "round": observation.current_round, "action": action.get("action"),
+            "round": observation.current_round,
+            "output": {key: value for key, value in action.items() if key != "reasoning"},
             # Hidden reasoning is returned only by reasoning models.
             "reasoning": getattr(choice.message, "reasoning", None),
             "stated_reasoning": action.get("reasoning"),
+            "provider": getattr(response, "provider", None),
         })
         return action
 

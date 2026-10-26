@@ -85,6 +85,8 @@ class EpisodeRecord:
 
     # LLM call metadata
     llm_calls: list[dict[str, Any]] = field(default_factory=list)
+    # Chain-of-thought monitor judgements per agent, with evidence quotes; local exports only.
+    cot_monitor: dict[str, dict[str, Any]] | None = None
 
     # Timing
     start_time: float = 0.0
@@ -293,6 +295,7 @@ class MetricsCollector:
                         "jury_metrics": episode_jury_metrics(ep, history),
                         "auditor_panel": ep.auditor_panel,
                         "llm_calls": ep.llm_calls,
+                        "cot_monitor": ep.cot_monitor,
                         "infrastructure_failure": ep.infrastructure_failure,
                         "failure_reason": ep.failure_reason,
                         "duration_secs": ep.end_time - ep.start_time,

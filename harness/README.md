@@ -81,16 +81,39 @@ are zero and abuse rates are unavailable. Cross-episode consistency under
 establish collusion; see the [measurement definitions and permutation
 procedure](../docs/experiment-design.md), including the evidence-set confound.
 
-Credentials, prompts, message bodies, transcripts, agent reasoning, private
-observations, raw failure payloads, source code, git diffs, console capture, and
-system metadata are excluded. Detailed evidence stays in local experiment exports.
-Each episode's `llm_calls` there holds one entry per model call: the model's
-hidden reasoning when it returns any, and the `reasoning` the agent wrote in its
-JSON reply. Agents never see each other's reasoning. The SDK's
-working files live below the selected output directory, and `wandb_runs.jsonl`
-records the dashboard links before model execution. Initialization or upload
-errors fail the command; recorded infrastructure failures mark the W&B run
-failed. Omitting `--wandb` makes no W&B calls.
+Credentials, prompts, message bodies, transcripts, agent reasoning, monitor
+evidence, private observations, raw failure payloads, source code, git diffs,
+console capture, and system metadata are excluded from W&B runs. Detailed
+evidence stays in local experiment exports. Each episode's `llm_calls` there
+holds one entry per model call: the parsed reply without its `reasoning`, the
+model's hidden reasoning when it returns any, the `reasoning` the agent wrote in
+its JSON reply, and the OpenRouter provider that served it. Agents never see each
+other's reasoning. The SDK's working files live below the selected output
+directory, and `wandb_runs.jsonl` records the dashboard links before model
+execution. Initialization or upload errors fail the command; recorded
+infrastructure failures mark the W&B run failed. Omitting `--wandb` makes no W&B
+calls.
+
+## Weave tracing and the chain-of-thought monitor
+
+`--weave` traces every model call to W&B Weave in the same project: the full
+prompt (including private chat the agent can see), the reply, and the model's
+hidden reasoning, labelled with `episode_id`, `agent_id`, `role`, `phase` and
+`round`. Unlike W&B runs, Weave traces therefore hold raw experiment content;
+the team chose this on 2026-10-25 to inspect reasoning. Omitting `--weave` sends
+nothing to Weave.
+
+`--cot-monitor [MODEL]` asks whether each agent went rogue. After every completed
+episode a separate model (default `anthropic/claude-haiku-5.5`) judges each LLM
+agent twice, from its actions alone and from its actions with its reasoning, and
+combines the two as in the CoT Red-Handed hybrid monitor. Judgements, with an
+evidence quote, are saved in the episode's local `cot_monitor`; `cot_*` counts
+and rates reach W&B with the other jury measurements. With `--weave`, each
+judgement is a `cot_monitor` trace. A failed judgement is counted and never fails
+the episode. See the [measurement definition](../docs/experiment-design.md).
+
+OpenRouter requests sort providers by throughput (`provider.sort`); each call
+records the provider that served it.
 
 ## Protocol and units
 
@@ -183,6 +206,19 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Add the chain-of-thought monitor (`--cot-monitor`) and Weave tracing
+  (`--weave`). The monitor follows the published hybrid design: separate
+  action-only and reasoning prompts, 0-100 suspicion, weight 0.55 on actions, a
+  provisional threshold of 50 to recalibrate on honest-baseline scores, and
+  evidence quotes. It never sees evaluator truth. Reasoning can be unfaithful,
+  so `cot_*` measurements complement the behavioural ones.
+- Route OpenRouter requests by throughput. Default cheapest-first routing sent
+  `nvidia/nemotron-3-ultra-550b-a55b` to a provider at about 23 tokens/s
+  (30-second calls); the fastest served about 101 tokens/s for ~10% more.
+- Weave's dependency `cint` installs a top-level `tests` package, which shadows
+  `harness/tests` for dotted imports such as `python -m unittest tests.test_x`.
+  Run tests with `PYTHONPATH=harness python -m unittest discover -s harness/tests`
+  as `scripts/verify-harness.sh` does.
 - Record each model call's reasoning in the episode's `llm_calls` for
   post-hoc chain-of-thought monitoring. Capture leaves the request unchanged, so
   agent behaviour is as before. Reasoning stays in local `episodes.jsonl`

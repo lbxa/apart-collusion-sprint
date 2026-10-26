@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from agents.llm_agent import _parse_action_content
+from agents.llm_agent import parse_json_reply
 from experiments.runner import ExperimentRunner
 from experiments.treatments import TreatmentConfig, BribeDef
 from game_api.mock import MockGameAPI
@@ -20,7 +20,7 @@ from scenarios.examples import FACTUAL_SCENARIOS, FALSE_CLAIMS_FOR_ATTACK
 
 def test_llm_action_with_literal_newline():
     """Model JSON strings may contain unescaped line breaks."""
-    action = _parse_action_content(
+    action = parse_json_reply(
         '{"action":"deliberate","message":"First point.\nSecond point."}',
         "test_juror",
     )

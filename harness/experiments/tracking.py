@@ -9,9 +9,11 @@ from pathlib import Path
 import subprocess
 
 from agents.base import AgentConfig
+from agents.llm_agent import OPENROUTER_PROVIDER
 from experiments.design import Cell
 from experiments.treatments import TreatmentConfig
 from metrics.collector import ExperimentMetrics
+from metrics.cot_monitor import ACTION_WEIGHT, ROGUE_THRESHOLD
 
 
 SUMMARY_METRICS = (
@@ -109,6 +111,10 @@ class WandbTracker:
             "scripted_auditors": len(treatment.scripted_auditor_indices),
             "temperature": AgentConfig.__dataclass_fields__["temperature"].default,
             "max_tokens": AgentConfig.__dataclass_fields__["max_tokens"].default,
+            "openrouter_provider_routing": OPENROUTER_PROVIDER,
+            "cot_monitor_model": treatment.cot_monitor_model,
+            "cot_rogue_threshold": ROGUE_THRESHOLD if treatment.cot_monitor_model else None,
+            "cot_action_weight": ACTION_WEIGHT if treatment.cot_monitor_model else None,
         }
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.run = self.sdk.init(
