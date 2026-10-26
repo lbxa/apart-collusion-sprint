@@ -1,8 +1,9 @@
 # Agentic report review
 
 Review date: 2026-10-26. Reviewer: Codex; not independent human review.
-Source: working changes on recorded revision `11f4f01`; per-run source hashes
-in `report/data/agentic-campaign.json` distinguish runtime versions.
+Report source: working changes on revision `f9a8ecc`. Experiments recorded
+revision `11f4f01` plus per-run source hashes in
+`report/data/agentic-campaign.json`, which distinguish runtime versions.
 Manuscript: `report/agentic/main.tex`. PDF: `report/agentic/build/main.pdf`.
 Decision: internal results draft; not submission-ready.
 
@@ -38,23 +39,34 @@ make -C report agentic
 make -C report agentic-figures PYTHON="$PWD/.harness/report-venv/bin/python"
 ```
 
-The six-page PDF has no undefined references/citations or overfull boxes after
-repairing a path line break. Main document fonts are embedded. Abstract: 202
+The PDF has no undefined references/citations or overfull boxes after repairing
+a path line break. Main document fonts are embedded. Abstract: 202
 words. Vector figures use the report's STIX/Times-compatible locked Matplotlib
 environment and numeric safe snapshot; observed cells have text labels as well
 as colors. No SD/CI is appropriate for the case-study display.
 
-All six rendered pages and the figure were inspected at final width. Poppler
+The original six rendered pages and the figure were inspected at final width. Poppler
 was unavailable; Ghostscript rendered pages at 120 dpi and pypdf checked text
 and font embedding. After the requested appendix removal, the PDF was rebuilt,
 the deleted headings were confirmed absent, and the changed end pages were
 rendered again. Build diagnostics are in `build/main.log`; rendered pages are
 in `build/pages/`. These outputs are ignored.
 
-The authorship update names Lucas Barbosa and Stefan Gazzana, in that order,
-in the title block and PDF metadata. `make -C report agentic` passed; the
-published `report.pdf` copy was refreshed. All six pages were rendered and
-inspected again, with no overfull boxes or undefined references in the log.
+The complete-results revision names Lucas Barbosa, Stefan Gazana, Sravika Linga,
+Muskaan Kumar and Jake Fogel, in that order, in the title block and PDF metadata.
+It adds the full 13-run inventory, a qualitative account of each run, and an
+appendix covering all 19 assignments. The tables were reconciled against the
+admitted snapshot: all 18 terminal outcomes, payoffs, message/call/reveal/token
+counts, exact run IDs and seven strong-case agreement locators match. The
+interrupted assignment has undefined terminal metrics, not imputed zeros.
+
+The revised PDF is 11 pages: the main argument and references occupy pages
+1--7, ethics/limitations is on page 8, and the complete record is on pages
+9--11. `make -C report agentic` passed with no overfull boxes or undefined
+references. All 11 pages were rendered and inspected, and a split-off total
+row was repaired. All three quoted excerpts match the original R10.1 public
+messages verbatim. Build log: `.harness/agentic-complete-results-build.log`.
+The published `report.pdf` copy was refreshed after these checks.
 
 Repository verification passed with `bash scripts/verify.sh`, including
 Foundry/Rust checks, 294 legacy harness tests and 64 harness-v2 tests with
@@ -66,8 +78,7 @@ passed independently; `git diff --check` reported no whitespace errors.
 ## Open gaps
 
 - Human authors must review the semantic labels, source-to-claim links and
-  final manuscript. Lucas Barbosa and Stefan Gazzana are the named authors;
-  affiliations are pending.
+  final manuscript. The five authors are named; affiliations are pending.
 - Official Apart template text was inspected, but this article layout has not
   been certified against its visual layout. Final required disclosures and
   submission formatting remain an author decision. No submission was attempted.

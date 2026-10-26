@@ -34,7 +34,8 @@ by the research task and has not been attempted.
 The agentic manuscript uses `article` at 11pt on US Letter, one-inch margins
 and New TX text/math fonts. Build `make -C report agentic` with TeX Live
 pdfLaTeX through latexmk; the PDF is `report/agentic/build/main.pdf`.
-Its six pages include references and the limitations/ethics appendix. The
+Its main text is followed by references, the limitations/ethics appendix,
+and a complete run/episode appendix. The
 [review record](../../report/agentic/review.md) preserves checks and gaps.
 The user requested removal of its LLM Usage and Execution/accounting
 appendices. This edit does not certify final submission compliance.
@@ -81,7 +82,7 @@ reason. Keep the source URL and the date checked beside each external rule.
 | Required data/code artifacts and accessibility requirements | UNSET |
 | Submission files, size limits, portal, deadline, and stated timezone | PDF; deadline above; no submission attempted; remaining portal/size details unverified |
 | Camera-ready changes and publication/license requirements | UNSET |
-| Last policy check, checker, and unresolved questions | 2026-10-26, Codex; authors Lucas Barbosa and Stefan Gazzana; affiliations, visual layout and final disclosures open |
+| Last policy check, checker, and unresolved questions | 2026-10-26, Codex; authors Lucas Barbosa, Stefan Gazana, Sravika Linga, Muskaan Kumar, Jake Fogel; affiliations, visual layout and final disclosures open |
 
 Official rules for the chosen venue and stage take precedence over house
 formatting. Preserve scientific accuracy and disclose limitations when fitting

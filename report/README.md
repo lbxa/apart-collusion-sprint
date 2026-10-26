@@ -7,6 +7,10 @@ It uses the separate [agentic campaign snapshot](data/agentic-campaign.json),
 It does not pool the older results below. Complete experiment JSONs are in
 `harness-v2/results/campaign-2026-10-26/export/`; large evidence files use Git LFS.
 The published PDF copy is [agentic/report.pdf](agentic/report.pdf).
+It includes all 13 agentic campaign runs, the 19 assigned episodes, and a
+run-by-run interpretation; Appendix B contains the complete episode tables
+and evidence locators. The named authors are Lucas Barbosa, Stefan Gazana,
+Sravika Linga, Muskaan Kumar and Jake Fogel.
 
 ## Earlier baseline report
 

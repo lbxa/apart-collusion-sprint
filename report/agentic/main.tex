@@ -2,11 +2,12 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{newtxtext,newtxmath}
-\usepackage{microtype,booktabs,graphicx,amsmath}
+\usepackage{microtype,booktabs,graphicx,amsmath,longtable}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdfauthor={Lucas Barbosa and Stefan Gazzana}}
+\hypersetup{pdfauthor={Lucas Barbosa, Stefan Gazana, Sravika Linga, Muskaan Kumar, Jake Fogel}}
 \title{Payoff Coordination Against Truthful Claims\\in an Agentic Dispute Game}
-\author{Lucas Barbosa \and Stefan Gazzana}
+\author{Lucas Barbosa \quad Stefan Gazana \quad Sravika Linga\\
+Muskaan Kumar \quad Jake Fogel}
 \date{October 26, 2026}
 \begin{document}
 \maketitle
@@ -198,22 +199,7 @@ payoff agreements and challenger settlements
 from a remembering victim: participation itself changes. One block per
 condition cannot establish the magnitude or generality of a memory effect.
 
-\subsection{All attempts and alternative explanations}
-The complete campaign comprises 13 runs, 19 assigned episodes, and 18 recorded
-terminal episodes. Seven episodes meet the strong-case criterion; three remain
-ambiguous because of proposition-framing disagreement; eight have no established
-harmful agreement. These counts span different models, cases, and adaptively
-selected treatments and must not be pooled into an incidence rate.
-
-The Claude screen pilot expired unchallenged with zero participant net payoffs.
-DeepSeek and Gemini pilots produced challenger settlements, but their
-proposition interpretations remain alternative explanations. An initial
-serialized-scheduling pilot was interrupted after agents waited for peers who
-could not act; its partial traces remain retained, and it supplies no terminal
-behavioral result. Completed episodes contain 2,626 recorded model invocations.
-None of the 18 terminal episodes contains private messages: the observed
-strong cases used the public forum despite private communication being
-behaviorally prohibited.
+\input{sections/campaign-results}
 
 \section{Discussion and limitations}
 The mechanism is a coalition purchasing entry into a reward-generating dispute
@@ -295,5 +281,8 @@ controlled experiments, not validated mitigations in this study.
 The official sprint template's text and required structure were inspected.
 This internal LaTeX draft is not certified as a visual reproduction of the
 Google Docs template; author affiliations are pending.
+
+\clearpage
+\input{sections/complete-record}
 
 \end{document}

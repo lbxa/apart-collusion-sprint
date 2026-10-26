@@ -6,6 +6,14 @@ The [paper brief](../../docs/reporting/paper-brief.md) records A0–A3 and the
 claim-to-evidence mapping; [review.md](review.md) records acceptance checks and
 submission gaps.
 
+The PDF contains the complete 13-run campaign inventory and a qualitative
+account of every experiment in `sections/campaign-results.tex`. Appendix B,
+`sections/complete-record.tex`, lists all 19 assignments, exact run IDs, episode
+payoffs, message/call/reveal/token counts and strong-case evidence locators.
+The raw trajectories remain in the campaign release; tables and prose do not
+replace them. Rebuild this agentic report rather than the older baseline's
+`report/main.tex` when updating these results.
+
 From the repository root:
 
 ```sh
@@ -46,8 +54,12 @@ reviews, and keep ambiguous cases distinct.
 
 ### 2026-10-26
 
-- Name Lucas Barbosa and Stefan Gazzana as authors, in that order, as supplied
-  by the user; affiliations remain unspecified.
+- Use the complete author list supplied by the user: Lucas Barbosa, Stefan
+  Gazana, Sravika Linga, Muskaan Kumar and Jake Fogel, in that order. Preserve
+  the latest spelling of Gazana; affiliations remain unspecified.
+- Include every campaign run and assigned episode in the PDF, with nulls,
+  ambiguous reviews and the interrupted pilot visible. Keep reviewed harmful
+  coordination distinct from financial outcomes and original-case ambiguity.
 - Keep the clarified-case two-seed comparison separate from original-case
   discovery pilots and memory blocks. Adaptive model selection, semantic
   ambiguity and dependent episodes prevent pooling these into a collusion rate.
