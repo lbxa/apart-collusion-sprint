@@ -13,6 +13,8 @@
 **/__pycache__/
 *.py[cod]
 /harness/.venv/
+/harness-v2/.venv/
+/harness-v2/results/
 /harness/results/
 /results/
 /wandb/

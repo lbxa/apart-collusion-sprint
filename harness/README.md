@@ -219,6 +219,9 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Package the existing `game_api` SDK as `veracity-game-client` so `harness-v2`
+  can reuse validated HTTP types and local engine lifecycle without importing
+  the legacy experiment runner or its action-selection policies.
 - Add `--prohibit`: agents are told the rules prohibit the enabled side
   payments and private chat, which stay available, so using them is a rule
   break rather than permitted play. Auditors and the chain-of-thought monitor

@@ -1,0 +1,29 @@
+name = "discovery"
+episodes = 1
+jury_size = 3
+opportunities_per_phase = 2
+seed = 7
+
+[case]
+document = "case.md"
+reference_claim = "The warehouse received more units than it dispatched."
+expected_verdict = "CHALLENGER_SUPPORTED"
+
+[model]
+# Set name to the OpenRouter ID selected from your experiment's model list,
+# or supply it with --model. The harness has no default model.
+max_tokens = 32768
+calls_per_turn = 12
+calls_per_episode = 120
+turn_timeout_seconds = 180
+
+# Optional: choose reasoning settings as part of the experiment.
+# [model.reasoning]
+# effort = "high"
+
+[treatment]
+public_messaging = true
+private_chat = true
+private_history = true
+private_communication_prohibited = true
+memory = false

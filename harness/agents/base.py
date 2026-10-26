@@ -7,10 +7,16 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from game_api.types import (
-    AgentAction, ChatAction, DeliberateAction, FinalVoteAction, FindingAction, InterviewAction, Observation,
-    OfferTransfersAction, Role,
+    AgentAction,
+    ChatAction,
+    DeliberateAction,
+    FinalVoteAction,
+    FindingAction,
+    InterviewAction,
+    Observation,
+    OfferTransfersAction,
+    Role,
 )
-
 
 PUBLIC_MEMORY_FIELDS = ("episode_id", "outcome", "my_payout", "my_bond")
 
@@ -22,9 +28,9 @@ class AgentConfig:
 
     # Model — default to Nemotron Ultra 550B (free) via OpenRouter
     model: str = "nvidia/nemotron-3-ultra-550b-a55b:free"
-    provider: str = "openrouter"        # "openrouter" | "openai"
+    provider: str = "openrouter"  # "openrouter" | "openai"
     temperature: float = 0.7
-    max_tokens: int = 8192              # reasoning models count hidden reasoning against this
+    max_tokens: int = 8192  # reasoning models count hidden reasoning against this
 
     # Persona & motivation
     persona: str = ""
@@ -37,18 +43,19 @@ class AgentConfig:
 
     # Memory
     memory_enabled: bool = True
-    memory_window: int = 10             # past episodes to remember
-    context_window: int = 8192          # max tokens
+    memory_window: int = 10  # past episodes to remember
+    context_window: int = 8192  # max tokens
 
     # Deliberation style
-    deliberation_style: str = "analytical"  # analytical | intuitive | adversarial | social
-    verbosity: str = "normal"               # terse | normal | verbose
+    deliberation_style: str = (
+        "analytical"  # analytical | intuitive | adversarial | social
+    )
+    verbosity: str = "normal"  # terse | normal | verbose
 
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class BaseAgent(ABC):
-
     def __init__(self, config: AgentConfig):
         self.config = config
         self.episode_memory: list[dict[str, Any]] = []
@@ -80,7 +87,9 @@ class BaseAgent(ABC):
 
     async def offer_transfers(self, observation: Observation) -> OfferTransfersAction:
         """Side-payment offers a party makes before deliberation; none by default."""
-        return OfferTransfersAction(agent_id=self.agent_id, episode_id=observation.episode_id)
+        return OfferTransfersAction(
+            agent_id=self.agent_id, episode_id=observation.episode_id
+        )
 
     async def respond_to_offer(self, observation: Observation) -> None:
         """Accept by setting observation.bribe_offers[0].accepted; declined by default."""
@@ -91,7 +100,9 @@ class BaseAgent(ABC):
 
     async def interview(self, observation: Observation) -> InterviewAction:
         """A post-verdict exchange between auditors and jurors; silent by default."""
-        return InterviewAction(agent_id=self.agent_id, episode_id=observation.episode_id)
+        return InterviewAction(
+            agent_id=self.agent_id, episode_id=observation.episode_id
+        )
 
     async def review(self, observation: Observation) -> FindingAction:
         """An auditor's finding on the settled episode; other roles never review."""
@@ -100,9 +111,11 @@ class BaseAgent(ABC):
     def record_episode_outcome(self, summary: dict[str, Any]):
         if not self.config.memory_enabled or self.config.memory_window <= 0:
             return
-        self.episode_memory.append({key: summary[key] for key in PUBLIC_MEMORY_FIELDS if key in summary})
+        self.episode_memory.append(
+            {key: summary[key] for key in PUBLIC_MEMORY_FIELDS if key in summary}
+        )
         if len(self.episode_memory) > self.config.memory_window:
-            self.episode_memory = self.episode_memory[-self.config.memory_window:]
+            self.episode_memory = self.episode_memory[-self.config.memory_window :]
 
     def get_memory_context(self) -> str:
         if not self.episode_memory or not self.config.memory_enabled:

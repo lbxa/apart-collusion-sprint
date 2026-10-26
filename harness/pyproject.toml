@@ -1,0 +1,13 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "veracity-game-client"
+version = "0.1.0"
+description = "Shared validated HTTP client for the Veracity game engine"
+requires-python = ">=3.12"
+dependencies = ["aiohttp>=3.12,<4", "pydantic>=2.12,<3"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["game_api"]

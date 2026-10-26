@@ -1,7 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
 [project]
 name = "harness-v2"
 version = "0.1.0"
-description = "Add your description here"
+description = "Isolated Deep Agents experiments on the Veracity game"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "deepagents>=0.7.32,<0.8",
+    "langchain>=1.4,<2",
+    "langchain-core>=1.7,<2",
+    "langchain-openrouter>=0.2.9,<0.3",
+    "langgraph-checkpoint>=4.3,<5",
+    "langgraph-checkpoint-sqlite>=3,<4",
+    "aiohttp>=3.14,<4",
+    "pydantic>=2.12,<3",
+    "docker>=7,<8",
+    "python-dotenv>=1.2,<2",
+    "veracity-game-client",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "pytest-asyncio>=1,<2", "ruff>=0.14,<1"]
+
+[project.scripts]
+veracity-harness = "veracity_harness.cli:main"
+
+[tool.uv.sources]
+veracity-game-client = { path = "../harness", editable = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/veracity_harness"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = ["integration: requires Docker and the built Rust/Anvil engine"]
+addopts = "-m 'not integration'"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
