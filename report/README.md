@@ -30,6 +30,10 @@ establish an absence of collusion or a treatment effect.
 | [Probe data](data/exploratory-probes.json) | Content-free counts, settings and source hashes for probes X1–X6 |
 | [Probe script](analysis/probe_snapshot.py) | Extracts the probe snapshot from local exports and renders its table |
 | [Probe table](tables/exploratory-probes.tex) | Generated results table for the probes; do not edit |
+| [Model benchmark](sections/benchmark.tex) | Per-model benchmark table; a template until model-screen runs are admitted |
+| [Benchmark data](data/model-benchmark.json) | Content-free W&B run settings and counts for the benchmark |
+| [Benchmark script](analysis/model_benchmark.py) | Fetches run summaries from W&B and renders the benchmark table |
+| [Benchmark table](tables/model-benchmark.tex) | Generated benchmark table; do not edit |
 | [Makefile](Makefile) | Compiles the document; regenerates the figure on request |
 | [Template provenance](template/README.md) | Attachment attribution, hashes, and adaptation decisions |
 | [Review record](review.md) | Evidence, build, and final-size rendered checks |
@@ -88,6 +92,17 @@ original exports, run
 `harness/.venv/bin/python report/analysis/probe_snapshot.py --extract --experiments .harness/experiments`
 from the repository root. Its tests run with `python3 -m unittest test_probe_snapshot`
 from `report/analysis/`.
+
+### Regenerating the model benchmark
+
+`make -C report tables` also renders `tables/model-benchmark.tex` from the committed
+snapshot. To admit model-screen runs, fetch their W&B summaries from the repository root:
+`set -a && . ./.env && set +a && harness/.venv/bin/python report/analysis/model_benchmark.py --fetch --since <UTC time>`.
+Only runs created at or after `--since` enter the snapshot, and only finished runs of
+one condition enter the table. Set `featured` (a column name) or `condition`
+(`{"cell": ..., "prohibited": ..., "party_auditor_offers": ...}`) in the snapshot to override the defaults:
+the first column alphabetically, and the condition most finished runs share.
+Its tests run with `python3 -m unittest test_model_benchmark` from `report/analysis/`.
 
 ### Regenerating the figures
 
