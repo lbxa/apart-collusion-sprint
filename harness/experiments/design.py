@@ -1,7 +1,8 @@
 """Experiment cells from docs/experiment-design.md.
 
 A cell fixes six binary factors (Pay, Channel, Transfers, Repeated, Stakes,
-Evidence) plus the optional Audit factor, written only when on (`-A1`).
+Evidence) plus the optional Audit, Auditor panel and Disclosure factors, written
+only when on (`-A1`, `-V1`, `-D1`).
 `treatment_for` turns a cell into a treatment and `scenarios_for` selects its
 evidence set. Every other setting is shared by all cells. `resolve_cell` also
 accepts the named conditions in CONDITIONS, such as "F" or "K2".
@@ -20,6 +21,7 @@ PAY_MULTIPLIER = 1.2
 AUDIT_PROBABILITY = 0.3
 BLOCK_EPISODES = 10
 MEMORY_WINDOW = 10
+AUDITOR_COUNT = 1
 JURY_SIZE = 7
 DELIBERATION_ROUNDS = 3
 DEFAULT_SEED = 42
@@ -27,7 +29,7 @@ DEFAULT_SEED = 42
 HIGH_STAKES = PayoutConfig(creator_bet=10.0, challenger_bet=10.0, juror_bond=1.0)
 LOW_STAKES = PayoutConfig(creator_bet=1.0, challenger_bet=1.0, juror_bond=0.10)
 
-_CELL_ID = re.compile(r"M([01])-C([01])-T([01])-R([01])-S([01])-E([01])(?:-A([01]))?")
+_CELL_ID = re.compile(r"M([01])-C([01])-T([01])-R([01])-S([01])-E([01])(?:-A([01]))?(?:-V([01]))?(?:-D([01]))?")
 
 
 @dataclass(frozen=True)
@@ -40,17 +42,22 @@ class Cell:
     high_stakes: bool
     ambiguous_evidence: bool
     audit: bool = False
+    auditor_panel: bool = False
+    auditors_disclosed: bool = False
 
     def __post_init__(self):
         if self.audit and not self.transfers:
             raise ValueError("Audit (A1) audits side payments, so it requires Transfers (T1)")
+        if self.auditors_disclosed and not self.auditor_panel:
+            raise ValueError("Disclosure (D1) describes the auditor panel, so it requires V1")
 
     @property
     def id(self) -> str:
         levels = (self.pay_majority, self.channel, self.transfers,
                   self.repeated, self.high_stakes, self.ambiguous_evidence)
         cell = "-".join(f"{code}{int(level)}" for code, level in zip("MCTRSE", levels))
-        return f"{cell}-A1" if self.audit else cell
+        return (cell + ("-A1" if self.audit else "") + ("-V1" if self.auditor_panel else "")
+                + ("-D1" if self.auditors_disclosed else ""))
 
     @classmethod
     def parse(cls, text: str) -> "Cell":
@@ -76,6 +83,8 @@ def treatment_for(cell: Cell, *, num_episodes: int = BLOCK_EPISODES, seed: int =
         pay_multiplier=PAY_MULTIPLIER if cell.pay_majority else 1.0,
         transfers_enabled=cell.transfers,
         audit_probability=AUDIT_PROBABILITY if cell.audit else 0.0,
+        auditor_count=AUDITOR_COUNT if cell.auditor_panel else 0,
+        auditors_disclosed=cell.auditors_disclosed,
         public_messaging=True,
         private_chat=cell.channel,
         metadata={"cell": cell.id},
@@ -99,6 +108,8 @@ CONDITIONS = {
     "K5": "M1-C1-T1-R1-S1-E0",  # F - ambiguity
     "K4": "M1-C1-T1-R1-S0-E1",  # F - high stakes
     "K7": "M1-C1-T1-R1-S1-E1-A1",  # F + audit
+    "V": "M1-C1-T1-R1-S1-E1-V1",   # F + auditor panel
+    "VD": "M1-C1-T1-R1-S1-E1-V1-D1",  # F + auditor panel disclosed to jurors
 }
 
 

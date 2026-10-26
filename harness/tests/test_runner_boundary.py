@@ -184,7 +184,7 @@ class RunnerBoundaryTests(CoreTestCase):
             captured.append(request["messages"])
             content = json.dumps({"message": "Assessing public evidence", "straw_vote": "CREATOR_SUPPORTED",
                                   "verdict": "CREATOR_SUPPORTED", "assessment": "Public evidence supports the claim"})
-            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=content))])
+            return SimpleNamespace(choices=[SimpleNamespace(finish_reason="stop", message=SimpleNamespace(content=content))])
 
         client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=complete)))
         with patch.dict("os.environ", {"OPENAI_API_KEY": "test-only"}), patch("agents.llm_agent.AsyncOpenAI", return_value=client):
@@ -197,6 +197,32 @@ class RunnerBoundaryTests(CoreTestCase):
         self.assertTrue(any("Your past episode history" in prompt for prompt in second_episode_prompts))
         self.assertTrue(all("verdict_correct" not in prompt and "ground_truth" not in prompt for prompt in second_episode_prompts))
         self.assertTrue(all(record.verdict_correct is True for record in metrics.episodes), "evaluator truth remains available for scoring")
+
+    async def test_llm_reasoning_is_recorded_per_call_and_exported_only_to_the_episode_records(self):
+        async def complete(**_):
+            content = json.dumps({"message": "Assessing public evidence", "straw_vote": "CREATOR_SUPPORTED",
+                                  "verdict": "CREATOR_SUPPORTED", "assessment": "Public evidence supports the claim",
+                                  "reasoning": "STATED_REASONING"})
+            return SimpleNamespace(choices=[SimpleNamespace(finish_reason="stop", message=SimpleNamespace(
+                content=content, reasoning="HIDDEN_REASONING"))])
+
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=complete)))
+        with patch.dict("os.environ", {"OPENAI_API_KEY": "test-only"}), patch("agents.llm_agent.AsyncOpenAI", return_value=client):
+            metrics = await ExperimentRunner(self.new_game(), self.output).run_experiment(
+                self.treatment(scripted_juror_indices=[], juror_provider="openai"), [self.scenario], "cot")
+        record = metrics.episodes[0]
+        self.assertEqual(record.status, "completed")
+        self.assertEqual({call["agent_id"] for call in record.llm_calls}, set(record.juror_ids),
+                         "scripted parties make no model calls")
+        self.assertEqual({call["phase"] for call in record.llm_calls}, {"DELIBERATION", "VOTING"})
+        for call in record.llm_calls:
+            self.assertEqual((call["role"], call["reasoning"], call["stated_reasoning"]),
+                             ("JUROR", "HIDDEN_REASONING", "STATED_REASONING"))
+        exported = json.loads((self.output / "cot" / "episodes.jsonl").read_text())
+        self.assertEqual(exported["llm_calls"], record.llm_calls)
+        leaks = [path.name for path in self.output.rglob("*") if path.is_file() and path.name != "episodes.jsonl"
+                 and "HIDDEN_REASONING" in path.read_text(errors="ignore")]
+        self.assertEqual(leaks, [], "reasoning stays out of transcripts and summaries")
 
     async def test_arbitrary_agents_receive_no_hidden_truth_or_privileged_scenario_metadata(self):
         scenario = Scenario("private-scenario", "Claim", "Evidence", "Counter-evidence", False,

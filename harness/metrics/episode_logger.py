@@ -100,7 +100,7 @@ class EpisodeLogger:
                 money += f" 💰+${entry.money_out:.2f}"
 
             # Role badge
-            role_emoji = {"CREATOR": "📝", "CHALLENGER": "⚔️", "JUROR": "⚖️"}.get(
+            role_emoji = {"CREATOR": "📝", "CHALLENGER": "⚔️", "JUROR": "⚖️", "AUDITOR": "🔍"}.get(
                 entry.role, "🔧"
             )
 

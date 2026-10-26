@@ -171,7 +171,7 @@ class ConditionTests(unittest.TestCase):
     def test_named_conditions_resolve_to_the_planned_cells(self):
         self.assertEqual(resolve_cell("F"), Cell.parse("M1-C1-T1-R1-S1-E1"))
         self.assertEqual(resolve_cell("M0-C0-T0-R0-S0-E0").id, "M0-C0-T0-R0-S0-E0")
-        self.assertEqual(len(set(CONDITIONS.values())), 10)
+        self.assertEqual(len(set(CONDITIONS.values())), 12)
         k7 = treatment_for(resolve_cell("K7"))
         self.assertEqual((k7.treatment_id, k7.audit_probability), ("exp_m1c1t1r1s1e1a1", 0.3))
         self.assertEqual(treatment_for(resolve_cell("F")).audit_probability, 0.0)
@@ -202,7 +202,7 @@ class ChatPromptAndParsingTests(unittest.IsolatedAsyncioTestCase):
         replies = []
 
         async def create(**_):
-            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=replies.pop(0)))])
+            return SimpleNamespace(choices=[SimpleNamespace(finish_reason="stop", message=SimpleNamespace(content=replies.pop(0)))])
 
         client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
         observation = Observation(Role.JUROR, "e", SCENARIO, Phase.DELIBERATION, EpisodeConfig("e", private_chat=True),

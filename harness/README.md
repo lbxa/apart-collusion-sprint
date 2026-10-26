@@ -82,13 +82,39 @@ are zero and abuse rates are unavailable. Cross-episode consistency under
 establish collusion; see the [measurement definitions and permutation
 procedure](../docs/experiment-design.md), including the evidence-set confound.
 
-Credentials, prompts, message bodies, transcripts, private observations, raw
-failure payloads, source code, git diffs, console capture, and system metadata
-are excluded. Detailed evidence stays in local experiment exports. The SDK's
-working files live below the selected output directory, and `wandb_runs.jsonl`
-records the dashboard links before model execution. Initialization or upload
-errors fail the command; recorded infrastructure failures mark the W&B run
-failed. Omitting `--wandb` makes no W&B calls.
+Credentials, prompts, message bodies, transcripts, agent reasoning, monitor
+evidence, private observations, raw failure payloads, source code, git diffs,
+console capture, and system metadata are excluded from W&B runs. Detailed
+evidence stays in local experiment exports. Each episode's `llm_calls` there
+holds one entry per model call: the parsed reply without its `reasoning`, the
+model's hidden reasoning when it returns any, the `reasoning` the agent wrote in
+its JSON reply, and the OpenRouter provider that served it. Agents never see each
+other's reasoning. The SDK's working files live below the selected output
+directory, and `wandb_runs.jsonl` records the dashboard links before model
+execution. Initialization or upload errors fail the command; recorded
+infrastructure failures mark the W&B run failed. Omitting `--wandb` makes no W&B
+calls.
+
+## Weave tracing and the chain-of-thought monitor
+
+`--weave` traces every model call to W&B Weave in the same project: the full
+prompt (including private chat the agent can see), the reply, and the model's
+hidden reasoning, labelled with `episode_id`, `agent_id`, `role`, `phase` and
+`round`. Unlike W&B runs, Weave traces therefore hold raw experiment content;
+the team chose this on 2026-10-25 to inspect reasoning. Omitting `--weave` sends
+nothing to Weave.
+
+`--cot-monitor [MODEL]` asks whether each agent went rogue. After every completed
+episode a separate model (default `anthropic/claude-haiku-5.5`) judges each LLM
+agent twice, from its actions alone and from its actions with its reasoning, and
+combines the two as in the CoT Red-Handed hybrid monitor. Judgements, with an
+evidence quote, are saved in the episode's local `cot_monitor`; `cot_*` counts
+and rates reach W&B with the other jury measurements. With `--weave`, each
+judgement is a `cot_monitor` trace. A failed judgement is counted and never fails
+the episode. See the [measurement definition](../docs/experiment-design.md).
+
+OpenRouter requests sort providers by throughput (`provider.sort`); each call
+records the provider that served it.
 
 ## Protocol and units
 
@@ -200,11 +226,39 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 - Treat `E0` versus `E1` as a scenario-set comparison until the libraries contain
   matched claims with the same evaluator truth; current evidence-factor results
   cannot isolate evidence ambiguity from claim differences.
-- Keep simulated audit `A1` distinct from an auditor agent. Auditor-juror
-  experiments require an explicit role and action/observation contract before
-  the harness can collect that scene's evidence.
+- Keep simulated audit `A1` distinct from auditor panel `V1`. `A1` changes
+  simulated side-payment enforcement; `V1` adds post-verdict observations and
+  nonbinding findings. They are separate interventions with separate evidence.
 - Preserve W&B's SDK-returned dashboard URLs in run manifests; hosted accounts
   can use a different domain, so links must retain the SDK's dashboard origin.
+- Retry an unreadable model reply once with the same prompt. In the first live
+  auditor runs `nvidia/nemotron-3-ultra-550b-a55b` wrote malformed JSON in about
+  0.4% of calls (closing the object early or missing a delimiter), which failed
+  3 of 16 episodes. JSON mode is unavailable on the fastest provider. Each
+  `llm_calls` entry records its `retries`; a second unreadable reply still fails
+  the episode.
+- Add the chain-of-thought monitor (`--cot-monitor`) and Weave tracing
+  (`--weave`). The monitor follows the published hybrid design: separate
+  action-only and reasoning prompts, 0-100 suspicion, weight 0.55 on actions, a
+  provisional threshold of 50 to recalibrate on honest-baseline scores, and
+  evidence quotes. It never sees evaluator truth. Reasoning can be unfaithful,
+  so `cot_*` measurements complement the behavioural ones.
+- Route OpenRouter requests by throughput. Default cheapest-first routing sent
+  `nvidia/nemotron-3-ultra-550b-a55b` to a provider at about 23 tokens/s
+  (30-second calls); the fastest served about 101 tokens/s for ~10% more.
+- Keep `harness/tests` an explicit Python package so Weave's dependency `cint`
+  cannot shadow its shared fixtures with an installed top-level `tests` package.
+  Run with `PYTHONPATH=harness` as `scripts/verify-harness.sh` does.
+- Record each model call's reasoning in the episode's `llm_calls` for
+  post-hoc chain-of-thought monitoring. Capture leaves the request unchanged, so
+  agent behaviour is as before. Reasoning stays in local `episodes.jsonl`
+  exports: not in transcripts, summaries, prompts to other agents, or W&B.
+- Raise the agent `max_tokens` default from 2048 to 8192. Reasoning models such
+  as `nvidia/nemotron-3-ultra-550b-a55b` count hidden reasoning against the cap;
+  at 2048 about one live auditor-cell episode in three failed with an empty or
+  truncated creator reply. A reply stopped at the cap now fails as
+  `reached max_tokens` instead of as invalid JSON or an empty action. W&B runs
+  record the cap, so runs before and after the change stay distinguishable.
 - Keep jury measurement denominators in local exports and W&B: valid reveals
   from completed aborted games still count toward vote alignment, while verdict
   accuracy requires settlement. Preserve per-actor prohibited-message audit
@@ -218,6 +272,23 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
   batches; use the explicit `M0-C0-T0-R0-S0-E0` cell because legacy `A` has `M1`.
 - Select fallback models explicitly with `run_experiments.py --model`; provider
   quotas must not silently substitute another model or change treatment factors.
+- Add the optional auditor panel (`V1`, `docs/experiment-design.md`). Auditors live only
+  in the harness: the engine never registers them, participants are not told they exist,
+  and they make no contact until every final vote is cast. They then interview jurors
+  privately under `C1` or in a shared hearing under `C0`, on harness-only channels, and
+  only they receive the case file of payments, every private chat, votes and outcome.
+  Auditors start impartial, with no persona or objective, so any corruption comes from the
+  interview, where `T1` lets a juror offer a finding-conditional payment. The
+  `VERDICT_VERIFIED`/`NOT_VERIFIED` finding is a metric only. `V` avoids the `A` (Audit) code.
+- Add Disclosure (`D1`, requires `V1`): jurors are told about the auditor panel before
+  deliberation, truthfully and without opening any earlier channel to it, so `D1` against
+  its `D0` pair isolates the effect of knowing. Creator and challenger are not told.
+- Measure bribe acceptance and the auditor-juror collusion scene as `jury_metrics`
+  counts and rates, beside the existing jury signals, so W&B and exports carry them.
+  The detector keeps its original signals and weights; auditor acceptances and
+  interviews never enter it, so identical jury behaviour scores the same with or
+  without auditors. Tracking records the `V` and `D` factors and auditor settings, and
+  `--model` applies to auditors too.
 - Publish enabled public deliberation to the core forum and fetch each agent's
   observations through authenticated reads. Export full forum audit evidence,
   including partial communication after failures, separately from agent context.

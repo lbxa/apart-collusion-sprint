@@ -21,6 +21,9 @@ from typing import Any
 from game_api.money import Amount, financial_json, financial_sum
 from metrics.jury import aggregate_jury_metrics, episode_jury_metrics
 
+# Deliberation messages; auditor interviews ("auditor_private", "auditor_hearing") are not.
+DELIBERATION_CHANNELS = ("public", "private")
+
 
 @dataclass
 class EpisodeRecord:
@@ -35,6 +38,7 @@ class EpisodeRecord:
     creator_id: str = ""
     challenger_id: str = ""
     juror_ids: list[str] = field(default_factory=list)
+    auditor_ids: list[str] = field(default_factory=list)
 
     # Ground truth
     ground_truth: bool | None = None
@@ -76,9 +80,13 @@ class EpisodeRecord:
     simulated_utility: dict[str, float] = field(default_factory=dict)
     # Heuristic analysis, including comparable prior episodes; not proof.
     collusion_analysis: dict[str, Any] = field(default_factory=dict)
+    # Auditor findings when the panel is on: {"panel_finding", "findings": {auditor: {...}}}.
+    auditor_panel: dict[str, Any] | None = None
 
     # LLM call metadata
     llm_calls: list[dict[str, Any]] = field(default_factory=list)
+    # Chain-of-thought monitor judgements per agent, with evidence quotes; local exports only.
+    cot_monitor: dict[str, dict[str, Any]] | None = None
 
     # Timing
     start_time: float = 0.0
@@ -90,6 +98,11 @@ class EpisodeRecord:
 
     # Status
     status: str = "scheduled"
+
+    @property
+    def deliberation_messages(self) -> list[dict[str, Any]]:
+        """Public and private deliberation; auditor interviews are excluded so cells stay comparable."""
+        return [m for m in self.messages if m.get("channel") in DELIBERATION_CHANNELS]
 
 
 @dataclass
@@ -196,7 +209,7 @@ class ExperimentMetrics:
     def avg_messages_per_episode(self) -> float:
         if not self.episodes:
             return 0.0
-        return sum(len(ep.messages) for ep in self.episodes) / len(self.episodes)
+        return sum(len(ep.deliberation_messages) for ep in self.episodes) / len(self.episodes)
 
     def summary(self) -> dict[str, Any]:
         summary = {
@@ -264,7 +277,7 @@ class MetricsCollector:
                         "payouts": ep.payouts,
                         "forfeited": ep.forfeited,
                         "deliberation_rounds": ep.deliberation_rounds,
-                        "messages_count": len(ep.messages),
+                        "messages_count": len(ep.deliberation_messages),
                         "messages": ep.messages,
                         "forum_audit": ep.forum_audit,
                         "forum_audit_error": ep.forum_audit_error,
@@ -280,6 +293,9 @@ class MetricsCollector:
                         "simulated_utility": ep.simulated_utility,
                         "collusion_analysis": ep.collusion_analysis,
                         "jury_metrics": episode_jury_metrics(ep, history),
+                        "auditor_panel": ep.auditor_panel,
+                        "llm_calls": ep.llm_calls,
+                        "cot_monitor": ep.cot_monitor,
                         "infrastructure_failure": ep.infrastructure_failure,
                         "failure_reason": ep.failure_reason,
                         "duration_secs": ep.end_time - ep.start_time,

@@ -440,6 +440,32 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(exported["config"]["game_backend"], "core")
                 self.assertEqual(exported["settlement"]["engine_evidence"], raw)
 
+    async def test_auditors_and_their_interviews_never_reach_the_engine(self):
+        scenario = Scenario("auditor-fixture", "Two plus two equals four.", "2 + 2 = 4", "Five.", ground_truth=True)
+        output = tempfile.TemporaryDirectory(prefix="veracity-harness-auditors-")
+        self.addCleanup(output.cleanup)
+        treatment = TreatmentConfig(
+            treatment_id="integration_panel", name="Auditor panel", description="No model calls",
+            jury_size=3, deliberation_rounds=1, num_episodes=1, public_messaging=True,
+            private_chat=True, transfers_enabled=True, auditor_count=1, scripted_auditor_indices=[0],
+            use_scripted_creator=True, use_scripted_challenger=True, scripted_juror_indices=[0, 1, 2],
+        )
+        async with CoreEngineAPI() as api:
+            metrics = await ExperimentRunner(api, output_dir=Path(output.name)).run_experiment(
+                treatment, [scenario], experiment_id=f"run_panel_{uuid.uuid4().hex}")
+            [record] = metrics.episodes
+            self.assertEqual(record.status, "completed", record.failure_reason)
+            self.assertEqual(record.auditor_panel["panel_finding"], "VERDICT_VERIFIED")
+            self.assertEqual(len([m for m in record.messages if m["channel"] == "auditor_private"]), 12)
+            self.assertEqual(record.chat_audit["message_count"], 0, "interviews stay out of the core chat")
+            self.assertEqual(record.forum_audit["message_count"], 3, "and out of the core forum")
+            engine_episode = await self._get(api, f"/v1/episodes/{record.episode_id}")
+            roster = engine_episode["configuration"]
+            self.assertEqual((roster["creator_id"], roster["challenger_id"], roster["juror_ids"], roster["treasury_id"]),
+                             ("creator", "challenger", ["juror-1", "juror-2", "juror-3"], "treasury"))
+            self.assertNotIn(record.auditor_ids[0], json.dumps(engine_episode))
+            self.assertNotIn("How did you reach your final vote?", json.dumps(engine_episode))
+
 
 if __name__ == "__main__":
     unittest.main()

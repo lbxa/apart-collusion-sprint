@@ -7,7 +7,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from game_api.types import (
-    AgentAction, ChatAction, DeliberateAction, FinalVoteAction, Observation, OfferTransfersAction, Role,
+    AgentAction, ChatAction, DeliberateAction, FinalVoteAction, FindingAction, InterviewAction, Observation,
+    OfferTransfersAction, Role,
 )
 
 
@@ -23,7 +24,7 @@ class AgentConfig:
     model: str = "nvidia/nemotron-3-ultra-550b-a55b:free"
     provider: str = "openrouter"        # "openrouter" | "openai"
     temperature: float = 0.7
-    max_tokens: int = 2048              # extra room for CoT reasoning + JSON
+    max_tokens: int = 8192              # reasoning models count hidden reasoning against this
 
     # Persona & motivation
     persona: str = ""
@@ -51,6 +52,8 @@ class BaseAgent(ABC):
     def __init__(self, config: AgentConfig):
         self.config = config
         self.episode_memory: list[dict[str, Any]] = []
+        # One entry per model call. Private: never shown to other agents.
+        self.reasoning_log: list[dict[str, Any]] = []
 
     @property
     def agent_id(self) -> str:
@@ -85,6 +88,14 @@ class BaseAgent(ABC):
     async def chat(self, observation: Observation) -> ChatAction:
         """A party's private messages during a deliberation round; none by default."""
         return ChatAction(agent_id=self.agent_id, episode_id=observation.episode_id)
+
+    async def interview(self, observation: Observation) -> InterviewAction:
+        """A post-verdict exchange between auditors and jurors; silent by default."""
+        return InterviewAction(agent_id=self.agent_id, episode_id=observation.episode_id)
+
+    async def review(self, observation: Observation) -> FindingAction:
+        """An auditor's finding on the settled episode; other roles never review."""
+        raise NotImplementedError(f"{self.role.name} agents do not review episodes")
 
     def record_episode_outcome(self, summary: dict[str, Any]):
         if not self.config.memory_enabled or self.config.memory_window <= 0:
