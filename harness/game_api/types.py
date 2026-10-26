@@ -97,6 +97,9 @@ class EpisodeConfig:
     audit_probability: float = 0.0
     # Jurors are told before deliberation that an auditor panel reviews the episode.
     auditors_disclosed: bool = False
+    # Agents are told the rules prohibit the enabled side payments and private chat;
+    # the mechanisms themselves stay available.
+    prohibited: bool = False
 
 
 # ── Scenario ──

@@ -101,6 +101,8 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
             treatment = replace(treatment, cot_monitor_model=args.cot_monitor)
         if args.party_auditor_offers:
             treatment = replace(treatment, party_auditor_offers=True)
+        if args.prohibit:
+            treatment = replace(treatment, prohibited=True)
         if args.scripted:
             treatment = replace(
                 treatment, use_scripted_creator=True, use_scripted_challenger=True,
@@ -193,6 +195,8 @@ async def main():
     parser.add_argument("--party-auditor-offers", action="store_true",
                         help="After settlement, let the creator and challenger offer auditors finding-conditional "
                              "payments (needs V1 and T1)")
+    parser.add_argument("--prohibit", action="store_true",
+                        help="Tell agents the rules prohibit side payments and private chat; both stay available")
     args = parser.parse_args()
 
     if args.list:

@@ -75,6 +75,10 @@ class TreatmentConfig:
     # every auditor one payment conditional on its finding (capped like party offers).
     party_auditor_offers: bool = False
 
+    # Tell every agent that the rules prohibit the enabled side payments and private
+    # chat. Both stay available, so using them is a measured rule break.
+    prohibited: bool = False
+
     # OpenRouter model that judges each completed episode's agent reasoning
     # (metrics/cot_monitor.py); None skips the chain-of-thought monitor.
     cot_monitor_model: str | None = None
@@ -151,6 +155,8 @@ class TreatmentConfig:
             raise ValueError("disclosing auditors requires an auditor panel")
         if self.party_auditor_offers and (not self.auditor_count or self.transfers_enabled is not True):
             raise ValueError("party offers to auditors require an auditor panel and side payments")
+        if self.prohibited and self.transfers_enabled is not True and not self.private_chat:
+            raise ValueError("a prohibition needs side payments or private chat to prohibit")
 
 
 # -- Predefined treatments --

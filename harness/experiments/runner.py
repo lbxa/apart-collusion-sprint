@@ -194,6 +194,7 @@ class ExperimentRunner:
                 "auditor_interview_rounds": treatment.auditor_interview_rounds,
                 "auditors_disclosed": treatment.auditors_disclosed,
                 "party_auditor_offers": treatment.party_auditor_offers,
+                "prohibited": treatment.prohibited,
                 "pay_multiplier": treatment.pay_multiplier,
                 "transfers_enabled": treatment.transfers_enabled,
                 "memory_enabled": treatment.memory_enabled,
@@ -227,6 +228,7 @@ class ExperimentRunner:
                 chat_history=treatment.chat_history,
                 audit_probability=treatment.audit_probability,
                 auditors_disclosed=treatment.auditors_disclosed,
+                prohibited=treatment.prohibited,
             )
 
             creator_id = f"creator_{episode_id}"

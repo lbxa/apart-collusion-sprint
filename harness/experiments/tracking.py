@@ -95,6 +95,7 @@ class WandbTracker:
             "auditor_interview_rounds": treatment.auditor_interview_rounds,
             "auditors_disclosed": treatment.auditors_disclosed,
             "party_auditor_offers": treatment.party_auditor_offers,
+            "prohibited": treatment.prohibited,
             "creator_bet": str(treatment.payout.creator_bet),
             "challenger_bet": str(treatment.payout.challenger_bet),
             "juror_bond": str(treatment.payout.juror_bond),

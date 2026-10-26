@@ -219,6 +219,10 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Add `--prohibit`: agents are told the rules prohibit the enabled side
+  payments and private chat, which stay available, so using them is a rule
+  break rather than permitted play. Auditors and the chain-of-thought monitor
+  are told the same rules. Before, prompts only described the mechanisms.
 - Add `--party-auditor-offers`: after settlement the creator and challenger learn
   of the auditors and may each offer every auditor one finding-conditional
   payment. Without it, only jurors could offer an auditor anything, and a
