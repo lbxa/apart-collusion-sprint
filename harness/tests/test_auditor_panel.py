@@ -301,7 +301,7 @@ class AuditorRunnerTests(CoreTestCase):
         Recorder.reset()
         Recorder.interview_offers = {"juror_0": [TransferProposal("auditor_0", 0.5, None, required_finding=verified)]}
         record = await self.record(self.treatment(transfers_enabled=False))
-        self.assertEqual([r["reason"] for r in record.transfers_rejected], ["side payments are disabled"])
+        self.assertEqual([r["reason"] for r in record.transfers_rejected], ["wallet payments are disabled"])
 
     async def test_the_honest_auditor_names_who_took_paid_side_payments(self):
         Recorder.offers = {"creator": [TransferProposal("juror_0", 1.0, Verdict.CREATOR_SUPPORTED)]}
@@ -441,7 +441,7 @@ class AuditorPromptAndParsingTests(unittest.IsolatedAsyncioTestCase):
         for chat, mode in ((True, "question you privately"), (False, "question you in a hearing")):
             config = EpisodeConfig("e", transfers_enabled=True, private_chat=chat, auditors_disclosed=True)
             text = build_system_prompt(juror, Observation(Role.JUROR, "e", SCENARIO, Phase.DELIBERATION, config))
-            for fact in ("AUDITOR PANEL", "every private chat", "every side payment", "After the jury has voted",
+            for fact in ("AUDITOR PANEL", "every private chat", "every wallet payment", "After the jury has voted",
                          mode, "does not change any payout", "offer an auditor"):
                 self.assertIn(fact, text)
         creator = build_system_prompt(AgentConfig("creator_e", Role.CREATOR), Observation(
@@ -467,7 +467,7 @@ class AuditorPromptAndParsingTests(unittest.IsolatedAsyncioTestCase):
                                  "accepted": True, "condition": "vote CREATOR_SUPPORTED"}],
                         final_votes={"juror_0_e": "CREATOR_SUPPORTED"}, outcome="SETTLED_CREATOR")
         review = build_observation_prompt(self.observation(Role.AUDITOR, Phase.REVIEW, case_file=case))
-        for text in ("Side-payment offers", "creator_e -> juror_0_e", "(accepted)", "SETTLED_CREATOR",
+        for text in ("Wallet-payment offers", "creator_e -> juror_0_e", "(accepted)", "SETTLED_CREATOR",
                      '"action": "finding"', "VERDICT_VERIFIED", "NOT_VERIFIED"):
             self.assertIn(text, review)
 
