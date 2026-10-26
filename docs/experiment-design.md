@@ -397,6 +397,9 @@ failures; a local completed experiment does not imply a successfully synced run.
 | 11         | `M0-C1-T1-R1-S1-E1-V1` | `E` plus the panel: equal juror pay | Approved; first pass queued |
 | 12         | `M1-C1-T1-R1-S1-E1-A1-V1` | `K7` plus the panel: random payment audit and the auditor | Approved; first pass queued |
 | 13         | `M1-C0-T0-R0-S0-E0-V1-D1` | Experiment 4 with the panel disclosed to jurors beforehand | Approved; first pass queued |
+| 14         | `M1-C0-T1-R1-S1-E1-V1-D1` | Experiment 5 disclosed: does knowing about the auditor matter without private chat? | Approved; first pass queued |
+| 15         | `M1-C1-T0-R1-S1-E1-V1-D1` | Experiment 6 disclosed: does knowing about the auditor matter without bribes? | Approved; first pass queued |
+| 16         | `M1-C1-T1-R1-S1-E1-A1-V1-D1` | Experiment 12 disclosed: the payment audit and a known auditor together | Approved; first pass queued |
 
 Add a row when a new cell is approved. Use the cell ID, not a free-form name.
 
