@@ -19,6 +19,7 @@ establish an absence of collusion or a treatment effect.
 | [Research environment](sections/system.tex) | Mechanism and system-boundary diagram |
 | [Methods](sections/methods.tex) | Endpoint, notation, denominator, and uncertainty assumptions |
 | [Results](sections/results.tex) | Actual smoke measurements, counts, and two data figures |
+| [Exploratory probes](sections/probes.tex) | Six single-episode DeepSeek probes: design, results table and observations |
 | [Discussion](sections/discussion.tex) | Interpretation and limitations |
 | [Conclusion](sections/conclusion.tex) | Supported takeaway |
 | [References](sections/references.tex) | Keyed references to inspected local primary documents |
@@ -26,6 +27,9 @@ establish an absence of collusion or a treatment effect.
 | [Process figure](figures/baseline-process.pdf) | Deliberation rates and episode duration spread |
 | [Analysis script](analysis/baseline_figures.py) | Safe source extraction, validated calculations, and Matplotlib rendering |
 | [Admitted data](data/baseline-smoke.json) | Public revealed votes, counts, timing, and source provenance; no message bodies |
+| [Probe data](data/exploratory-probes.json) | Content-free counts, settings and source hashes for probes X1–X6 |
+| [Probe script](analysis/probe_snapshot.py) | Extracts the probe snapshot from local exports and renders its table |
+| [Probe table](tables/exploratory-probes.tex) | Generated results table for the probes; do not edit |
 | [Makefile](Makefile) | Compiles the document; regenerates the figure on request |
 | [Template provenance](template/README.md) | Attachment attribution, hashes, and adaptation decisions |
 | [Review record](review.md) | Evidence, build, and final-size rendered checks |
@@ -76,6 +80,15 @@ log and temporary files; it is ignored by Git. `make -C report clean` removes
 LaTeX build products and report PDFs from both editor and command-line builds,
 preserving the included figures. Run cleanup only when no build is active.
 
+### Regenerating the probe table
+
+`make -C report tables` renders `tables/exploratory-probes.tex` from the committed
+snapshot with the standard library only. To re-admit the probes from the ignored
+original exports, run
+`harness/.venv/bin/python report/analysis/probe_snapshot.py --extract --experiments .harness/experiments`
+from the repository root. Its tests run with `python3 -m unittest test_probe_snapshot`
+from `report/analysis/`.
+
 ### Regenerating the figures
 
 The report has an isolated, locked Python environment. From the repository root:
@@ -119,6 +132,13 @@ comparisons remain future work. This is not a submission-ready empirical study.
 ## Changelog
 
 ### 2026-10-25
+
+- Add six single-episode DeepSeek probes (X1–X6) as a bounded exploratory
+  section. Each probe is one episode, so the report gives counts, not rates or
+  spreads, and names the compared pairs and their code revisions. X2's auditor
+  observations are excluded because a since-fixed defect showed the auditor both
+  of each juror's offers as accepted. Probe numbers come from a content-free
+  snapshot and a generated table so no interview text or reasoning is committed.
 
 - Admit the two-episode baseline smoke and replace the fictional comparison.
   Use episode-level descriptive SD, preserve structural NAs, and retain the

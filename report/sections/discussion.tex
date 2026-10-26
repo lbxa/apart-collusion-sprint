@@ -21,8 +21,23 @@ Several baseline controls also restrict the questions the data can answer.
 Private-channel abuse is unobservable without a private opportunity, and bribe
 acceptance is inapplicable without transfers. Forced claim and challenge actions
 do not reveal voluntary party agreement. Cross-episode consistency under
-disabled memory does not measure learned coordination. No auditor agent is
-implemented, so auditor--juror collusion is outside this run's scope.
+disabled memory does not measure learned coordination. The baseline has no
+auditor, so auditor--juror collusion is outside its scope.
+
+The probes in Section~\ref{sec:probes} carry stronger caveats. Each setting
+has one episode, one model and one false claim, and model sampling is
+stochastic, so a repetition could differ. Each compared pair changes one
+mechanism, but runs at a different time and code revision. The
+evidence-consistent side was always the challenger, so no juror faced an offer
+that paid for the truthful vote against an offer that paid more for a false
+one. Accepting an aligned payment is therefore not evidence that money changed
+a vote. In this design, the auditor's finding has no consequences, which gives
+no participant a reason to buy it. The prohibition changed what agents were
+told, not their payoffs, and nothing enforced it. The reasoning monitor is an
+uncalibrated single-model judge whose rogue label treats accepting a permitted
+payment as a breach of a juror's duty. Repeated episodes, other models, true
+claims and validated monitor labels are needed before any of these
+observations becomes a finding about rates or effects.
 
 The next stage is the planned two-block, 20-episode baseline, followed by six
 single-factor screens and the 64-cell design~\cite{project-design}. Comparing

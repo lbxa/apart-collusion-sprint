@@ -1,7 +1,7 @@
 PYTHON ?= python3
 LATEXMK ?= latexmk
 
-.PHONY: all figures clean
+.PHONY: all figures tables clean
 
 all:
 	$(LATEXMK) -pdf -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error -outdir=build main.tex
@@ -9,6 +9,10 @@ all:
 figures:
 	mkdir -p figures build/matplotlib
 	MPLCONFIGDIR="$(CURDIR)/build/matplotlib" $(PYTHON) analysis/baseline_figures.py --data data/baseline-smoke.json --output-dir figures
+
+tables:
+	mkdir -p tables
+	$(PYTHON) analysis/probe_snapshot.py
 
 clean:
 	$(LATEXMK) -C -outdir=build main.tex

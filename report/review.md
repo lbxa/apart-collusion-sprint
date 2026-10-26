@@ -96,3 +96,36 @@ implementation, final author list and submission venue remain open. Two selected
 clear scenarios cannot establish population accuracy, a treatment effect or an
 absence of collusion. This review supersedes the earlier fictional-sample review;
 that sample's counts remain available only as reporting-guide examples.
+
+## Revision review: exploratory probes
+
+```text
+Review date / reviewer: 2026-10-25 / Claude Code session, for the project team
+Source revision / dirty changes: e5b3eb3 plus this revision's report, brief and analysis changes
+Manuscript path / PDF path: report/main.tex; checked build at a scratch path (not committed)
+Venue, year, track, stage / rules checked at: internal report; no venue selected (venue.md unchanged)
+Evidence IDs and analysis revision: B0 unchanged; probes X1–X6 (paper brief), snapshot data/exploratory-probes.json
+Figure/table regeneration commands and output paths: `make -C report tables` (reads the committed
+  snapshot, writes tables/exploratory-probes.tex); snapshot refreshed from the ignored originals with
+  `harness/.venv/bin/python report/analysis/probe_snapshot.py --extract --experiments .harness/experiments`.
+  Baseline figures unchanged.
+Compiler / distribution / package and bibliography versions: Tectonic 0.17.0 (Homebrew), on-demand
+  bundle packages; keyed thebibliography. The recorded pdfTeX/TeX Live 2025/Latexmk 4.86a toolchain is
+  not installed on this machine, so the official `make -C report` build was not run.
+Clean build command / exit status / log: `tectonic --keep-logs --outdir <scratch> main.tex` from report/;
+  exit 0; 7 US Letter pages; no errors, undefined references or citations, missing glyphs or overfull
+  boxes; one underfull \vbox at the first page break (extra space after the introduction), accepted.
+Pages and figures inspected at final size: all 7 pages rendered at 110 dpi; Table 2 fits the text width
+  with its caption above; baseline figures, equations and Table 1 unchanged; references resolve.
+Scientific and reader-comprehension findings: each probe is one episode, reported as counts with no
+  rate, mean or SD; compared pairs and their revisions are named; X2's auditor observations are
+  excluded because its case file marked both of a juror's offers accepted; the monitor is presented
+  as uncalibrated heuristic labels. Earlier session claims that jurors widely denied payments to the
+  auditor came from X2's contaminated interview and are not reported. Analysis tests: 3 probe tests
+  and the existing baseline tests pass.
+Accepted warnings / not-applicable checks and reasons: the underfull page-break box above; no new
+  figure, so grayscale and colour-vision checks are not applicable to this revision.
+Open gaps / responsible person / next action: official pdfLaTeX build of this revision (project team);
+  repeated probe blocks, true-claim scenarios, other models, monitor calibration and validation.
+Decision: draft
+```
