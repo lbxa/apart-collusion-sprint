@@ -137,14 +137,18 @@ class LLMAgent(BaseAgent):
     def _apply_bribe_decision(
         self, observation: Observation, action: dict[str, Any]
     ) -> None:
-        offer = observation.bribe_offer
-        if offer is None or "bribe_decision" not in action:
+        offers = observation.bribe_offers
+        if not offers or "bribe_decision" not in action:
             return
 
+        # One offer is answered "accept"; competing offers are chosen by number.
+        choices = ({"accept": 0} if len(offers) == 1
+                   else {f"accept {number}": number - 1 for number in range(1, len(offers) + 1)})
         decision = action["bribe_decision"]
-        if decision not in ("accept", "reject"):
+        if decision != "reject" and decision not in choices:
             raise ValueError(f"Invalid bribe decision from agent {self.agent_id}: {decision!r}")
-        offer.accepted = decision == "accept"
+        for index, offer in enumerate(offers):
+            offer.accepted = choices.get(decision) == index
 
     @staticmethod
     def _verdict(value: Any) -> Verdict:

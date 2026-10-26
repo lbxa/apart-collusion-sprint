@@ -140,8 +140,8 @@ class ChatAndAuditRunnerTests(CoreTestCase):
 
         class Accepting(ChatPlanAgent):
             async def deliberate(self, observation):
-                if observation.bribe_offer:
-                    observation.bribe_offer.accepted = True
+                if observation.bribe_offers:
+                    observation.bribe_offers[0].accepted = True
                 return await super().deliberate(observation)
 
         with patch("experiments.runner.HonestAgent", Accepting):

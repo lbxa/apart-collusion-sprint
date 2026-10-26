@@ -351,6 +351,7 @@ class ExperimentRunner:
                     treatment, scenario, ep_config, agents, creator_id, challenger_id,
                     juror_ids, bribe_offers, record, ep_logger,
                 )
+            held_offers = [(recipient, offer) for recipient, offers in bribe_offers.items() for offer in offers]
             record.bribes_offered = [{
                 "offer_id": f"{episode_id}:bribe:{index}",
                 "offered_by": offer.offered_by,
@@ -361,7 +362,9 @@ class ExperimentRunner:
                 "required_finding": None,
                 "accepted": False,
                 "simulated_payout": 0.0,
-            } for index, (recipient, offer) in enumerate(bribe_offers.items())]
+            } for index, (recipient, offer) in enumerate(held_offers)]
+            # Acceptance is per offer: a juror holding two offers accepts at most one.
+            held_by_id = {entry["offer_id"]: offer for entry, (_, offer) in zip(record.bribes_offered, held_offers)}
             record.deliberation_rounds = treatment.deliberation_rounds
 
             participants = (creator_id, challenger_id, *juror_ids)
@@ -383,8 +386,6 @@ class ExperimentRunner:
                                                              round_num, chat_action.private_messages)
 
                 for j_idx, jid in enumerate(juror_ids):
-                    bribe = bribe_offers.get(jid)
-
                     messages = (await run.game_api.get_forum_messages(episode_id, jid)
                                 if treatment.public_messaging else [])
 
@@ -393,7 +394,7 @@ class ExperimentRunner:
                         ep_config,
                         messages,
                         straw_polls, jid, treatment,
-                        bribe_offer=bribe,
+                        bribe_offers=bribe_offers.get(jid, []),
                         current_round=round_num,
                         **await self._chat_view(run, episode_id, jid, participants),
                     )
@@ -428,10 +429,7 @@ class ExperimentRunner:
                     if delib_action.straw_vote is not None:
                         round_poll.votes[jid] = delib_action.straw_vote
 
-                    # Track bribe acceptance
-                    if juror_obs.bribe_offer and juror_obs.bribe_offer.accepted:
-                        if jid not in record.bribes_accepted:
-                            record.bribes_accepted.append(jid)
+                    self._accept_offer(bribe_offers.get(jid, []), juror_obs.bribe_offers, jid, record)
 
                 straw_polls.append(round_poll)
                 record.straw_polls.append({
@@ -451,8 +449,6 @@ class ExperimentRunner:
                     logger.info("Juror %s refusing to cast final vote", jid)
                     continue
 
-                bribe = bribe_offers.get(jid)
-
                 messages = (await run.game_api.get_forum_messages(episode_id, jid)
                             if treatment.public_messaging else [])
 
@@ -461,7 +457,7 @@ class ExperimentRunner:
                     ep_config,
                     messages,
                     straw_polls, jid, treatment,
-                    bribe_offer=bribe,
+                    bribe_offers=bribe_offers.get(jid, []),
                     **await self._chat_view(run, episode_id, jid, participants),
                 )
 
@@ -482,14 +478,14 @@ class ExperimentRunner:
                     f"Verdict: {vote_action.verdict.name} | Assessment: {vote_action.assessment[:150]}",
                 )
 
-                if juror_obs.bribe_offer and juror_obs.bribe_offer.accepted:
-                    if jid not in record.bribes_accepted:
-                        record.bribes_accepted.append(jid)
-                        ep_logger.log(
-                            "VOTING", jid, "JUROR", "bribe_accepted",
-                            f"Accepted bribe of ${bribe.amount:.2f}: {bribe.condition}",
-                            channel="private",
-                        )
+                accepted_offer = self._accept_offer(bribe_offers.get(jid, []), juror_obs.bribe_offers, jid, record)
+                if accepted_offer is not None:
+                    ep_logger.log(
+                        "VOTING", jid, "JUROR", "bribe_accepted",
+                        f"Accepted bribe of ${accepted_offer.amount:.2f} from {accepted_offer.offered_by}: "
+                        f"{accepted_offer.condition}",
+                        channel="private",
+                    )
 
             # ── Phase 6: Settlement ──
             withhold_reveals = frozenset(juror_ids[index] for index in treatment.withhold_reveal_indices)
@@ -521,7 +517,7 @@ class ExperimentRunner:
                 if recipient in auditor_ids:
                     delivered = record.auditor_panel["findings"][recipient]["finding"] == offer["required_finding"]
                 else:
-                    offer["accepted"] = recipient in record.bribes_accepted
+                    offer["accepted"] = held_by_id[offer["offer_id"]].accepted
                     delivered = (settled_verdict is not None and settled_verdict.name == offer["required_verdict"]
                                  if recipient in (creator_id, challenger_id)
                                  else record.votes.get(recipient) == offer["required_verdict"])
@@ -767,7 +763,7 @@ class ExperimentRunner:
         straw_polls: list[StrawPoll],
         agent_id: str,
         treatment: TreatmentConfig,
-        bribe_offer: BribeOffer | None = None,
+        bribe_offers: list[BribeOffer] = (),
         current_round: int = 0,
         transfer_stage: str | None = None,
         transfer_recipients: tuple[str, ...] = (),
@@ -788,7 +784,7 @@ class ExperimentRunner:
             visible_messages=copy.deepcopy([msg for msg in messages if msg.channel in self._allowed_channels(treatment)]),
             straw_polls=copy.deepcopy(straw_polls) if treatment.public_messaging else [],
             allowed_channels=self._allowed_channels(treatment),
-            bribe_offer=copy.deepcopy(bribe_offer),
+            bribe_offers=copy.deepcopy(list(bribe_offers)),
             transfer_stage=transfer_stage,
             transfer_recipients=transfer_recipients,
             transfer_cap=transfer_cap,
@@ -966,11 +962,11 @@ class ExperimentRunner:
                       channel="auditor_private")
         observation = self._make_observation(
             Role.AUDITOR, record.episode_id, scenario, Phase.INTERVIEW, ep_config, [], [], auditor, treatment,
-            bribe_offer=BribeOffer(juror, amount, condition, required_verdict=None, required_finding=finding),
+            bribe_offers=[BribeOffer(juror, amount, condition, required_verdict=None, required_finding=finding)],
             transfer_stage="respond",
         )
         await run.agents[auditor].respond_to_offer(observation)
-        offer["accepted"] = observation.bribe_offer.accepted
+        offer["accepted"] = observation.bribe_offers[0].accepted
         if offer["accepted"]:
             if auditor not in record.bribes_accepted:
                 record.bribes_accepted.append(auditor)
@@ -1007,11 +1003,14 @@ class ExperimentRunner:
         creator_id: str,
         challenger_id: str,
         juror_ids: list[str],
-        offers: dict[str, BribeOffer],
+        offers: dict[str, list[BribeOffer]],
         record: EpisodeRecord,
         ep_logger: EpisodeLogger,
     ) -> None:
-        """Collect party offers, validate them, then let party recipients answer."""
+        """Collect sealed party offers, validate them, then let party recipients answer.
+
+        Neither party sees the other's offers, so a juror can hold one from each.
+        """
         payout = treatment.payout
         bets = {creator_id: payout.creator_bet, challenger_id: payout.challenger_bet}
         roles = {creator_id: Role.CREATOR, challenger_id: Role.CHALLENGER}
@@ -1045,29 +1044,44 @@ class ExperimentRunner:
                 condition = proposal.condition.strip() or (
                     f"the jury settles on {proposal.required_verdict.name}" if recipient_is_party
                     else f"vote {proposal.required_verdict.name}")
-                offers[proposal.recipient_id] = BribeOffer(
+                offers.setdefault(proposal.recipient_id, []).append(BribeOffer(
                     offered_by=sender, amount=proposal.amount, condition=condition,
                     required_verdict=proposal.required_verdict,
-                )
+                ))
                 committed[sender] += proposal.amount
                 ep_logger.log("TRANSFERS", sender, roles[sender].name, "offer",
                               f"${proposal.amount:.2f} to {proposal.recipient_id}: {condition}",
                               channel="private")
 
         for party in (creator_id, challenger_id):
+            # Only the other party can offer to a party, so a party holds at most one offer.
             if party not in offers:
                 continue
+            [offer] = offers[party]
             observation = self._make_observation(
                 roles[party], ep_config.episode_id, scenario, Phase.DELIBERATION, ep_config,
-                [], [], party, treatment, bribe_offer=offers[party], transfer_stage="respond",
+                [], [], party, treatment, bribe_offers=[offer], transfer_stage="respond",
             )
             await agents[party].respond_to_offer(observation)
-            if observation.bribe_offer.accepted:
-                offers[party].accepted = True
+            if observation.bribe_offers[0].accepted:
+                offer.accepted = True
                 record.bribes_accepted.append(party)
                 ep_logger.log("TRANSFERS", party, roles[party].name, "offer_accepted",
-                              f"Accepted ${offers[party].amount:.2f} from {offers[party].offered_by}",
-                              channel="private")
+                              f"Accepted ${offer.amount:.2f} from {offer.offered_by}", channel="private")
+
+    @staticmethod
+    def _accept_offer(held: list[BribeOffer], answered: list[BribeOffer], recipient: str,
+                      record: EpisodeRecord) -> BribeOffer | None:
+        """Record a recipient's choice among its held offers: at most one, and the first is final."""
+        if any(offer.accepted for offer in held):
+            return None
+        chosen = [index for index, offer in enumerate(answered) if offer.accepted]
+        if len(chosen) != 1:
+            return None
+        offer = held[chosen[0]]
+        offer.accepted = True
+        record.bribes_accepted.append(recipient)
+        return offer
 
     @staticmethod
     def _transfer_rejection(
@@ -1076,7 +1090,7 @@ class ExperimentRunner:
         recipients: tuple[str, ...],
         cap: float,
         remaining: float,
-        offers: dict[str, BribeOffer],
+        offers: dict[str, list[BribeOffer]],
     ) -> str | None:
         """Why a party's offer is invalid, or None. Agent mistakes never end an episode."""
         if proposal.recipient_id == sender:
@@ -1092,8 +1106,8 @@ class ExperimentRunner:
             return "amount exceeds the per-offer cap"
         if amount > remaining + 1e-9:
             return "amount exceeds the sender's remaining budget"
-        if proposal.recipient_id in offers:
-            return "recipient already has an offer"
+        if any(offer.offered_by == sender for offer in offers.get(proposal.recipient_id, [])):
+            return "recipient already has an offer from this sender"
         return None
 
     def _create_bribe_offers(
@@ -1102,7 +1116,7 @@ class ExperimentRunner:
         creator_id: str,
         challenger_id: str,
         juror_ids: list[str],
-    ) -> dict[str, BribeOffer]:
+    ) -> dict[str, list[BribeOffer]]:
         offers = {}
         role_to_id = {"creator": creator_id, "challenger": challenger_id}
         role_to_id.update({f"juror_{index}": actor for index, actor in enumerate(juror_ids)})
@@ -1117,8 +1131,8 @@ class ExperimentRunner:
                 recipient = role_to_id[role]
                 if recipient in offers:
                     raise ValueError("Only one simulated offer per juror is supported per episode")
-                offers[recipient] = BribeOffer(
+                offers[recipient] = [BribeOffer(
                     offered_by=role_to_id[bd.from_role], amount=bd.amount,
                     condition=bd.condition, required_verdict=bd.required_verdict,
-                )
+                )]
         return offers

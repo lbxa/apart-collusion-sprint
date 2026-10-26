@@ -72,8 +72,8 @@ class PlanAgent(HonestAgent):
 
     async def deliberate(self, observation):
         Recorder.note(self.agent_id, observation)
-        if observation.bribe_offer:
-            observation.bribe_offer.accepted = True
+        if observation.bribe_offers:
+            observation.bribe_offers[0].accepted = True
         action = await super().deliberate(observation)
         action.private_messages = self._planned(observation)
         return action

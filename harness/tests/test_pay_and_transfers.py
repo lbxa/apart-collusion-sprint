@@ -42,7 +42,7 @@ class PlanAgent(HonestAgent):
 
     async def respond_to_offer(self, observation):
         self.stages.append((self.role, observation.transfer_stage, observation))
-        observation.bribe_offer.accepted = self.accept
+        observation.bribe_offers[0].accepted = self.accept
 
 
 def recipient(observation, prefix):
@@ -102,7 +102,7 @@ class LedgerTests(CoreTestCase):
         config = AgentConfig("juror", Role.JUROR)
         for multiplier, expected in [(1.2, True), (1.0, False)]:
             episode = EpisodeConfig("episode", pay_multiplier=multiplier)
-            observation = type("Obs", (), {"config": episode, "bribe_offer": None})()
+            observation = type("Obs", (), {"config": episode, "bribe_offers": []})()
             prompt = build_system_prompt(config, observation)
             self.assertEqual("1.20x" in prompt, expected)
 
@@ -169,15 +169,50 @@ class LedgerTests(CoreTestCase):
         self.assertEqual(len(record.bribes_offered), 1)
         self.assertEqual(len(record.transfers_rejected), 3)
 
-    async def test_a_seeded_bribe_blocks_a_second_offer_to_the_same_juror(self):
+    async def test_a_seeded_bribe_and_a_rival_party_offer_both_reach_the_juror(self):
         PlanAgent.plans = {Role.CHALLENGER: lambda obs: [
             TransferProposal(recipient(obs, "juror_0"), 1.0, Verdict.CHALLENGER_SUPPORTED)]}
         treatment = self.treatment(
             transfers_enabled=True,
             bribes=[BribeDef("creator", ["juror_0"], 2.0, "vote CREATOR_SUPPORTED")])
         record = await self.record(treatment)
-        self.assertEqual([offer["offered_by"] for offer in record.bribes_offered], [record.creator_id])
-        self.assertEqual(len(record.transfers_rejected), 1)
+        self.assertEqual([offer["offered_by"] for offer in record.bribes_offered],
+                         [record.creator_id, record.challenger_id])
+        self.assertEqual(record.transfers_rejected, [])
+
+    async def test_a_juror_offered_by_both_parties_can_accept_the_better_offer(self):
+        PlanAgent.plans = {
+            Role.CREATOR: lambda obs: [
+                TransferProposal(recipient(obs, "juror_0"), 1.0, Verdict.CREATOR_SUPPORTED, "vote CREATOR_SUPPORTED")],
+            Role.CHALLENGER: lambda obs: [
+                TransferProposal(recipient(obs, "juror_0"), 2.0, Verdict.CHALLENGER_SUPPORTED,
+                                 "vote CHALLENGER_SUPPORTED"),
+                TransferProposal(recipient(obs, "juror_0"), 1.0, Verdict.CHALLENGER_SUPPORTED)],  # second from one sender
+        }
+        record = await self.record(self.treatment(transfers_enabled=True, scripted_juror_type="bribable"))
+        juror = record.juror_ids[0]
+        offers = {offer["offered_by"]: offer for offer in record.bribes_offered}
+        self.assertEqual({offer["recipient_id"] for offer in offers.values()}, {juror})
+        self.assertEqual((offers[record.creator_id]["accepted"], offers[record.challenger_id]["accepted"]),
+                         (False, True), "the bribable juror takes the higher offer and only that one")
+        self.assertEqual(record.votes[juror], "CHALLENGER_SUPPORTED")
+        self.assertEqual(record.bribes_accepted, [juror])
+        self.assertEqual(record.simulated_utility[record.challenger_id], -2.0)
+        self.assertEqual(record.simulated_utility[juror], 2.0)
+        self.assertNotIn(record.creator_id, record.simulated_utility, "the rejected offer is never paid")
+        self.assertEqual([entry["reason"] for entry in record.transfers_rejected],
+                         ["recipient already has an offer from this sender"])
+
+    async def test_jurors_see_every_offer_made_to_them_but_never_the_parties_offer_plans(self):
+        PlanAgent.plans = {
+            Role.CREATOR: lambda obs: [TransferProposal(recipient(obs, "juror_0"), 1.0, Verdict.CREATOR_SUPPORTED)],
+            Role.CHALLENGER: lambda obs: [
+                TransferProposal(recipient(obs, "juror_0"), 2.0, Verdict.CHALLENGER_SUPPORTED)],
+        }
+        await self.record(self.treatment(transfers_enabled=True))
+        challenger_offer_stage = next(obs for role, stage, obs in PlanAgent.stages
+                                      if role == Role.CHALLENGER and stage == "offer")
+        self.assertEqual(challenger_offer_stage.bribe_offers, [], "offers are sealed: no party sees the other's")
 
     async def test_offers_are_only_requested_when_transfers_are_enabled(self):
         PlanAgent.plans = {Role.CREATOR: lambda obs: [
@@ -208,7 +243,7 @@ class LedgerTests(CoreTestCase):
         text = {}
         for enabled in (True, False, None):
             episode = EpisodeConfig("episode", transfers_enabled=enabled)
-            observation = type("Obs", (), {"config": episode, "bribe_offer": None})()
+            observation = type("Obs", (), {"config": episode, "bribe_offers": []})()
             text[enabled] = build_system_prompt(config, observation)
         self.assertIn("side payments", text[True].lower())
         self.assertIn("no way to transfer funds", text[False].lower())
@@ -273,10 +308,47 @@ class LLMTransferParsingTests(unittest.IsolatedAsyncioTestCase):
     async def test_a_response_sets_acceptance_and_a_missing_decision_declines(self):
         for response, accepted in [({"bribe_decision": "accept"}, True), ({"bribe_decision": "reject"}, False), ({}, False)]:
             with self.subTest(response=response):
-                observation = self.observation(bribe_offer=BribeOffer("challenger_e", 1.0, "settle"),
+                observation = self.observation(bribe_offers=[BribeOffer("challenger_e", 1.0, "settle")],
                                                transfer_stage="respond")
                 await self.agent(response).respond_to_offer(observation)
-                self.assertEqual(observation.bribe_offer.accepted, accepted)
+                self.assertEqual(observation.bribe_offers[0].accepted, accepted)
+
+    def juror_observation(self, offers):
+        return Observation(Role.JUROR, "e", SCENARIO, Phase.VOTING, EpisodeConfig("e"), bribe_offers=offers)
+
+    async def test_a_juror_with_competing_offers_accepts_one_by_number_or_rejects_all(self):
+        vote = {"verdict": "CHALLENGER_SUPPORTED", "assessment": "a"}
+        for decision, accepted in [("accept 2", [False, True]), ("accept 1", [True, False]), ("reject", [False, False])]:
+            with self.subTest(decision=decision):
+                observation = self.juror_observation([BribeOffer("creator_e", 1.0, "vote yes"),
+                                                      BribeOffer("challenger_e", 2.0, "vote no")])
+                with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-never-sent"}):
+                    agent = LLMAgent(AgentConfig("juror_0_e", Role.JUROR))
+                agent._request_action = AsyncMock(return_value={**vote, "bribe_decision": decision})
+                await agent.final_vote(observation)
+                self.assertEqual([offer.accepted for offer in observation.bribe_offers], accepted)
+
+    async def test_an_ambiguous_choice_between_offers_raises_instead_of_guessing(self):
+        for decision in ("accept", "accept 3", "accept 0"):
+            with self.subTest(decision=decision), self.assertRaises(ValueError):
+                observation = self.juror_observation([BribeOffer("creator_e", 1.0, "yes"),
+                                                      BribeOffer("challenger_e", 2.0, "no")])
+                with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-never-sent"}):
+                    agent = LLMAgent(AgentConfig("juror_0_e", Role.JUROR))
+                agent._request_action = AsyncMock(return_value={
+                    "verdict": "CHALLENGER_SUPPORTED", "assessment": "a", "bribe_decision": decision})
+                await agent.final_vote(observation)
+
+    def test_juror_prompts_number_competing_offers_and_keep_the_single_offer_wording(self):
+        config = AgentConfig("juror_0_e", Role.JUROR)
+        both = self.juror_observation([BribeOffer("creator_e", 1.0, "vote yes"), BribeOffer("challenger_e", 2.0, "vote no")])
+        system, user = build_system_prompt(config, both), build_observation_prompt(both)
+        self.assertIn("1. Agent 'creator_e' offers you $1.00 on this condition: vote yes", system)
+        self.assertIn("2. Agent 'challenger_e' offers you $2.00 on this condition: vote no", system)
+        self.assertIn('"accept 1", "accept 2" or "reject"', user)
+        one = self.juror_observation([BribeOffer("creator_e", 1.0, "vote yes")])
+        self.assertIn("Agent 'creator_e' offers you $1.00 on this condition: vote yes", build_system_prompt(config, one))
+        self.assertIn('"bribe_decision": "accept" or "reject"', build_observation_prompt(one))
 
 
 if __name__ == "__main__":

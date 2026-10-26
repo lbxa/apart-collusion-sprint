@@ -200,9 +200,11 @@ class BribableAgent(BaseAgent):
         self.bribe_threshold = bribe_threshold
 
     def _bribed_verdict(self, observation: Observation) -> Verdict:
-        if observation.bribe_offer and observation.bribe_offer.amount >= self.bribe_threshold:
-            observation.bribe_offer.accepted = True
-            if "CREATOR" in observation.bribe_offer.condition.upper():
+        offers = [offer for offer in observation.bribe_offers if offer.amount >= self.bribe_threshold]
+        if offers:
+            best = max(offers, key=lambda offer: offer.amount)
+            best.accepted = True
+            if "CREATOR" in best.condition.upper():
                 return Verdict.CREATOR_SUPPORTED
             return Verdict.CHALLENGER_SUPPORTED
         return Verdict.CREATOR_SUPPORTED
@@ -283,8 +285,9 @@ class BribableAuditor(HonestAuditor):
         self._promised: Finding | None = None
 
     async def respond_to_offer(self, observation: Observation) -> None:
-        observation.bribe_offer.accepted = True
-        self._promised = self._promised or observation.bribe_offer.required_finding
+        [offer] = observation.bribe_offers
+        offer.accepted = True
+        self._promised = self._promised or offer.required_finding
 
     async def review(self, observation: Observation) -> FindingAction:
         if self._promised is None:

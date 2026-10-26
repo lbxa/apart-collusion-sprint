@@ -195,11 +195,12 @@ class Observation:
     # Agent's own state
     own_balance: Amount = 0.0
 
-    # Bribe offer
-    bribe_offer: BribeOffer | None = None
+    # Side offers to this agent, at most one per sender. A juror offered by both
+    # parties sees both and may accept at most one.
+    bribe_offers: list[BribeOffer] = field(default_factory=list)
 
     # Side-payment stage: "offer" asks a party for offers, "respond" asks a
-    # recipient to answer bribe_offer. The cap bounds each offer from this agent.
+    # recipient to answer its single offer. The cap bounds each offer from this agent.
     transfer_stage: str | None = None
     transfer_recipients: tuple[str, ...] = ()
     transfer_cap: float = 0.0

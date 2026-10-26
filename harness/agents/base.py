@@ -83,7 +83,7 @@ class BaseAgent(ABC):
         return OfferTransfersAction(agent_id=self.agent_id, episode_id=observation.episode_id)
 
     async def respond_to_offer(self, observation: Observation) -> None:
-        """Accept by setting observation.bribe_offer.accepted; declined by default."""
+        """Accept by setting observation.bribe_offers[0].accepted; declined by default."""
 
     async def chat(self, observation: Observation) -> ChatAction:
         """A party's private messages during a deliberation round; none by default."""

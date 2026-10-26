@@ -219,6 +219,13 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Let a juror choose between competing offers. The limit is now one offer per
+  sender per recipient, so a juror can hold one from each party; offers are
+  sealed, and the juror accepts at most one (`"accept 1"`, `"accept 2"` or
+  `"reject"`), first acceptance final. Before, the creator's offers were
+  processed first and blocked the challenger's: in a live DeepSeek episode all
+  seven challenger offers were dropped. `Observation.bribe_offers` replaces
+  `bribe_offer`, and acceptance is recorded per offer.
 - Add the categorical Models factor. Named lineups in `experiments/design.py`
   set the creator, challenger and jury models; auditors use the jury model.
   `run_experiments.py --lineup` selects them, and `run_lineups.py` runs cells

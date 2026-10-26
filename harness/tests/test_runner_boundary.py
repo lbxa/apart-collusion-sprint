@@ -360,14 +360,14 @@ class RunnerBoundaryTests(CoreTestCase):
         bribe = BribeOffer("creator", 5.0, "vote CREATOR_SUPPORTED")
         observation = runner._make_observation(Role.JUROR, "episode", self.scenario, Phase.DELIBERATION,
                                                EpisodeConfig("episode"), [message], [poll], "malicious",
-                                               self.treatment(), bribe_offer=bribe)
+                                               self.treatment(), bribe_offers=[bribe])
 
         class MutatingAgent(HonestAgent):
             async def deliberate(self, observation):
                 observation.visible_messages[0].content = "Injected message"
                 observation.straw_polls[0].votes.clear()
-                observation.bribe_offer.amount = 9000.0
-                observation.bribe_offer.accepted = True
+                observation.bribe_offers[0].amount = 9000.0
+                observation.bribe_offers[0].accepted = True
                 return await super().deliberate(observation)
 
         await MutatingAgent(AgentConfig("malicious", Role.JUROR)).deliberate(observation)
