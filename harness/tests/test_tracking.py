@@ -60,6 +60,7 @@ class WandbTrackingTests(unittest.TestCase):
         self.assertEqual(init["config"]["backend"], "core")
         self.assertEqual(init["config"]["blocks"], 1)
         self.assertEqual(init["config"]["block_index"], 1)
+        self.assertIsNone(init["config"]["lineup"])
         self.assertFalse(init["config"]["memory_enabled"])
         settings = self.sdk.Settings.call_args.kwargs
         for key in ("disable_code", "disable_git", "x_disable_meta", "x_disable_stats", "x_disable_machine_info"):
@@ -91,6 +92,16 @@ class WandbTrackingTests(unittest.TestCase):
         config = self.sdk.init.call_args.kwargs["config"]
         for role in ("creator", "challenger", "juror"):
             self.assertEqual(config[f"{role}_model"], "test/paid-model")
+
+    def test_lineup_runs_record_the_lineup_and_each_party_model(self):
+        self.treatment = treatment_for(resolve_cell("M0-C0-T0-R0-S0-E0"), lineup="opus_vs_gpt_luna", num_episodes=1)
+        with self.tracker():
+            pass
+        config = self.sdk.init.call_args.kwargs["config"]
+        self.assertEqual(config["lineup"], "opus_vs_gpt_luna")
+        self.assertEqual((config["creator_model"], config["challenger_model"]),
+                         (self.treatment.creator_model, self.treatment.challenger_model))
+        self.assertNotEqual(config["creator_model"], config["challenger_model"])
 
     def test_auditor_cells_are_distinguishable_and_their_settings_recorded(self):
         self.treatment = treatment_for(resolve_cell("VD"), num_episodes=1)

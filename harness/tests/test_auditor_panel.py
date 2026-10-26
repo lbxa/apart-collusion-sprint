@@ -351,7 +351,7 @@ class AuditorDesignTests(unittest.TestCase):
     def test_scripted_runs_script_the_auditors_too(self):
         args = argparse.Namespace(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
                                   cell="V", blocks=1, episodes=1, scripted=True, mock=True, seed=42, model=None,
-                                  cot_monitor=None)
+                                  lineup=None, cot_monitor=None)
         [treatment] = run_experiments.select_treatments(args)[0].values()
         self.assertEqual(treatment.scripted_auditor_indices, [0])
         self.assertEqual(run_knockout.make_dry_run_treatment(treatment).scripted_auditor_indices, [0])
@@ -359,7 +359,7 @@ class AuditorDesignTests(unittest.TestCase):
     def test_an_explicit_model_applies_to_auditors_too(self):
         args = argparse.Namespace(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
                                   cell="V", blocks=1, episodes=1, scripted=False, mock=True, seed=42,
-                                  model="provider/paid-route", cot_monitor=None)
+                                  model="provider/paid-route", lineup=None, cot_monitor=None)
         [treatment] = run_experiments.select_treatments(args)[0].values()
         self.assertEqual({treatment.creator_model, treatment.challenger_model, treatment.juror_model,
                           treatment.auditor_model}, {"provider/paid-route"})

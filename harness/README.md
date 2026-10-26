@@ -67,6 +67,13 @@ pay (`M1`). Use the full cell ID for this baseline.
 `--model PROVIDER/MODEL` explicitly selects the same model for the creator,
 challenger, and all LLM jurors, including juror overrides. Providers and treatment
 factors stay unchanged; omitting it preserves the configured model defaults.
+`--lineup NAME [NAME ...]` (with `--cell`) runs each block once per named model
+lineup from `experiments/design.py`: the creator and challenger may use different
+models, and every juror and auditor shares the jury model. `--list` prints the
+lineups, and the [Models factor](../docs/experiment-design.md#models-l-categorical)
+defines them. `--model` and `--lineup` are mutually exclusive.
+`run_lineups.py CELL... [--lineup NAME ...] [--jobs N] [-- OPTIONS]` runs each cell
+once per lineup in parallel, one process and log per pair, in one W&B group.
 Use a fresh output directory and W&B group when retrying with another model,
 and keep quota failures visible as failed runs. W&B records the selected model
 for each role so runs using different models can be compared separately.
@@ -206,6 +213,16 @@ expiry, content integrity, and cleanup. Model APIs are never needed by the gate.
 
 ### 2026-10-25
 
+- Add the categorical Models factor. Named lineups in `experiments/design.py`
+  set the creator, challenger and jury models; auditors use the jury model.
+  `run_experiments.py --lineup` selects them, and `run_lineups.py` runs cells
+  across lineups in parallel, one process per cell and lineup, because one
+  process running 17 lineups in turn would take about 40 hours per cell. The
+  lineup stays out of the cell ID, so earlier cell IDs and run names are
+  unchanged; treatment IDs, run keys, `config.lineup`/`config.models` in
+  episode exports, and W&B `lineup` carry it. The roster's priors come from
+  predecessor models on other tasks: no study measures bribery or jury
+  collusion by model.
 - Retry an unreadable model reply once with the same prompt. In the first live
   auditor runs `nvidia/nemotron-3-ultra-550b-a55b` wrote malformed JSON in about
   0.4% of calls (closing the object early or missing a delimiter), which failed

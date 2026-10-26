@@ -15,6 +15,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import run_experiments
 import run_knockout
+from experiments.design import LINEUPS
 
 
 def metrics(failure_rate=0.0):
@@ -136,6 +137,38 @@ class EntryPointTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(treatment.use_scripted_challenger)
         self.assertEqual(treatment.scripted_juror_indices, [])
         self.assertEqual(run_experiments.PREDEFINED_TREATMENTS["baseline"].creator_model, original)
+
+    async def test_wandb_labels_each_lineup_run_with_its_block(self):
+        first, second = list(LINEUPS)[:2]
+        context = Mock(__enter__=Mock(return_value=Mock()), __exit__=Mock(return_value=False))
+        with patch.object(run_experiments, "WandbTracker", return_value=context) as factory:
+            run = await self.invoke(run_experiments, [
+                "--cell", "M0-C0-T0-R0-S0-E0", "--blocks", "2", "--episodes", "1", "--lineup", first, second,
+                "--live", "--wandb", "--wandb-project", "test-project",
+            ])
+        self.assertEqual(run.result, 0)
+        calls = [call.kwargs for call in factory.call_args_list]
+        self.assertEqual([call["name"] for call in calls], [f"M0-C0-T0-R0-S0-E0_{name}_b{block}"
+                                                            for block in (1, 2) for name in (first, second)])
+        self.assertEqual([call["block_index"] for call in calls], [1, 1, 2, 2])
+        self.assertEqual({call["blocks"] for call in calls}, {2})
+        self.assertEqual(len({call["group"] for call in calls}), 1)
+
+    async def test_lineup_needs_a_cell_and_excludes_a_single_model(self):
+        name = next(iter(LINEUPS))
+        for arguments, message in [
+            (["--treatment", "baseline", "--lineup", name], "--lineup requires --cell"),
+            (["--cell", "M0-C0-T0-R0-S0-E0", "--lineup", name, "--model", "test/model"], "not allowed with"),
+            (["--cell", "M0-C0-T0-R0-S0-E0", "--lineup", "unknown"], "invalid choice"),
+        ]:
+            with self.subTest(arguments=arguments):
+                errors = io.StringIO()
+                with patch.object(run_experiments, "CoreEngineAPI") as core, \
+                     patch.object(sys, "argv", [run_experiments.__file__, *arguments]), \
+                     contextlib.redirect_stderr(errors), self.assertRaises(SystemExit):
+                    await run_experiments.main()
+                core.assert_not_called()
+                self.assertIn(message, errors.getvalue())
 
     async def test_blank_model_is_rejected_before_engine_startup(self):
         errors = io.StringIO()
