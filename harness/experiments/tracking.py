@@ -69,6 +69,7 @@ class WandbTracker:
         config = {
             "treatment_id": treatment.treatment_id,
             "cell": cell_id,
+            "lineup": treatment.metadata.get("lineup"),
             "factors": factors,
             "backend": self.backend,
             "purpose": self.purpose,

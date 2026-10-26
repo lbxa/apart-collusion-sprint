@@ -161,6 +161,16 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(math.isnan(metrics.verdict_accuracy))
         self.assertEqual(metrics.completion_rate, 0.0)
 
+    async def test_exported_episode_config_identifies_the_lineup_and_role_models(self):
+        treatment = self.treatment(creator_model="test/creator", challenger_model="test/challenger",
+                                   juror_model="test/jury", auditor_model="test/jury",
+                                   metadata={"cell": "M0-C0-T0-R0-S0-E0", "lineup": "test_lineup"})
+        await ExperimentRunner(MockGameAPI(), self.output).run_experiment(treatment, [self.scenario], "lineup")
+        exported = json.loads((self.output / "lineup" / "episodes.jsonl").read_text().splitlines()[0])
+        self.assertEqual(exported["config"]["lineup"], "test_lineup")
+        self.assertEqual(exported["config"]["models"], {"creator": "test/creator", "challenger": "test/challenger",
+                                                        "juror": "test/jury", "auditor": "test/jury"})
+
     async def test_exports_are_scoped_to_each_experiment_in_a_reused_runner(self):
         runner = ExperimentRunner(MockGameAPI(), self.output)
         for experiment in ["first", "second"]:

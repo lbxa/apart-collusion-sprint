@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import weave
 
-from experiments.design import resolve_cell, scenarios_for, treatment_for
+from experiments.design import LINEUPS, Lineup, resolve_cell, scenarios_for, treatment_for, with_models
 from experiments.runner import ExperimentRunner
 from experiments.tracking import WandbTracker
 from experiments.treatments import (
@@ -67,8 +67,13 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
         scenarios, default_episodes = FALSE_CLAIMS_FOR_ATTACK, 10
     elif args.cell:
         cell = resolve_cell(args.cell)
-        block = treatment_for(cell)
-        selected = {f"{cell.id}_b{number}": block for number in range(1, args.blocks + 1)}
+        selected = {}
+        # Lineups take turns within each block, so provider drift over time is not confounded with model.
+        for number in range(1, args.blocks + 1):
+            for lineup in args.lineup or [None]:
+                block = treatment_for(cell, lineup=lineup)
+                key = f"{cell.id}_{lineup}_b{number}" if lineup else f"{cell.id}_b{number}"
+                selected[key] = replace(block, metadata={**block.metadata, "block": number})
         scenarios, default_episodes = scenarios_for(cell), block.num_episodes
     elif args.compare_incentives:
         selected = {}
@@ -95,12 +100,7 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
     for key, treatment in selected.items():
         treatment = replace(treatment, num_episodes=episodes, seed=args.seed)
         if args.model is not None:
-            treatment = replace(
-                treatment, creator_model=args.model, challenger_model=args.model,
-                juror_model=args.model, auditor_model=args.model,
-                juror_overrides={index: {**override, "model": args.model}
-                                 for index, override in treatment.juror_overrides.items()},
-            )
+            treatment = with_models(treatment, Lineup(args.model, args.model, args.model))
         if args.cot_monitor is not None:
             treatment = replace(treatment, cot_monitor_model=args.cot_monitor)
         if args.scripted:
@@ -131,13 +131,13 @@ async def run_treatments(treatments, scenarios, *, output_dir, mock=False, core_
         runner = ExperimentRunner(game_api, output_dir=output_dir)
         results = {}
         group = wandb_group or f"jury-{uuid.uuid4().hex[:12]}"
-        for index, (key, treatment) in enumerate(treatments.items(), start=1):
+        for key, treatment in treatments.items():
             logger.info("Running treatment: %s", key)
             tracking = WandbTracker(
                 treatment=treatment, name=key, group=group, project=wandb_project,
                 entity=wandb_entity, backend="mock" if mock else "core",
                 purpose=run_purpose, blocks=block_count,
-                block_index=index if block_count is not None else None, output_dir=output_dir,
+                block_index=treatment.metadata.get("block"), output_dir=output_dir,
                 scenario_ids=[scenarios[episode_index % len(scenarios)].scenario_id
                               for episode_index in range(treatment.num_episodes)],
             ) if wandb_project else nullcontext()
@@ -181,7 +181,10 @@ async def main():
     backend.add_argument("--mock", action="store_true", help="Explicitly use the in-memory game instead of Rust and Anvil")
     parser.add_argument("--core-engine-dir", help="Optional core engine repository root override")
     parser.add_argument("--seed", type=int, default=42, help="Random assignment seed")
-    parser.add_argument("--model", help="Use this model for creator, challenger, and every LLM juror; preserve providers and factors")
+    model_choice = parser.add_mutually_exclusive_group()
+    model_choice.add_argument("--model", help="Use this model for creator, challenger, and every LLM juror; preserve providers and factors")
+    model_choice.add_argument("--lineup", nargs="+", choices=list(LINEUPS), metavar="LINEUP",
+                              help="Run each block once per named model lineup (with --cell); --list shows them")
     parser.add_argument("--env-file", type=Path, default=Path(__file__).resolve().parents[1] / ".env",
                         help="Optional dotenv file (default: repository .env); existing environment wins")
     parser.add_argument("--wandb", action="store_true", help="Upload scientific metrics to Weights & Biases")
@@ -200,6 +203,9 @@ async def main():
         print("\nAvailable treatments:\n")
         for key, treatment in sorted(PREDEFINED_TREATMENTS.items()):
             print(f"  {key:30s}  {treatment.name}\n  {'':30s}  {treatment.description}\n")
+        print("Model lineups (--cell ... --lineup NAME):\n")
+        for key, lineup in LINEUPS.items():
+            print(f"  {key:30s}  creator {lineup.creator}, challenger {lineup.challenger}, jury {lineup.jury}")
         return 0
     if args.episodes is not None and args.episodes < 1:
         parser.error("--episodes must be positive")
@@ -209,6 +215,8 @@ async def main():
         args.model = args.model.strip()
         if not args.model:
             parser.error("--model must not be blank")
+    if args.lineup and not args.cell:
+        parser.error("--lineup requires --cell")
     if args.mock and args.core_engine_dir:
         parser.error("--core-engine-dir cannot be used with --mock")
     if not (args.all or args.compare_jury_sizes or args.compare_incentives or args.treatment or args.cell or args.scripted):
