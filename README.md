@@ -74,9 +74,8 @@ harness/.venv/bin/python harness/run_knockout.py \
 
 The harness starts its own Rust server and Anvil on fresh loopback ports, calls
 `/v1`, commits/reveals votes, reads contract settlement, and stops both processes.
-`--dry-run` selects scripted agents and still uses the real game. `--mock` is an
-explicit alternative for harness-only simulations. No model key or public RPC
-is needed for the command above. See [the harness guide](harness/README.md) and
+`--dry-run` selects scripted agents and still uses the real game. No model key
+or public RPC is needed for the command above. See [the harness guide](harness/README.md) and
 [the integration contract](docs/integration.md) for units, limits, and evidence.
 
 ## API documentation
@@ -181,6 +180,9 @@ rolls back only worktrees and branches created by that invocation.
 
 ### 2026-10-25
 
+- Remove the harness's duplicate in-memory game and its mock execution mode.
+  Scripted tests and demos now exercise the same Rust/Solidity rules as live runs;
+  the harness retains experiment policy and consumes engine settlement evidence.
 - Move public deliberation messages into a persistent core forum. Record
   participant sends and exact read responses with operator-only usage audits;
   export audit evidence from the harness and retain private chat separately.

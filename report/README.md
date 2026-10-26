@@ -1,10 +1,11 @@
-# Sample Veracity report
+# Veracity baseline integration report
 
-This is the illustrative report from the reporting guide, expanded into a
-sectioned manuscript using the supplied `arxiv.sty` as a starting layout.
-**All quantitative results are fictional teaching counts.** It contains no new
-model experiment or claim of actual collusion. The system description cites
-the repository documents it uses.
+This internal report presents the first all-off jury smoke run, using the
+supplied `arxiv.sty` and the existing sectioned manuscript. It replaces the
+previous fictional teaching comparison with two live Nemotron episodes on the
+Rust/Anvil backend. Both verdicts and all 14 revealed votes matched evaluator
+truth. These observations establish integration readiness only; they do not
+establish an absence of collusion or a treatment effect.
 
 ## Files
 
@@ -13,23 +14,26 @@ the repository documents it uses.
 | [main.tex](main.tex) | Main document; orders the section inputs |
 | [preamble.tex](preamble.tex) | Packages, semantic macros, diagram styles, and template overrides |
 | [arxiv.sty](arxiv.sty) | Supplied single-column style, preserved byte-for-byte |
-| [Abstract](sections/abstract.tex) | Question, illustrative comparison, and scope |
+| [Abstract](sections/abstract.tex) | Integration question, observations, and scope |
 | [Introduction](sections/introduction.tex) | Motivation and report aims |
 | [Research environment](sections/system.tex) | Mechanism and system-boundary diagram |
 | [Methods](sections/methods.tex) | Endpoint, notation, denominator, and uncertainty assumptions |
-| [Results](sections/results.tex) | Fictional comparison, table, and figure |
+| [Results](sections/results.tex) | Actual smoke measurements, counts, and two data figures |
 | [Discussion](sections/discussion.tex) | Interpretation and limitations |
 | [Conclusion](sections/conclusion.tex) | Supported takeaway |
 | [References](sections/references.tex) | Keyed references to inspected local primary documents |
-| [Figure PDF](figures/figure-example.pdf) | Included vector figure for direct editor compilation |
+| [Outcome figure](figures/baseline-outcomes.pdf) | Episode-level rates and the revealed-vote matrix |
+| [Process figure](figures/baseline-process.pdf) | Deliberation rates and episode duration spread |
+| [Analysis script](analysis/baseline_figures.py) | Safe source extraction, validated calculations, and Matplotlib rendering |
+| [Admitted data](data/baseline-smoke.json) | Public revealed votes, counts, timing, and source provenance; no message bodies |
 | [Makefile](Makefile) | Compiles the document; regenerates the figure on request |
 | [Template provenance](template/README.md) | Attachment attribution, hashes, and adaptation decisions |
-| [Review record](review.md) | Build and rendered-PDF checks for this sample |
+| [Review record](review.md) | Evidence, build, and final-size rendered checks |
 
 Only `main.tex` is a standalone document. Edit prose in `sections/`, keep common
 formatting in `preamble.tex`, and change section order through `main.tex`.
-The figure generator and style remain canonical in
-[the reporting templates](../docs/reporting/README.md#table-of-contents).
+The current figure generator lives in `analysis/`; general style guidance and
+the former fictional example remain in [the reporting guide](../docs/reporting/README.md).
 
 ## Build
 
@@ -70,37 +74,65 @@ Hyperref packages. `LATEXMK` can select an installed executable.
 The PDF is **`report/build/main.pdf`**. The output directory also holds the TeX
 log and temporary files; it is ignored by Git. `make -C report clean` removes
 LaTeX build products and report PDFs from both editor and command-line builds,
-preserving the included figure. Run cleanup only when no build is active.
+preserving the included figures. Run cleanup only when no build is active.
 
-### Regenerating the figure
+### Regenerating the figures
 
-When the illustrative plot changes, run `make -C report figures` with Python
-and Matplotlib installed. `PYTHON` selects the interpreter, for example
-`make -C report figures PYTHON=/path/to/python`. This regenerates the canonical
-plot and its provenance JSON in `build/figures/`, then updates the included
-`figures/figure-example.pdf`. Include that PDF with source changes so editor
-builds remain self-contained. Ordinary builds do not regenerate the figure.
+The report has an isolated, locked Python environment. From the repository root:
+
+```sh
+UV_CACHE_DIR="$PWD/.tools/uv-cache" uv venv --python 3.12 .harness/report-venv
+UV_CACHE_DIR="$PWD/.tools/uv-cache" uv pip sync \
+  --python .harness/report-venv/bin/python report/requirements.lock
+make -C report figures PYTHON="$PWD/.harness/report-venv/bin/python"
+make -C report
+```
+
+This renders vector PDF and 300-dpi PNG figures from the committed safe snapshot.
+Ordinary TeX builds use the included PDFs and require neither Python nor the
+ignored original run directory. The snapshot records source hashes and the run
+configuration; it excludes prompts, message bodies, private observations, and
+credentials. Re-extract it from the original run only when admitting changed
+evidence; see `analysis/baseline_figures.py --help`.
+
+Means and sample standard deviations use the two episode observations, not the
+14 votes or 42 juror pairs as independent replicates. Pale solid regions use the
+mean's hue and represent one descriptive sample SD, not a confidence interval.
+Identical rates have SD zero and their regions collapse. Cross-episode
+consistency has only one episode comparison, so its SD is unavailable. Private
+abuse rates are unavailable because `C0` provides no private opportunity.
 
 ## Status and conventions
 
-This is an internal sample, with no submission venue or named author list.
+This is an internal smoke report, with no submission venue or named author list.
 The report date is fixed to October 25, 2026 in `preamble.tex`; the running header
-labels it an illustrative sample. The supplied style owns page geometry and
+labels it a baseline integration report. The supplied style owns page geometry and
 header setup. Local overrides leave the uploaded file unchanged.
 
-Follow the [reporting guide](../docs/reporting/README.md) for real manuscripts.
-Before replacing the teaching counts, fill the brief's evidence and claim map,
-choose actual treatment definitions, and regenerate figures and tables from the
-admitted data. Keep counts and references consistent across abstract, methods,
-results, table, figure, and conclusion. The sample is ready to edit; it is not a
-submission-ready empirical report.
+The [brief](../docs/reporting/paper-brief.md) admits only W&B run `m073at4i`
+(`M0-C0-T0-R0-S0-E0`). The earlier free-route attempt `2vu0jc3u` exhausted its
+daily quota and failed both episodes; it is an operational record, excluded from
+the successful retry's behavioral means. Scripted, mock, historical, and former
+fictional results are excluded. The 20-episode first pass and all treatment
+comparisons remain future work. This is not a submission-ready empirical study.
 
 ## Changelog
 
 ### 2026-10-25
 
-- Include the vector figure with the report so TeXShop and ordinary `make`
-  builds work without a Python environment; regenerate it explicitly with
-  `make figures` when its source changes.
+- Admit the two-episode baseline smoke and replace the fictional comparison.
+  Use episode-level descriptive SD, preserve structural NAs, and retain the
+  free-route failure separately so small-sample agreement cannot imply certainty.
+- Commit safe figure inputs and vector PDFs so TeXShop and ordinary `make`
+  builds remain portable without Python; regenerate assets explicitly with
+  `make figures`. Keep a separate locked report environment to avoid changing
+  harness dependencies.
+- Keep `baseline_figures.py` scoped to its admitted run. New experimental results
+  require an evidence-register update and corresponding validated inputs and
+  analysis because its fixed run identity and two-episode assumptions belong to
+  the baseline alone.
+- Distinguish regenerating figures from replaying model behavior: the safe
+  snapshot reproduces the plots, while provider nondeterminism and the original
+  dirty working tree prevent claiming exact experiment replay from a clean revision.
 - Select TeXShop's `pdflatexmk` engine and declare the root in every included
   TeX file so Cmd-T builds the complete manuscript and resolves references.

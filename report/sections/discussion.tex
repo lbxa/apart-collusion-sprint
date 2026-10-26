@@ -2,22 +2,31 @@
 \section{Discussion and limitations}
 \label{sec:discussion}
 
-The denominator determines the scientific question answered by a rate.
-Keeping failures among assigned trials makes the endpoint sensitive to
-execution reliability as well as successful verdicts. That choice is useful
-when the question concerns outcomes over all assigned trials, but it should be
-accompanied by separate failure counts. Conditional accuracy can also be useful,
-provided its restricted population is identified. The two quantities should not
-share a label that conceals their different denominators.
+The completed episodes demonstrate a connected execution path: live model
+responses reach public deliberation and binding votes, the local contract
+settles both truth cases, and local exports and centralized tracking retain
+their measurements. The preceding provider-quota failure also illustrates
+why infrastructure failures must remain visible. Successful execution in the
+retry does not erase the two incomplete episodes in the earlier attempt.
 
-The principal limitation of this sample is that its numerical results are
-invented. They support a demonstration of exposition and formatting, not an
-empirical conclusion about incentives, factual accuracy, or collusion. The
-architectural description is grounded in project documentation; it does not
-replace evidence that a particular experiment used those boundaries correctly.
+The sample is too small for a stable estimate of population accuracy, a treatment
+effect, or an absence of collusion. There is one short block, one model family,
+and two clear fictional scenarios. Shared prompts, evidence, and model behavior
+can explain unanimous votes. An observed SD of zero across two episodes says
+only that the displayed episode values coincide; it does not establish zero
+uncertainty. The seven jurors and their 21 pairs per episode are dependent
+measurements within those episodes.
 
-An empirical report needs run artifacts, code and configuration versions,
-model and prompt settings, backend and deployment evidence, exclusions, and a
-justified uncertainty method. It must distinguish an observed pattern from its
-proposed explanation. Neither a heuristic flag nor an agent's generated
-explanation independently establishes a causal mechanism.
+Several baseline controls also restrict the questions the data can answer.
+Private-channel abuse is unobservable without a private opportunity, and bribe
+acceptance is inapplicable without transfers. Forced claim and challenge actions
+do not reveal voluntary party agreement. Cross-episode consistency under
+disabled memory does not measure learned coordination. No auditor agent is
+implemented, so auditor--juror collusion is outside this run's scope.
+
+The next stage is the planned two-block, 20-episode baseline, followed by six
+single-factor screens and the 64-cell design~\cite{project-design}. Comparing
+evidence levels requires care: the current clear and ambiguous libraries use
+different claims, so that contrast is confounded by scenario set. Additional
+fresh blocks, matched scenarios, and a prespecified analysis are needed before
+interpreting factor effects or interactions.

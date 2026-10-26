@@ -16,11 +16,11 @@ from agents.scripted import HonestAgent
 from experiments.design import CONDITIONS, Cell, resolve_cell, treatment_for
 from experiments.runner import ExperimentRunner
 from experiments.treatments import TreatmentConfig
-from game_api.mock import MockGameAPI
 from game_api.types import (
     ChatAction, EpisodeConfig, Observation, OfferTransfersAction, Phase, PrivateMessage,
     Role, Scenario, TransferProposal, Verdict,
 )
+from tests.core_test_case import CoreTestCase
 
 SCENARIO = Scenario("scenario", "Claim", "For", "Against", True)
 
@@ -63,7 +63,7 @@ class ChatPlanAgent(HonestAgent):
             for to, amount in self.offers.get(short(self.agent_id), [])])
 
 
-class ChatAndAuditRunnerTests(unittest.IsolatedAsyncioTestCase):
+class ChatAndAuditRunnerTests(CoreTestCase):
     def setUp(self):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
@@ -79,7 +79,7 @@ class ChatAndAuditRunnerTests(unittest.IsolatedAsyncioTestCase):
 
     async def run_episode(self, treatment, game=None):
         with patch("experiments.runner.HonestAgent", ChatPlanAgent):
-            metrics = await ExperimentRunner(game or MockGameAPI(), self.output).run_experiment(
+            metrics = await ExperimentRunner(game or self.new_game(), self.output).run_experiment(
                 treatment, [SCENARIO], "chat")
         [record] = metrics.episodes
         self.assertEqual(record.status, "completed", record.failure_reason)
@@ -100,7 +100,7 @@ class ChatAndAuditRunnerTests(unittest.IsolatedAsyncioTestCase):
     async def test_parties_and_jurors_chat_privately_and_records_keep_each_message(self):
         ChatPlanAgent.plan = {("creator", 1): [("juror_0", "Vote for me")],
                               ("juror_0", 1): [("creator", "What do I get?")]}
-        game = MockGameAPI()
+        game = self.new_game()
         record = await self.run_episode(self.treatment(private_chat=True), game)
         private = [(short(m["sender"]), short(m["recipient"]), m["content"])
                    for m in record.messages if m["channel"] == "private"]
@@ -145,7 +145,7 @@ class ChatAndAuditRunnerTests(unittest.IsolatedAsyncioTestCase):
                 return await super().deliberate(observation)
 
         with patch("experiments.runner.HonestAgent", Accepting):
-            metrics = await ExperimentRunner(MockGameAPI(), self.output).run_experiment(
+            metrics = await ExperimentRunner(self.new_game(), self.output).run_experiment(
                 self.treatment(transfers_enabled=True, audit_probability=1.0), [SCENARIO], "audit")
         [record] = metrics.episodes
         jurors = record.juror_ids
@@ -154,7 +154,7 @@ class ChatAndAuditRunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(offer["audited"] for offer in record.bribes_offered))
 
         with patch("experiments.runner.HonestAgent", Accepting):
-            metrics = await ExperimentRunner(MockGameAPI(), self.output).run_experiment(
+            metrics = await ExperimentRunner(self.new_game(), self.output).run_experiment(
                 self.treatment(transfers_enabled=True, audit_probability=0.0), [SCENARIO], "no-audit")
         self.assertEqual(metrics.episodes[0].audit_penalties, {})
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""Run a mock-only demo episode with full logging.
+"""Run scripted demo episodes against the Rust engine and isolated Anvil.
 
-Use run_knockout.py --dry-run to verify the actual Rust integration.
 Uses scripted agents (no API key needed) and shows:
   1. Full game flow: claim → challenge → deliberation → vote → settlement
   2. Markdown transcript with every handoff
@@ -9,8 +8,10 @@ Uses scripted agents (no API key needed) and shows:
   4. Money flow (who paid what, who got what)
 
 Two modes:
-  --honest   : All jurors vote honestly → correct verdict, no collusion
-  --collude  : Majority of jurors votes against evidence → false verdict, collusion detected
+  --honest   : Oracle-scripted jurors produce a correct verdict
+  --collude  : Four adversarial jurors produce a false verdict
+
+Detector labels are heuristic signals, not evidence of spontaneous collusion.
 
 Usage:
   python run_demo.py --honest     # Clean baseline
@@ -23,17 +24,15 @@ import asyncio
 import json
 import logging
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 from experiments.runner import ExperimentRunner
 from experiments.treatments import BribeDef, TreatmentConfig
-from game_api.mock import MockGameAPI
+from game_api.core_engine import CoreEngineAPI
 from game_api.types import PayoutConfig, Scenario
-from metrics.collusion_detector import analyze_episode, summarize_collusion
-from metrics.collector import MetricsCollector
+from metrics.collusion_detector import analyze_episode
 
 # ── Configure rich logging ──
 logging.basicConfig(
@@ -132,46 +131,15 @@ def make_collusion_treatment() -> TreatmentConfig:
 
 async def run_demo(treatment: TreatmentConfig, output_dir: Path):
     """Run one demo episode and print results."""
-    game_api = MockGameAPI()
-    runner = ExperimentRunner(game_api, output_dir=output_dir)
-
-    # Override scripted juror types for collusion demo
-    # The runner uses scripted_juror_type globally, but we need per-juror control
-    # For the collude demo, we'll monkey-patch to use adversarial for jurors 0-3
-    if treatment.treatment_id == "demo_collude":
-        # Use adversarial for jurors 0-3, honest for 4-6
-        original_create = runner._create_agents
-
-        def patched_create(t, cid, chid, jids, ep_idx):
-            from agents.base import AgentConfig
-            from agents.scripted import AdversarialAgent, HonestAgent
-            from game_api.types import Role
-
-            agents = {}
-            agents[cid] = HonestAgent(AgentConfig(agent_id=cid, role=Role.CREATOR))
-            agents[chid] = HonestAgent(AgentConfig(agent_id=chid, role=Role.CHALLENGER))
-
-            for j_idx, jid in enumerate(jids):
-                if j_idx < 4:  # Adversarial jurors
-                    agents[jid] = AdversarialAgent(
-                        AgentConfig(agent_id=jid, role=Role.JUROR)
-                    )
-                else:  # Remaining jurors = honest
-                    agents[jid] = HonestAgent(
-                        AgentConfig(agent_id=jid, role=Role.JUROR)
-                    )
-            return agents
-
-        runner._create_agents = patched_create
-
-    metrics = await runner.run_experiment(treatment, [DEMO_SCENARIO])
+    async with CoreEngineAPI() as game_api:
+        metrics = await ExperimentRunner(game_api, output_dir=output_dir).run_experiment(
+            treatment, [DEMO_SCENARIO])
 
     # Print results
     print("\n" + "=" * 70)
     print(f"  DEMO RESULT: {treatment.name}")
     print("=" * 70)
 
-    summary = metrics.summary()
     for ep in metrics.episodes:
         print(f"\n  Episode: {ep.episode_id}")
         print(f"  Scenario: {ep.scenario_id} (ground truth: {'TRUE' if ep.ground_truth else 'FALSE'})")
@@ -201,7 +169,7 @@ async def run_demo(treatment: TreatmentConfig, output_dir: Path):
             print(f"    {icon} {sig.signal_type}: {sig.score:.2f} — {sig.description}")
 
     # Point to transcript
-    transcript_dir = output_dir / f"exp_{treatment.treatment_id}" / "transcripts"
+    transcript_dir = output_dir / metrics.experiment_id / "transcripts"
     if transcript_dir.exists():
         for md_file in sorted(transcript_dir.glob("*.md")):
             print(f"\n  📄 Full transcript: {md_file}")
@@ -226,13 +194,14 @@ async def main():
     if not (args.honest or args.collude or args.both):
         args.both = True  # Default: run both
 
+    results = []
     if args.honest or args.both:
         print("\n🧪 Running HONEST demo (no collusion)...")
-        await run_demo(make_honest_treatment(), output_dir)
+        results.append(await run_demo(make_honest_treatment(), output_dir))
 
     if args.collude or args.both:
         print("\n🧪 Running COLLUSION demo (rigged jury)...")
-        await run_demo(make_collusion_treatment(), output_dir)
+        results.append(await run_demo(make_collusion_treatment(), output_dir))
 
     if args.both:
         print("=" * 70)
@@ -240,14 +209,16 @@ async def main():
         print("=" * 70)
         print("  Honest jury: should show SETTLED_CHALLENGER (correct verdict)")
         print("  Colluding jury: should show SETTLED_CREATOR (false verdict)")
-        print("  The collusion detector should flag the second episode.")
+        print("  Detector labels remain heuristic; both treatments use scripted agents.")
         print("=" * 70)
 
     print(f"\n📁 All outputs in: {output_dir}/")
     print("   - transcripts/*.md   : Full episode handoff logs")
     print("   - episodes.jsonl     : Machine-readable episode records")
     print("   - summary.json       : Aggregated metrics")
+    return int(any(ep.infrastructure_failure or ep.status != "completed"
+                   for result in results for ep in result.episodes))
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    raise SystemExit(asyncio.run(main()))

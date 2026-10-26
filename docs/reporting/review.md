@@ -18,6 +18,10 @@ source provenance is indexed in [the guide](README.md).
   effect sizes, and baselines match the cited data and analysis revision.
   Repeated episodes or shared scenarios are handled with an appropriate unit of
   analysis. Undefined quantities are labeled, not plotted or tabulated as zero.
+- [ ] Mean/SD summaries identify the eligible observation unit and sample size;
+  sample SD uses `n - 1`. Nested votes, pairs, or rounds are not counted as extra
+  independent replicates. Zero SD remains collapsed, SD with fewer than two
+  observations is unavailable, and descriptive SD is distinguished from SE/CI.
 - [ ] Backend, protocol version, deployment, model/prompt, treatment, observation
   access, and randomness are traceable. Mock, scripted, historical, and model
   results are labeled and not silently pooled. Scripted oracle performance is
@@ -69,6 +73,13 @@ source provenance is indexed in [the guide](README.md).
   and captions are interpretable. Color is not the only distinction. Tables use
   restrained rules and consistent precision. Diagrams label the intended
   relationships and have consistent styles.
+- [ ] Charts follow the [publication style](visuals.md#publication-chart-style):
+  manuscript-compatible typography, restrained colors, raw observations where
+  useful, and lighter solid same-hue SD fills with visible mean marks. Axes,
+  footnotes, panel titles, and captions have enough space at final print size.
+- [ ] Vector chart fonts are embedded, PNG previews meet final-size resolution,
+  and grayscale/color-vision checks preserve the meaning of markers and labels.
+  The saved script, safe inputs, environment and command reproduce the figures.
 - [ ] Review the actual submission PDF, including font embedding and file size
   if required by the venue. Check the supplement and any promised reproduction
   assets as well as the main text.

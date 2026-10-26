@@ -146,13 +146,6 @@ class CoreEngineAPI(GameAPI):
         await self.client.wait_operation(operation)
         return True
 
-    async def post_juror_bond(self, episode_id: str, juror_id: str) -> bool:
-        self._actor(episode_id, juror_id, "juror")
-        return False  # The contract takes this deposit with commitVote.
-
-    async def start_deliberation(self, episode_id: str) -> bool:
-        return await self.get_state(episode_id) == Phase.CHALLENGED
-
     def _forum_role(self, episode_id: str, actor_id: str) -> str:
         role = self._episodes[episode_id].harness_to_engine.get(actor_id)
         if role is None:
@@ -205,9 +198,6 @@ class CoreEngineAPI(GameAPI):
             if report.next_after <= after:
                 raise CoreEngineError("Forum audit cursor did not advance")
             after = report.next_after
-
-    async def start_voting(self, episode_id: str) -> bool:
-        return await self.get_state(episode_id) == Phase.CHALLENGED
 
     async def cast_vote(self, episode_id: str, juror_id: str, verdict: Verdict,
                         assessment: str = "Juror assessment.") -> bool:

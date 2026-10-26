@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-"""Run collusion experiments against the Rust game and local Anvil by default.
+"""Run collusion experiments against the Rust game and local Anvil.
 
 Examples:
   python run_experiments.py --treatment baseline --scripted --episodes 2
   OPENROUTER_API_KEY=... python run_experiments.py --all --live
   python run_experiments.py --compare-jury-sizes --scripted
-  python run_experiments.py --compare-jury-sizes --mock --scripted
 
---scripted (also --dry-run) disables model calls, not the real game. Only --mock
-selects the in-memory game. The external harness's treatment definitions remain
-unchanged; unsupported real-protocol configurations fail before engine startup.
+--scripted (also --dry-run) disables model calls, not the real game. Every run
+uses Rust and Anvil; unsupported configurations fail before engine startup.
 """
 
 import argparse
@@ -35,7 +33,6 @@ from experiments.treatments import (
     make_jury_size_treatment,
 )
 from game_api.core_engine import CoreEngineAPI
-from game_api.mock import MockGameAPI
 from game_api.types import EpisodeConfig
 from scenarios.examples import ALL_SCENARIOS, FALSE_CLAIMS_FOR_ATTACK
 
@@ -52,8 +49,7 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
         scenarios, default_episodes = ALL_SCENARIOS, 5
     elif args.compare_jury_sizes:
         selected = {}
-        sizes = [3, 5, 7, 11, 21] if args.mock else [3, 5, 7]
-        for size in sizes:
+        for size in (3, 5, 7):
             for with_adversaries in [False, True]:
                 key = f"jury_{size}{'_adversarial' if with_adversaries else ''}"
                 treatment = PREDEFINED_TREATMENTS.get(key)
@@ -69,12 +65,12 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
         scenarios, default_episodes = scenarios_for(cell), block.num_episodes
     elif args.compare_incentives:
         selected = {}
+        # Equal thirds are not exactly representable in contract basis points.
         for winner, juror, protocol, label in [
             (0.60, 0.30, 0.10, "default_60_30_10"),
             (0.80, 0.15, 0.05, "high_winner_80_15_5"),
             (0.40, 0.50, 0.10, "high_juror_40_50_10"),
             (0.50, 0.20, 0.30, "high_protocol_50_20_30"),
-            (1 / 3, 1 / 3, 1 / 3, "equal_33_33_33"),
         ]:
             treatment = make_incentive_treatment(winner, juror, protocol, label)
             selected[label] = replace(treatment, use_scripted_creator=True, use_scripted_challenger=True)
@@ -103,25 +99,23 @@ def select_treatments(args) -> tuple[dict[str, TreatmentConfig], list]:
                 treatment, use_scripted_creator=True, use_scripted_challenger=True,
                 scripted_juror_indices=list(range(treatment.jury_size)),
             )
-        if not args.mock:
-            CoreEngineAPI.validate_config(EpisodeConfig(
-                episode_id="preflight", payout=treatment.payout,
-                jury_size=treatment.jury_size, deliberation_rounds=treatment.deliberation_rounds,
-            ))
+        CoreEngineAPI.validate_config(EpisodeConfig(
+            episode_id="preflight", payout=treatment.payout,
+            jury_size=treatment.jury_size, deliberation_rounds=treatment.deliberation_rounds,
+        ))
         prepared[key] = treatment
     return prepared, scenarios
 
 
-async def run_treatments(treatments, scenarios, *, output_dir, mock=False, core_engine_dir=None,
+async def run_treatments(treatments, scenarios, *, output_dir, core_engine_dir=None,
                          wandb_project=None, wandb_entity=None, wandb_group=None,
                          run_purpose="exploratory", block_count=None):
     """Own the game process for the complete experiment batch, including failures."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    game_api = MockGameAPI() if mock else CoreEngineAPI(core_engine_dir=core_engine_dir)
-    logger.info("Using %s game backend", "mock" if mock else "core")
+    game_api = CoreEngineAPI(core_engine_dir=core_engine_dir)
+    logger.info("Using core game backend")
     try:
-        if not mock:
-            await game_api.start()
+        await game_api.start()
         runner = ExperimentRunner(game_api, output_dir=output_dir)
         results = {}
         group = wandb_group or f"jury-{uuid.uuid4().hex[:12]}"
@@ -129,7 +123,7 @@ async def run_treatments(treatments, scenarios, *, output_dir, mock=False, core_
             logger.info("Running treatment: %s", key)
             tracking = WandbTracker(
                 treatment=treatment, name=key, group=group, project=wandb_project,
-                entity=wandb_entity, backend="mock" if mock else "core",
+                entity=wandb_entity, backend="core",
                 purpose=run_purpose, blocks=block_count,
                 block_index=index if block_count is not None else None, output_dir=output_dir,
                 scenario_ids=[scenarios[episode_index % len(scenarios)].scenario_id
@@ -150,8 +144,7 @@ async def run_treatments(treatments, scenarios, *, output_dir, mock=False, core_
         print(f"\nFull results saved to {output_path}")
         return results
     finally:
-        if not mock:
-            await game_api.stop()
+        await game_api.stop()
 
 
 async def main():
@@ -159,7 +152,7 @@ async def main():
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument("--treatment", help="Treatment ID to run")
     selection.add_argument("--all", action="store_true", help="Run all core treatments")
-    selection.add_argument("--compare-jury-sizes", action="store_true", help="Compare 3/5/7 jurors on core; --mock also includes 11/21")
+    selection.add_argument("--compare-jury-sizes", action="store_true", help="Compare supported juries of 3, 5, and 7")
     selection.add_argument("--cell", help="Cell ID or named condition from docs/experiment-design.md, e.g. M1-C1-T1-R1-S1-E1 or K2")
     selection.add_argument("--compare-incentives", action="store_true", help="Compare original incentive structures; unsupported core configurations fail preflight")
     parser.add_argument("--blocks", type=int, default=2, help="Independent fresh-memory blocks per cell (with --cell)")
@@ -167,12 +160,10 @@ async def main():
     parser.add_argument("--episodes", type=int, help="Positive number of episodes per treatment")
     parser.add_argument("--output", default="results", help="Output directory")
     models = parser.add_mutually_exclusive_group()
-    models.add_argument("--scripted", "--dry-run", dest="scripted", action="store_true", help="Use scripted models without API calls; still use the real game unless --mock")
+    models.add_argument("--scripted", "--dry-run", dest="scripted", action="store_true", help="Use scripted models without API calls against the real game")
     models.add_argument("--live", dest="scripted", action="store_false", help="Use each treatment's configured agents (default; scripted controls are preserved)")
     parser.set_defaults(scripted=False)
-    backend = parser.add_mutually_exclusive_group()
-    backend.add_argument("--core-engine", action="store_true", help="Use Rust and Anvil (default; retained for compatibility)")
-    backend.add_argument("--mock", action="store_true", help="Explicitly use the in-memory game instead of Rust and Anvil")
+    parser.add_argument("--core-engine", action="store_true", help="Use Rust and Anvil (retained for compatibility)")
     parser.add_argument("--core-engine-dir", help="Optional core engine repository root override")
     parser.add_argument("--seed", type=int, default=42, help="Random assignment seed")
     parser.add_argument("--model", help="Use this model for creator, challenger, and every LLM juror; preserve providers and factors")
@@ -199,8 +190,6 @@ async def main():
         args.model = args.model.strip()
         if not args.model:
             parser.error("--model must not be blank")
-    if args.mock and args.core_engine_dir:
-        parser.error("--core-engine-dir cannot be used with --mock")
     if not (args.all or args.compare_jury_sizes or args.compare_incentives or args.treatment or args.cell or args.scripted):
         parser.print_help()
         return 0
@@ -210,7 +199,7 @@ async def main():
         load_dotenv(args.env_file, override=False)
         treatments, scenarios = select_treatments(args)
         results = await run_treatments(
-            treatments, scenarios, output_dir=Path(args.output), mock=args.mock,
+            treatments, scenarios, output_dir=Path(args.output),
             core_engine_dir=args.core_engine_dir,
             wandb_project=(args.wandb_project or os.environ.get("WANDB_PROJECT") or "apart-collusion-sprint") if args.wandb else None,
             wandb_entity=args.wandb_entity or os.environ.get("WANDB_ENTITY"),

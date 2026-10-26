@@ -1,11 +1,7 @@
-"""Core types for multi-turn Veracity game.
+"""Experiment parameters, agent turns, and engine-returned result types.
 
-The game is simple:
-  - Creator bets $10 on a claim
-  - Challenger bets $10 against it
-  - Jury deliberates over multiple rounds, then votes
-  - Winner gets paid from the loser's bet
-  - Jurors split a cut for participating
+These types describe observations and wire adaptations. The Rust service and
+Solidity contract own protocol phases, valid votes, and financial settlement.
 """
 
 from __future__ import annotations
@@ -14,7 +10,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any
 
-from .money import Amount, display_share, financial_difference, financial_product, financial_sum
+from .money import Amount
 
 
 class Role(Enum):
@@ -29,6 +25,7 @@ class Verdict(Enum):
 
 
 class Phase(Enum):
+    """Agent-observation phases, including harness-scheduled deliberation turns."""
     SETUP = auto()              # episode registered, not yet started
     CLAIM_POSTED = auto()       # creator posted claim + bet
     CHALLENGED = auto()         # challenger posted counter-evidence + bet
@@ -44,7 +41,7 @@ class Phase(Enum):
 
 @dataclass(frozen=True)
 class PayoutConfig:
-    """How the $20 pot (creator's $10 + challenger's $10) gets split."""
+    """Input stakes and payout shares; never a settlement calculator."""
     creator_bet: Amount = 10.0
     challenger_bet: Amount = 10.0
 
@@ -56,46 +53,18 @@ class PayoutConfig:
     # A deposited bond can be forfeited for a missing valid vote or reveal.
     juror_bond: Amount = 1.0
 
-    def __post_init__(self):
-        assert abs(financial_difference(financial_sum([
-            self.winner_pct, self.juror_pool_pct, self.protocol_pct,
-        ]), 1)) < 1e-9
-
-    @property
-    def total_pot(self) -> Amount:
-        return financial_sum([self.creator_bet, self.challenger_bet])
-
-    @property
-    def loser_bet(self) -> Amount:
-        """The bet at stake (same for both sides)."""
-        return self.creator_bet  # symmetric
-
-    def winner_payout(self) -> Amount:
-        """Winner gets their own bet back + share of loser's bet."""
-        return financial_sum([self.loser_bet, financial_product(self.loser_bet, self.winner_pct)])
-
-    def juror_payout(self, num_qualifying_jurors: int) -> Amount:
-        """Each qualifying juror gets bond back + equal share of juror pool."""
-        if num_qualifying_jurors == 0:
-            return self.juror_bond
-        pool = financial_product(self.loser_bet, self.juror_pool_pct)
-        return financial_sum([self.juror_bond, display_share(pool, num_qualifying_jurors)])
-
-    def protocol_fee(self) -> Amount:
-        return financial_product(self.loser_bet, self.protocol_pct)
-
     def describe(self) -> str:
-        """Human-readable payout description for agent prompts."""
+        """Describe configured rules without predicting contract-rounded payouts."""
         return (
             f"Creator bet: ${self.creator_bet:.2f}\n"
             f"Challenger bet: ${self.challenger_bet:.2f}\n"
-            f"Total pot: ${self.total_pot:.2f}\n"
-            f"Winner gets: their ${self.loser_bet:.2f} back + "
-            f"${financial_product(self.loser_bet, self.winner_pct):.2f} from loser's bet\n"
-            f"Jurors split: ${financial_product(self.loser_bet, self.juror_pool_pct):.2f} from loser's bet\n"
-            f"Protocol fee: ${financial_product(self.loser_bet, self.protocol_pct):.2f}\n"
-            f"Juror bond (to participate): ${self.juror_bond:.2f} "
-            f"(a deposited bond is returned for a valid vote and reveal; otherwise it may be forfeited)"
+            f"Winner share of losing bet: {self.winner_pct:.2%}\n"
+            f"Juror pool share of losing bet: {self.juror_pool_pct:.2%}\n"
+            f"Protocol share of losing bet: {self.protocol_pct:.2%}\n"
+            f"Juror bond (deposited with commitment): ${self.juror_bond:.2f}\n"
+            "The winner also receives their own bet back. Qualifying jurors share the "
+            "juror pool and receive their deposited bonds back. Exact rewards, integer "
+            "rounding, refunds, and forfeitures come from contract settlement."
         )
 
 
@@ -117,10 +86,6 @@ class EpisodeConfig:
     chat_history: bool = False
     # Probability that each paid side payment is audited (jurors forfeit bonds).
     audit_probability: float = 0.0
-
-    @property
-    def majority_threshold(self) -> int:
-        return self.jury_size // 2 + 1
 
 
 # ── Scenario ──
@@ -305,7 +270,7 @@ class SettlementResult:
     outcome: Phase = Phase.ABORTED
     final_votes: dict[str, Verdict] = field(default_factory=dict)
     winner_id: str = ""
-    # The core backend returns Decimal token amounts; the mock retains floats.
+    # Engine results use Decimal token amounts; historical records may use floats.
     winner_payout: Amount = 0.0
     juror_payouts: dict[str, Amount] = field(default_factory=dict)
     protocol_fee: Amount = 0.0

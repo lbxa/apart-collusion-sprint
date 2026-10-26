@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
-"""Test the multi-turn harness end-to-end with scripted agents and mock API.
+"""Test the multi-turn harness end-to-end with scripted agents and Rust/Anvil.
 
 Validates the full pipeline without requiring LLM API keys.
 """
 
 import asyncio
+from decimal import Decimal
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 from agents.llm_agent import _parse_action_content
 from experiments.runner import ExperimentRunner
-from experiments.treatments import TreatmentConfig, BribeDef
-from game_api.mock import MockGameAPI
+from experiments.treatments import TreatmentConfig
+from game_api.core_engine import CoreEngineAPI
 from game_api.types import PayoutConfig
 from scenarios.examples import FACTUAL_SCENARIOS, FALSE_CLAIMS_FOR_ATTACK
 
@@ -27,11 +29,23 @@ def test_llm_action_with_literal_newline():
     assert action["message"] == "First point.\nSecond point."
 
 
+async def run_scripted_experiment(treatment, scenarios):
+    """Own the actual protocol processes and verify authoritative run evidence."""
+    with tempfile.TemporaryDirectory(prefix="veracity-harness-") as directory:
+        async with CoreEngineAPI() as api:
+            metrics = await ExperimentRunner(api, output_dir=Path(directory)).run_experiment(
+                treatment, scenarios)
+    for episode in metrics.episodes:
+        assert episode.status == "completed", episode.failure_reason
+        assert not episode.infrastructure_failure, episode.failure_reason
+        assert episode.config["game_backend"] == "core"
+        assert episode.settlement["engine_evidence"]
+    return metrics
+
+
 async def test_honest_baseline():
     """All honest scripted agents — should get perfect accuracy."""
     print("\n=== Test: Honest Baseline (Multi-Turn) ===")
-    api = MockGameAPI()
-    runner = ExperimentRunner(api, output_dir=Path("/tmp/test_results"))
 
     treatment = TreatmentConfig(
         treatment_id="test_honest",
@@ -47,7 +61,7 @@ async def test_honest_baseline():
         scripted_juror_type="honest",
     )
 
-    metrics = await runner.run_experiment(treatment, FACTUAL_SCENARIOS)
+    metrics = await run_scripted_experiment(treatment, FACTUAL_SCENARIOS)
     summary = metrics.summary()
 
     print(f"  Verdict accuracy: {summary['verdict_accuracy']}")
@@ -68,8 +82,6 @@ async def test_honest_baseline():
 async def test_adversarial_majority():
     """Adversarial majority on false claims — should produce false verdicts."""
     print("\n=== Test: Adversarial Majority (Multi-Turn) ===")
-    api = MockGameAPI()
-    runner = ExperimentRunner(api, output_dir=Path("/tmp/test_results"))
 
     treatment = TreatmentConfig(
         treatment_id="test_adversarial",
@@ -85,7 +97,7 @@ async def test_adversarial_majority():
         scripted_juror_type="adversarial",
     )
 
-    metrics = await runner.run_experiment(treatment, FALSE_CLAIMS_FOR_ATTACK)
+    metrics = await run_scripted_experiment(treatment, FALSE_CLAIMS_FOR_ATTACK)
     summary = metrics.summary()
 
     print(f"  Verdict accuracy: {summary['verdict_accuracy']}")
@@ -100,8 +112,6 @@ async def test_adversarial_majority():
 async def test_non_voter_attack():
     """Non-voting agents should cause hung juries."""
     print("\n=== Test: Non-Voter Attack ===")
-    api = MockGameAPI()
-    runner = ExperimentRunner(api, output_dir=Path("/tmp/test_results"))
 
     treatment = TreatmentConfig(
         treatment_id="test_non_voter",
@@ -117,7 +127,7 @@ async def test_non_voter_attack():
         scripted_juror_type="non_voting",
     )
 
-    metrics = await runner.run_experiment(treatment, FALSE_CLAIMS_FOR_ATTACK)
+    metrics = await run_scripted_experiment(treatment, FALSE_CLAIMS_FOR_ATTACK)
     summary = metrics.summary()
 
     print(f"  Hung jury rate: {summary['hung_jury_rate']}")
@@ -126,15 +136,16 @@ async def test_non_voter_attack():
 
     assert summary["hung_jury_rate"] == 1.0, f"Expected 100% hung juries, got {summary['hung_jury_rate']}"
     assert summary["completion_rate"] == 0.0
-    assert summary["participation_loss"] > 0, "Expected bond forfeitures from non-voters"
+    assert Decimal(str(summary["participation_loss"])) == 0, "Absent jurors never deposit a bond"
+    assert all(not record.forfeited for record in metrics.episodes)
+    assert all(set(record.bonds_deposited) == {record.creator_id, record.challenger_id}
+               for record in metrics.episodes)
     print("  PASSED ✓")
 
 
 async def test_settlement_accounting():
-    """Verify payout math with $10/$10 bets."""
+    """Verify contract payout evidence with 10-token party stakes."""
     print("\n=== Test: Settlement Accounting ===")
-    api = MockGameAPI()
-    runner = ExperimentRunner(api, output_dir=Path("/tmp/test_results"))
 
     payout = PayoutConfig(
         creator_bet=10.0,
@@ -148,7 +159,7 @@ async def test_settlement_accounting():
     treatment = TreatmentConfig(
         treatment_id="test_accounting",
         name="Test Accounting",
-        description="Verify $10/$10 payout math",
+        description="Verify contract payouts with 10-token party stakes",
         public_messaging=True,
         jury_size=5,
         payout=payout,
@@ -160,7 +171,7 @@ async def test_settlement_accounting():
         scripted_juror_type="honest",
     )
 
-    metrics = await runner.run_experiment(treatment, FACTUAL_SCENARIOS[:2])
+    metrics = await run_scripted_experiment(treatment, FACTUAL_SCENARIOS[:2])
 
     for ep in metrics.episodes:
         if ep.outcome in ("SETTLED_CREATOR", "SETTLED_CHALLENGER"):
@@ -169,20 +180,17 @@ async def test_settlement_accounting():
             juror_total = sum(settlement["juror_payouts"].values())
             protocol_fee = settlement["protocol_fee"]
 
-            # Winner gets bet back ($10) + 60% of loser's bet ($6) = $16
-            assert abs(winner_payout - 16.0) < 0.01, f"Expected winner to get $16, got {winner_payout}"
+            # The observed winner entitlement is 16 tokens.
+            assert winner_payout == Decimal("16.00"), f"Expected winner to get 16 tokens, got {winner_payout}"
 
-            # 5 jurors split 30% of $10 = $3, plus bonds back
-            # Each juror: $1 bond + $0.60 share = $1.60
-            expected_juror_total = 5 * (1.0 + 0.60)
-            assert abs(juror_total - expected_juror_total) < 0.01, \
-                f"Expected juror total ${expected_juror_total}, got {juror_total}"
+            # Five valid revealers receive 8 tokens including their bonds.
+            assert juror_total == Decimal("8.00"), f"Expected juror total 8 tokens, got {juror_total}"
 
-            # Protocol gets 10% of $10 = $1
-            assert abs(protocol_fee - 1.0) < 0.01, f"Expected protocol fee $1, got {protocol_fee}"
+            # The observed protocol entitlement is 1 token.
+            assert protocol_fee == Decimal("1.00"), f"Expected protocol fee 1 token, got {protocol_fee}"
 
-            print(f"  Episode {ep.episode_id}: winner=${winner_payout:.2f}, "
-                  f"jurors=${juror_total:.2f}, protocol=${protocol_fee:.2f}")
+            print(f"  Episode {ep.episode_id}: winner={winner_payout:.2f}, "
+                  f"jurors={juror_total:.2f}, protocol={protocol_fee:.2f} tokens")
 
     print("  PASSED ✓")
 
@@ -190,8 +198,6 @@ async def test_settlement_accounting():
 async def test_deliberation_messages():
     """Verify deliberation produces messages and straw polls."""
     print("\n=== Test: Deliberation Messages ===")
-    api = MockGameAPI()
-    runner = ExperimentRunner(api, output_dir=Path("/tmp/test_results"))
 
     treatment = TreatmentConfig(
         treatment_id="test_deliberation",
@@ -207,7 +213,7 @@ async def test_deliberation_messages():
         scripted_juror_type="honest",
     )
 
-    metrics = await runner.run_experiment(treatment, FACTUAL_SCENARIOS[:1])
+    metrics = await run_scripted_experiment(treatment, FACTUAL_SCENARIOS[:1])
     ep = metrics.episodes[0]
 
     # 3 jurors * 5 rounds = 15 messages
@@ -230,10 +236,8 @@ async def test_deliberation_messages():
 async def test_custom_payout_structure():
     """Test with different payout percentages."""
     print("\n=== Test: Custom Payout Structure ===")
-    api = MockGameAPI()
-    runner = ExperimentRunner(api, output_dir=Path("/tmp/test_results"))
 
-    # 80% to winner, 15% to jurors, 5% protocol
+    # Configure 80% to winner, 15% to jurors, 5% protocol.
     payout = PayoutConfig(
         creator_bet=10.0,
         challenger_bet=10.0,
@@ -246,7 +250,7 @@ async def test_custom_payout_structure():
     treatment = TreatmentConfig(
         treatment_id="test_custom_payout",
         name="Test Custom Payout",
-        description="80/15/5 split with $2 bond",
+        description="80/15/5 split with a 2-token bond",
         public_messaging=True,
         jury_size=3,
         payout=payout,
@@ -258,26 +262,23 @@ async def test_custom_payout_structure():
         scripted_juror_type="honest",
     )
 
-    metrics = await runner.run_experiment(treatment, FACTUAL_SCENARIOS[:1])
+    metrics = await run_scripted_experiment(treatment, FACTUAL_SCENARIOS[:1])
     ep = metrics.episodes[0]
 
     assert ep.outcome in ("SETTLED_CREATOR", "SETTLED_CHALLENGER")
     settlement = ep.settlement
 
-    # Winner: $10 bet + 80% of $10 = $18
-    assert abs(settlement["winner_payout"] - 18.0) < 0.01
+    # Verify entitlements returned by the contract, without a local calculator.
+    assert settlement["winner_payout"] == Decimal("18.00")
 
-    # 3 jurors split 15% of $10 = $1.50, plus $2 bond each
-    # Each juror: $2 + $0.50 = $2.50
     for jid, jpay in settlement["juror_payouts"].items():
-        assert abs(jpay - 2.50) < 0.01, f"Expected juror payout $2.50, got {jpay}"
+        assert jpay == Decimal("2.50"), f"Expected juror payout 2.50 tokens, got {jpay}"
 
-    # Protocol: 5% of $10 = $0.50
-    assert abs(settlement["protocol_fee"] - 0.50) < 0.01
+    assert settlement["protocol_fee"] == Decimal("0.50")
 
-    print(f"  Winner: ${settlement['winner_payout']:.2f}")
-    print(f"  Per juror: ${list(settlement['juror_payouts'].values())[0]:.2f}")
-    print(f"  Protocol: ${settlement['protocol_fee']:.2f}")
+    print(f"  Winner: {settlement['winner_payout']:.2f} tokens")
+    print(f"  Per juror: {list(settlement['juror_payouts'].values())[0]:.2f} tokens")
+    print(f"  Protocol: {settlement['protocol_fee']:.2f} tokens")
     print("  PASSED ✓")
 
 

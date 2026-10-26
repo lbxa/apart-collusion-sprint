@@ -25,14 +25,6 @@ class GameAPI(ABC):
     async def challenge(self, episode_id: str, challenger_id: str, evidence: str = "") -> bool: ...
 
     @abstractmethod
-    async def post_juror_bond(self, episode_id: str, juror_id: str) -> bool:
-        """Return True only for an actual deposit; False may defer it to voting."""
-        ...
-
-    @abstractmethod
-    async def start_deliberation(self, episode_id: str) -> bool: ...
-
-    @abstractmethod
     async def send_forum_message(self, episode_id: str, sender_id: str,
                                  content: str, round_num: int) -> Message: ...
 
@@ -43,9 +35,6 @@ class GameAPI(ABC):
     async def get_forum_audit(self, episode_id: str) -> dict:
         """Return evaluator-only metadata, including every audit page."""
         ...
-
-    @abstractmethod
-    async def start_voting(self, episode_id: str) -> bool: ...
 
     @abstractmethod
     async def cast_vote(self, episode_id: str, juror_id: str, verdict: Verdict, assessment: str = "") -> bool: ...

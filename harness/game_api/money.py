@@ -1,7 +1,7 @@
 """Exact token amounts and arithmetic, independent of Decimal's global context."""
 
 from collections.abc import Iterable
-from decimal import Decimal, InvalidOperation, localcontext
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 Amount = Decimal | int | float
@@ -44,7 +44,7 @@ def _decimal(value: Amount | str) -> Decimal:
 
 
 def financial_sum(values: Iterable[Amount]) -> Amount:
-    """Sum exactly when any operand is Decimal; retain legacy mock float behavior."""
+    """Sum exact engine amounts while accepting historical numeric records."""
     amounts = list(values)
     if not any(isinstance(value, Decimal) for value in amounts):
         return sum(amounts)
@@ -72,15 +72,6 @@ def financial_product(left: Amount, right: Amount) -> Amount:
     coefficient = int("".join(map(str, left_parts.digits))) * int("".join(map(str, right_parts.digits)))
     return Decimal((left_parts.sign ^ right_parts.sign, tuple(map(int, str(coefficient))),
                     left_parts.exponent + right_parts.exponent))
-
-
-def display_share(amount: Amount, count: int) -> Amount:
-    """Split an estimated prompt/mock payout; contract settlement remains authoritative."""
-    if not isinstance(amount, Decimal):
-        return amount / count
-    with localcontext() as context:
-        context.prec = max(28, len(amount.as_tuple().digits) + len(str(count)) + 28)
-        return amount / count
 
 
 def restore_amount(value: Amount | str) -> Amount:

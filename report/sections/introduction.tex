@@ -2,21 +2,21 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Multi-agent evaluations ask how behavior changes when agents have different
-incentives, information, or opportunities to communicate. Answering that
-question requires a clear account of what the environment enforces, what the
-experiment varies, and which observations support the reported conclusion.
-The Veracity project supplies a reduced dispute game in which agents can create
-claims, challenge them, assess evidence, and vote under specified payment
-rules~\cite{project-spec}.
+Studying collusion among language-model agents requires an environment that
+preserves its protocol rules while exposing the intended experimental controls.
+The reduced Veracity game assigns agents to create a claim, challenge it, and
+serve on a jury whose committed votes determine financial
+settlement~\cite{project-spec}. The broader experiment varies incentives,
+communication, transfers, memory, stakes, and evidence. Before interpreting
+differences between those settings, we need to verify that live agents can
+complete the baseline and that its measurements remain traceable to execution.
 
-A measurement choice arises before comparing treatments: should a rate include
-trials that fail before producing a verdict? A rate conditional on obtaining
-a verdict answers a different question from a rate over all assigned trials.
-Readers need both the denominator and the failure count to interpret either
-quantity. This report uses a fictional example to make that distinction visible.
-
-The sample describes the division of responsibility between the harness,
-service, and contract, then presents a descriptive comparison through a metric,
-table, and uncertainty plot. The comparison uses invented counts. Labels A and B
-do not identify executed configurations or actual experimental conditions.
+This report answers that narrower integration question. We examine one short
+block of two episodes with all six factors at level zero. One claim is true
+and the other false, allowing us to distinguish following evidence from always
+supporting the same party. We report jury agreement, truth alignment, private
+traffic, and consistency across the two episodes, alongside execution checks.
+The figures show the observations as well as their means and descriptive
+standard deviations. The study supplies a reproducible starting point for
+the planned factorial experiments, with no treatment comparison or inferential
+claim about collusion.

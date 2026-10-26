@@ -1,10 +1,15 @@
-# What the Harness Needs From the Game
+# Archived Game-Builder Handoff
 
 > Historical handoff retained for context. Use [SPEC.md](../SPEC.md),
 > [the `/v1` API](../docs/api.md), and [integration notes](../docs/integration.md)
 > for implemented rules. The contract controls phases and settlement.
+> Requirements, method lists, and checkboxes below record the initial proposal;
+> they are not current work items. The Python mock engine has been removed.
+> Independent bond posting and synthetic phase commands must not be reintroduced.
 
-This document tells you exactly what the experiment harness expects from the game (Rust + Solidity on Polygon Amoy). The harness drives LLM-backed agents through a veracity dispute game and measures collusion across treatments. You build the game mechanics; the harness handles agents, prompts, objective injection, and metrics.
+This document recorded the initial expectations before the Rust/Solidity
+integration. The current harness calls the implemented `/v1` API and owns only
+experiments, agents, observations, and metrics; it does not implement game rules.
 
 ---
 
@@ -239,32 +244,23 @@ For the harness to run against your game, we need:
 
 ---
 
-## Adapter Pattern
+## Implemented Adapter Boundary
 
-We currently have a `MockGameAPI` in Python that implements all of this in-memory. When your game is ready, we write a thin adapter that translates our Python calls into your API (REST, gRPC, contract calls, whatever). The adapter implements the same interface:
-
-```python
-class GameAPI(ABC):
-    async def register_episode(self, config, creator_id, challenger_id, juror_ids, treasury_id) -> str: ...
-    async def post_claim(self, episode_id, creator_id) -> bool: ...
-    async def challenge(self, episode_id, challenger_id) -> bool: ...
-    async def post_juror_bond(self, episode_id, juror_id) -> bool: ...
-    async def start_deliberation(self, episode_id) -> bool: ...
-    async def start_voting(self, episode_id) -> bool: ...
-    async def cast_vote(self, episode_id, juror_id, verdict) -> bool: ...
-    async def settle(self, episode_id) -> SettlementResult: ...
-    async def expire(self, episode_id) -> SettlementResult: ...
-    async def get_state(self, episode_id) -> Phase: ...
-    async def get_balances(self, episode_id) -> dict[str, float]: ...
-```
-
-The mock passes all 6 integration tests. Your implementation should pass the same tests when swapped in.
+The initial harness used an in-memory `MockGameAPI`. That implementation and its
+settlement calculators have since been deleted. All executable entrypoints,
+scripted demos, and runner regressions now use `CoreEngineAPI`, `CoreClient`,
+and the Rust/Solidity engine. The current interface is
+[`game_api/interface.py`](game_api/interface.py), not the historical method list
+above. Juror bonds are deposited with confirmed commitments; deliberation is a
+harness schedule, and chain deadlines govern protocol phases. Settlements and
+balances are returned by the engine without a Python substitute.
 
 ---
 
-## Questions? Priority Order
+## Historical Priority Order
 
-If you're short on time, build in this order:
+The initial proposal listed the following priorities. Its independent-bond and
+manual-transition conventions were superseded by the implemented protocol:
 
 1. **settle()** — the payout math (this is what we actually measure)
 2. **register_episode + post_claim + challenge** — basic episode setup

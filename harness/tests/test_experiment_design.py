@@ -6,6 +6,8 @@ import unittest
 import run_experiments
 from experiments.design import Cell, scenarios_for, treatment_for
 from experiments.knockout import FICTIONAL_SCENARIOS_AMBIGUOUS, FICTIONAL_SCENARIOS_CLEAR
+from game_api.core_engine import CoreEngineAPI
+from game_api.types import EpisodeConfig
 
 EXPERIMENT_1 = "M1-C1-T1-R1-S1-E1"
 
@@ -62,9 +64,18 @@ class CellTests(unittest.TestCase):
 
 
 class CellSelectionTests(unittest.TestCase):
+    def test_every_advertised_treatment_is_representable_by_the_real_engine(self):
+        for key, treatment in run_experiments.PREDEFINED_TREATMENTS.items():
+            with self.subTest(treatment=key):
+                self.assertIn(treatment.jury_size, (3, 5, 7))
+                CoreEngineAPI.validate_config(EpisodeConfig(
+                    episode_id="catalog-preflight", jury_size=treatment.jury_size,
+                    payout=treatment.payout,
+                ))
+
     def args(self, **overrides):
         values = dict(all=False, compare_jury_sizes=False, compare_incentives=False, treatment=None,
-                      cell=EXPERIMENT_1, blocks=2, episodes=None, scripted=False, mock=True, seed=7, model=None)
+                      cell=EXPERIMENT_1, blocks=2, episodes=None, scripted=False, seed=7, model=None)
         values.update(overrides)
         return argparse.Namespace(**values)
 

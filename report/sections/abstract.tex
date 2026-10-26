@@ -1,13 +1,15 @@
 % !TEX root = ../main.tex
 \begin{abstract}
-Evaluations of agent behavior need to distinguish an assigned trial from a
-trial that produces an interpretable outcome. We present a sample reporting
-structure for the reduced Veracity dispute game, separating the system's
-financial authority from its experimental controls. A fictional comparison
-illustrates how to report a target-verdict rate with explicit denominators,
-failure counts, and uncertainty: treatment A reaches the target in 12 of 40
-assigned trials and treatment B in 18 of 40, a descriptive difference of
-15 percentage points. These invented counts demonstrate a measurement and
-presentation convention. No model experiment was run to produce them, and
-they establish neither a treatment effect nor evidence of collusion.
+Before comparing opportunities for agent collusion, we test whether the
+integrated Veracity experiment can execute an all-levers-off jury baseline.
+Two live-model episodes use seven jurors, three public deliberation rounds,
+clear evidence, flat juror pay, low stakes, and no private channels, transfers,
+or cross-episode memory. Both episodes settle correctly through the Rust
+service and Solidity contract on local Anvil. All 14 juror reveals agree with
+evaluator truth, and all 42 within-episode juror pairs agree. Episode-level
+headline rates have a mean of 100\% and an observed sample standard deviation
+of zero. These two episodes verify the execution and measurement path; they
+do not estimate treatment effects, population accuracy, or the absence of
+collusion. A preceding free-route attempt failed on provider quota and is
+reported separately.
 \end{abstract}

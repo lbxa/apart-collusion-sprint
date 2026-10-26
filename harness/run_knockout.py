@@ -44,7 +44,6 @@ from experiments.knockout import (
 )
 from experiments.runner import ExperimentRunner
 from experiments.treatments import TreatmentConfig
-from game_api.mock import MockGameAPI
 from game_api.core_engine import CoreEngineAPI
 from game_api.types import EpisodeConfig
 from scenarios.examples import FACTUAL_SCENARIOS
@@ -88,7 +87,6 @@ async def run_conditions(
     output_dir: Path,
     episodes_per_condition: int | None = None,
     dry_run: bool = False,
-    use_core_engine: bool = True,
     core_engine_dir: str | None = None,
 ):
     """Run a set of conditions and produce comparative results."""
@@ -100,21 +98,19 @@ async def run_conditions(
             treatment = make_dry_run_treatment(treatment)
         episodes = episodes_per_condition if episodes_per_condition is not None else (3 if dry_run else treatment.num_episodes)
         treatment = replace(treatment, num_episodes=episodes)
-        if use_core_engine:
-            CoreEngineAPI.validate_config(EpisodeConfig(
-                episode_id="preflight", payout=treatment.payout,
-                jury_size=treatment.jury_size, deliberation_rounds=treatment.deliberation_rounds,
-            ))
+        CoreEngineAPI.validate_config(EpisodeConfig(
+            episode_id="preflight", payout=treatment.payout,
+            jury_size=treatment.jury_size, deliberation_rounds=treatment.deliberation_rounds,
+        ))
         prepared[cid] = treatment
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    game_api = CoreEngineAPI(core_engine_dir=core_engine_dir) if use_core_engine else MockGameAPI()
-    logger.info("Using %s game backend; models=%s", "core" if use_core_engine else "mock", "scripted" if dry_run else "configured")
+    game_api = CoreEngineAPI(core_engine_dir=core_engine_dir)
+    logger.info("Using core game backend; models=%s", "scripted" if dry_run else "configured")
     all_results = {}
     total_start = time.monotonic()
     try:
-        if use_core_engine:
-            await game_api.start()
+        await game_api.start()
         runner = ExperimentRunner(game_api, output_dir=output_dir)
         for cid, treatment in prepared.items():
             logger.info("CONDITION: %s — %s", cid, treatment.name)
@@ -141,8 +137,7 @@ async def run_conditions(
         print(f"Full results: {results_file}")
         return all_results
     finally:
-        if use_core_engine:
-            await game_api.stop()
+        await game_api.stop()
 
 
 def _describe_levers(condition_id: str) -> dict[str, bool]:
@@ -216,7 +211,7 @@ Examples:
                         help="Run a single condition by ID")
     models = parser.add_mutually_exclusive_group()
     models.add_argument("--dry-run", "--scripted", dest="dry_run", action="store_true",
-                        help="Use scripted models without an API key; keep the selected game backend")
+                        help="Use scripted models without an API key against Rust and Anvil")
     models.add_argument("--live", dest="dry_run", action="store_false",
                         help="Use the treatment's configured model agents (default)")
     parser.set_defaults(dry_run=False)
@@ -226,11 +221,8 @@ Examples:
                         help="Episodes per condition (overrides default)")
     parser.add_argument("--output", type=str, default="results/knockout",
                         help="Output directory")
-    backend = parser.add_mutually_exclusive_group()
-    backend.add_argument("--core-engine", action="store_true",
+    parser.add_argument("--core-engine", action="store_true",
                         help="Use Rust and Anvil (default; retained for compatibility)")
-    backend.add_argument("--mock", action="store_true",
-                        help="Explicitly use the in-memory mock instead of Rust and Anvil")
     parser.add_argument("--core-engine-dir", type=str, default=None,
                         help="Override the core engine repository root (default: this repository)")
 
@@ -249,8 +241,6 @@ Examples:
 
     if args.episodes is not None and args.episodes < 1:
         parser.error("--episodes must be positive")
-    if args.mock and args.core_engine_dir:
-        parser.error("--core-engine-dir cannot be used with --mock")
 
     if args.pilot:
         conditions = {"knockout_full": KNOCKOUT_CONDITIONS["knockout_full"]}
@@ -278,7 +268,7 @@ Examples:
     try:
         results = await run_conditions(
             conditions, Path(args.output), episodes_per_condition=episodes,
-            dry_run=args.dry_run, use_core_engine=not args.mock,
+            dry_run=args.dry_run,
             core_engine_dir=args.core_engine_dir,
         )
     except Exception as error:

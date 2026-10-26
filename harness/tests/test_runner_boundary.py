@@ -16,13 +16,14 @@ from agents.prompts import build_system_prompt
 from agents.scripted import HonestAgent
 from experiments.runner import ExperimentRunner
 from experiments.treatments import BribeDef, NON_VOTER_ATTACK, TreatmentConfig
-from game_api.mock import MockGameAPI
+from game_api.core_engine import CoreEngineAPI
 from game_api.state_file import state_to_settlement
 from game_api.types import (
     BribeOffer, ChallengeAction, DeliberateAction, EpisodeConfig, FinalVoteAction,
     Message, Phase, PostClaimAction, Role, Scenario, SettlementResult, StrawPoll, Verdict,
 )
 from metrics.collector import EpisodeRecord, ExperimentMetrics, MetricsCollector
+from tests.core_test_case import CoreTestCase
 
 
 class EvidenceAgent(HonestAgent):
@@ -36,42 +37,36 @@ class EvidenceAgent(HonestAgent):
                                Verdict.CREATOR_SUPPORTED, "Actual assessment\n")
 
 
-class DeferredBondGame(MockGameAPI):
-    """A deterministic seam with core's deposit-with-commit semantics."""
-    backend = "core"
+class RecordingCoreGame(CoreEngineAPI):
+    """Record forwarded actions while the actual engine owns their effects."""
 
     def __init__(self):
         super().__init__()
         self.forwarded = []
-        self.bonds_before_deliberation = None
-        self.engine_evidence = {"outcome": "SETTLED_CREATOR", "winner_payout": "16000000000000000000",
-                                "deployment": {"chain_id": 31337, "contract_address": "0xfeed"}}
+        self.commitments_before_first_vote = None
+        self.engine_evidence = None
 
     async def post_claim(self, episode_id, creator_id, content=""):
         self.forwarded.append(("claim", creator_id, content))
-        return await super().post_claim(episode_id, creator_id)
+        return await super().post_claim(episode_id, creator_id, content)
 
     async def challenge(self, episode_id, challenger_id, evidence=""):
         self.forwarded.append(("challenge", challenger_id, evidence))
-        return await super().challenge(episode_id, challenger_id)
-
-    async def post_juror_bond(self, episode_id, juror_id):
-        return False
-
-    async def start_deliberation(self, episode_id):
-        self.bonds_before_deliberation = dict(self._episodes[episode_id].juror_bonded)
-        return await super().start_deliberation(episode_id)
+        return await super().challenge(episode_id, challenger_id, evidence)
 
     async def cast_vote(self, episode_id, juror_id, verdict, assessment=""):
+        if self.commitments_before_first_vote is None:
+            episode = await self.client.get_episode(episode_id)
+            self.commitments_before_first_vote = {
+                juror.actor_id: juror.commitment for juror in episode.jurors
+                if juror.commitment is not None
+            }
         self.forwarded.append(("vote", juror_id, assessment))
-        self._episodes[episode_id].juror_bonded[juror_id] = True
-        return await super().cast_vote(episode_id, juror_id, verdict)
+        return await super().cast_vote(episode_id, juror_id, verdict, assessment)
 
     async def settle(self, episode_id, *, withhold_reveals=frozenset()):
         result = await super().settle(episode_id, withhold_reveals=withhold_reveals)
-        result.engine_evidence = self.engine_evidence
-        # The engine may have included fewer reveals than requested votes.
-        result.final_votes = dict(list(result.final_votes.items())[:2])
+        self.engine_evidence = result.engine_evidence
         return result
 
 
@@ -90,7 +85,7 @@ class RecordingAgent(HonestAgent):
                                 straw_vote=Verdict.CREATOR_SUPPORTED)
 
 
-class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
+class RunnerBoundaryTests(CoreTestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -106,16 +101,18 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         return TreatmentConfig(**values)
 
     async def test_actual_action_text_and_engine_evidence_cross_the_typed_boundary(self):
-        game = DeferredBondGame()
+        game = self.new_game(RecordingCoreGame)
         runner = ExperimentRunner(game, self.output)
         with patch("experiments.runner.HonestAgent", EvidenceAgent):
-            metrics = await runner.run_experiment(self.treatment(), [self.scenario], "forwarding")
+            metrics = await runner.run_experiment(self.treatment(withhold_reveal_indices=(2,)), [self.scenario], "forwarding")
         record = metrics.episodes[0]
         self.assertEqual(record.status, "completed", record.failure_reason)
+        self.assertRegex(record.settlement["engine_evidence"]["deployment"]["contract_address"],
+                         r"^0x[0-9a-fA-F]{40}$")
         self.assertEqual(game.forwarded[0][2], "Actual claim\n café")
         self.assertEqual(game.forwarded[1][2], "Actual counter-evidence\n")
         self.assertEqual([row[2] for row in game.forwarded if row[0] == "vote"], ["Actual assessment\n"] * 3)
-        self.assertEqual(game.bonds_before_deliberation, {})
+        self.assertEqual(game.commitments_before_first_vote, {})
         self.assertEqual(record.config["game_backend"], "core")
         self.assertEqual(len(record.votes), 2, "only engine-confirmed reveals belong in final votes")
         self.assertEqual(record.settlement["engine_evidence"], game.engine_evidence)
@@ -125,7 +122,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(record.settlement["engine_evidence"]["deployment"]["chain_id"], 31337)
 
     async def test_noncommitting_jurors_have_no_deposit_or_forfeiture_in_core_records(self):
-        game = DeferredBondGame()
+        game = self.new_game(RecordingCoreGame)
         runner = ExperimentRunner(game, self.output)
         metrics = await runner.run_experiment(self.treatment(scripted_juror_type="non_voting"), [self.scenario], "absent")
         record = metrics.episodes[0]
@@ -138,7 +135,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("Bond deposited", transcript)
 
     async def test_a_committed_reveal_withholder_is_bonded_and_forfeited(self):
-        game = MockGameAPI()
+        game = self.new_game()
         runner = ExperimentRunner(game, self.output)
         metrics = await runner.run_experiment(self.treatment(withhold_reveal_indices=(2,)), [self.scenario], "withholding")
         record = metrics.episodes[0]
@@ -150,7 +147,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(record.votes), 2)
 
     async def test_post_settlement_failure_is_not_a_scored_success(self):
-        runner = ExperimentRunner(MockGameAPI(), self.output)
+        runner = ExperimentRunner(self.new_game(), self.output)
         with self.assertLogs("experiments.runner", level="ERROR"), patch("experiments.runner.analyze_episode", side_effect=RuntimeError("analysis failed")):
             metrics = await runner.run_experiment(self.treatment(), [self.scenario], "failed")
         record = metrics.episodes[0]
@@ -162,7 +159,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(metrics.completion_rate, 0.0)
 
     async def test_exports_are_scoped_to_each_experiment_in_a_reused_runner(self):
-        runner = ExperimentRunner(MockGameAPI(), self.output)
+        runner = ExperimentRunner(self.new_game(), self.output)
         for experiment in ["first", "second"]:
             await runner.run_experiment(self.treatment(), [self.scenario], experiment)
         second = [json.loads(line) for line in (self.output / "second" / "episodes.jsonl").read_text().splitlines()]
@@ -174,7 +171,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         for enabled, expected in [(True, [0, 1, 1]), (False, [0, 0, 0])]:
             RecordingAgent.observations = []
             RecordingAgent.configured_channel = "public"
-            runner = ExperimentRunner(MockGameAPI(), self.output / str(enabled))
+            runner = ExperimentRunner(self.new_game(), self.output / str(enabled))
             with patch("experiments.runner.HonestAgent", RecordingAgent):
                 await runner.run_experiment(self.treatment(num_episodes=3, memory_enabled=enabled, memory_window=1), [self.scenario], "memory")
             creators = [memory for actor, observation, memory in RecordingAgent.observations if observation.role == Role.CREATOR]
@@ -191,7 +188,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
 
         client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=complete)))
         with patch.dict("os.environ", {"OPENAI_API_KEY": "test-only"}), patch("agents.llm_agent.AsyncOpenAI", return_value=client):
-            metrics = await ExperimentRunner(MockGameAPI(), self.output).run_experiment(
+            metrics = await ExperimentRunner(self.new_game(), self.output).run_experiment(
                 self.treatment(num_episodes=2, scripted_juror_indices=[], juror_provider="openai", memory_enabled=True),
                 [self.scenario], "private-truth")
         self.assertTrue(all(record.status == "completed" for record in metrics.episodes))
@@ -207,7 +204,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         RecordingAgent.observations = []
         RecordingAgent.configured_channel = "public"
         with patch("experiments.runner.HonestAgent", RecordingAgent):
-            metrics = await ExperimentRunner(MockGameAPI(), self.output).run_experiment(self.treatment(), [scenario], "isolated")
+            metrics = await ExperimentRunner(self.new_game(), self.output).run_experiment(self.treatment(), [scenario], "isolated")
         self.assertEqual(metrics.episodes[0].status, "completed")
         self.assertTrue(RecordingAgent.observations)
         for _, observation, _ in RecordingAgent.observations:
@@ -235,7 +232,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
                 RecordingAgent.observations = []
                 RecordingAgent.configured_channel = channel
                 treatment = self.treatment(deliberation_rounds=2, public_messaging=public_enabled)
-                runner = ExperimentRunner(MockGameAPI(), self.output / f"{public_enabled}-{channel}")
+                runner = ExperimentRunner(self.new_game(), self.output / f"{public_enabled}-{channel}")
                 with patch("experiments.runner.HonestAgent", RecordingAgent):
                     metrics = await runner.run_experiment(treatment, [self.scenario], "channels")
                 self.assertEqual(len(metrics.episodes[0].messages), expected_messages)
@@ -247,7 +244,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
 
     def test_random_agents_use_the_recorded_seed_instead_of_process_entropy(self):
         treatment = self.treatment(scripted_juror_type="random", seed=2741)
-        runner = ExperimentRunner(MockGameAPI(), self.output)
+        runner = ExperimentRunner(self.new_game(), self.output)
         first = runner._create_agents(treatment, "creator-a", "challenger-a", ["a", "b", "c"], 0)
         second = runner._create_agents(treatment, "creator-b", "challenger-b", ["d", "e", "f"], 0)
         self.assertEqual(first["a"]._rng.getstate(), second["d"]._rng.getstate())
@@ -309,7 +306,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
     async def test_attack_assignment_and_target_survive_failure_before_participants_are_recorded(self):
         treatment = self.treatment(attack_target="abort", juror_overrides={0: {"motivation": "Force an abort"}})
         with self.assertLogs("experiments.runner", level="ERROR"), patch("experiments.runner.ExperimentRunner._create_agents", side_effect=RuntimeError("unavailable")):
-            metrics = await ExperimentRunner(MockGameAPI(), self.output).run_experiment(treatment, [self.scenario], "early-failure")
+            metrics = await ExperimentRunner(self.new_game(), self.output).run_experiment(treatment, [self.scenario], "early-failure")
         record = metrics.episodes[0]
         self.assertEqual(record.config["attack_target"], "abort")
         self.assertEqual(metrics.summary()["assigned_attack_episodes"], 1)
@@ -321,7 +318,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
             self.treatment(attack_target="made-up-success")
 
     async def test_an_agent_cannot_mutate_other_agents_message_poll_or_bribe_snapshots(self):
-        runner = ExperimentRunner(MockGameAPI(), self.output)
+        runner = ExperimentRunner(self.new_game(), self.output)
         message = Message("sender", "Original message", 1)
         poll = StrawPoll(1, {"sender": Verdict.CREATOR_SUPPORTED})
         bribe = BribeOffer("creator", 5.0, "vote CREATOR_SUPPORTED")
@@ -344,7 +341,7 @@ class RunnerBoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(bribe.accepted)
 
     async def test_undefined_summary_rates_export_as_json_null(self):
-        runner = ExperimentRunner(MockGameAPI(), self.output)
+        runner = ExperimentRunner(self.new_game(), self.output)
         metrics = await runner.run_experiment(self.treatment(), [self.scenario], "strict-json")
 
         def reject_non_json_constant(value):

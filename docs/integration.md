@@ -15,8 +15,8 @@
   Equal party bonds and payout shares map exactly to integer base units and basis
   points. Engine settlement is authoritative; failed infrastructure must never
   become a computed verdict or fabricated payout.
-- **Ports and use cases:** `GameAPI` connects the experiment runner to either the
-  Rust adapter or an explicitly selected mock. Register, post, challenge,
+- **Ports and use cases:** `GameAPI` connects the experiment runner to the
+  Rust adapter. Register, post, challenge,
   commit/reveal, settle, expire, and read balances use documented `/v1` routes.
   Public deliberation messages are posted to the episode's core forum and read
   back with each participant's credentials before deliberation and final voting.
@@ -31,7 +31,8 @@
   Only the owned local node may have its clock advanced to absolute deadlines.
 - **Failure model:** transport errors, invalid schemas, failed or reverted
   operations, and unconfirmed transactions propagate as infrastructure failures.
-  Unknown phases and settlement shapes fail closed. There is no mock fallback.
+  Unknown phases and settlement shapes fail closed. No Python game backend or
+  settlement calculator substitutes for an engine response.
 - **Idempotency and consistency:** stable per-episode, per-action keys identify
   mutating requests. Rust owns the durable journal and signed transaction
   recovery. SDK game actions return durable operation handles; `wait_operation` and

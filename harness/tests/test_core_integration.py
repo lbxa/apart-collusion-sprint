@@ -1,7 +1,7 @@
 """Acceptance tests for the real Python harness -> Rust API -> Anvil stack.
 
 These tests deliberately require the built engine and pinned Foundry tools.
-They never substitute the mock game or call a model provider.
+They require actual contract execution and never call a model provider.
 """
 
 from __future__ import annotations
@@ -86,10 +86,6 @@ class CoreIntegrationTests(unittest.IsolatedAsyncioTestCase):
         episode, creator, challenger, jurors, treasury = await self._register(api, **kwargs)
         self.assertTrue(await api.post_claim(episode, creator, content="A test claim.\n"))
         self.assertTrue(await api.challenge(episode, challenger, evidence="Test counter-evidence.\n"))
-        for juror in jurors:
-            await api.post_juror_bond(episode, juror)
-        await api.start_deliberation(episode)
-        await api.start_voting(episode)
         return episode, creator, challenger, jurors, treasury
 
     async def _assert_authoritative(self, api: CoreEngineAPI, result) -> dict:

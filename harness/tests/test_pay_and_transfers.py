@@ -13,22 +13,13 @@ from agents.llm_agent import LLMAgent
 from agents.scripted import HonestAgent
 from experiments.runner import ExperimentRunner
 from experiments.treatments import BribeDef, TreatmentConfig
-from game_api.mock import MockGameAPI
 from game_api.types import (
     BribeOffer, EpisodeConfig, FinalVoteAction, Observation, OfferTransfersAction, PayoutConfig,
     Phase, Role, Scenario, TransferProposal, Verdict,
 )
+from tests.core_test_case import CoreTestCase
 
 SCENARIO = Scenario("scenario", "Claim", "For", "Against", True)
-
-
-class ExactMoneyGame(MockGameAPI):
-    """Settles with the Decimal token amounts the core backend returns."""
-
-    async def settle(self, episode_id, *, withhold_reveals=frozenset()):
-        result = await super().settle(episode_id, withhold_reveals=withhold_reveals)
-        result.juror_payouts = {juror: Decimal(str(amount)) for juror, amount in result.juror_payouts.items()}
-        return result
 
 
 class PlanAgent(HonestAgent):
@@ -58,7 +49,7 @@ def recipient(observation, prefix):
     return next(identity for identity in observation.transfer_recipients if identity.startswith(prefix))
 
 
-class LedgerTests(unittest.IsolatedAsyncioTestCase):
+class LedgerTests(CoreTestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -72,8 +63,8 @@ class LedgerTests(unittest.IsolatedAsyncioTestCase):
         values.update(overrides)
         return TreatmentConfig(**values)
 
-    async def record(self, treatment, agent=PlanAgent, game=MockGameAPI):
-        runner = ExperimentRunner(game(), Path(self.directory.name))
+    async def record(self, treatment, agent=PlanAgent):
+        runner = ExperimentRunner(self.new_game(), Path(self.directory.name))
         with patch("experiments.runner.HonestAgent", agent):
             metrics = await runner.run_experiment(treatment, [SCENARIO], "ledger")
         record = metrics.episodes[0]
@@ -87,12 +78,12 @@ class LedgerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(record.outcome, "SETTLED_CREATOR")
         self.assertEqual(set(record.pay_bonuses), set(record.juror_ids[:2]))
         for juror in record.juror_ids[:2]:
-            self.assertAlmostEqual(record.pay_bonuses[juror], 0.2)
-            self.assertAlmostEqual(record.simulated_utility[juror], 0.2)
+            self.assertEqual(record.pay_bonuses[juror], Decimal("0.2"))
+            self.assertEqual(record.simulated_utility[juror], Decimal("0.2"))
         self.assertEqual(record.payouts[record.juror_ids[0]], 2.0, "the contract payout is unchanged")
 
     async def test_the_bonus_is_exact_when_the_backend_settles_in_decimal_amounts(self):
-        record = await self.record(self.treatment(pay_multiplier=1.2), game=ExactMoneyGame)
+        record = await self.record(self.treatment(pay_multiplier=1.2))
         self.assertEqual(record.pay_bonuses, {juror: Decimal("0.2") for juror in record.juror_ids[:2]})
         self.assertEqual(record.simulated_utility[record.juror_ids[0]], Decimal("0.2"))
 
@@ -172,7 +163,8 @@ class LedgerTests(unittest.IsolatedAsyncioTestCase):
             TransferProposal(recipient(obs, prefix), 2.0, yes)
             for prefix in ("juror_0", "juror_1", "juror_2", "challenger_")]}
         treatment = self.treatment(transfers_enabled=True, transfer_cap_pct=1.0,
-                                   payout=PayoutConfig(creator_bet=3.0, challenger_bet=3.0))
+                                   payout=PayoutConfig(creator_bet=3.0, challenger_bet=3.0,
+                                                       juror_bond=0.3))
         record = await self.record(treatment)
         self.assertEqual(len(record.bribes_offered), 1)
         self.assertEqual(len(record.transfers_rejected), 3)
@@ -234,7 +226,7 @@ class LedgerTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_private_chat_runs_now_that_the_runner_supports_it(self):
         # Behaviour is covered in test_private_chat_and_audit.py.
-        metrics = await ExperimentRunner(MockGameAPI(), Path(self.directory.name)).run_experiment(
+        metrics = await ExperimentRunner(self.new_game(), Path(self.directory.name)).run_experiment(
             self.treatment(private_chat=True), [SCENARIO], "chat")
         self.assertEqual(metrics.episodes[0].status, "completed", metrics.episodes[0].failure_reason)
         self.assertEqual(metrics.episodes[0].chat_audit["message_count"], 0)

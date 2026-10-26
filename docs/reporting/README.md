@@ -11,10 +11,10 @@ checks; routine LaTeX syntax remains reference material.
 | 1 | [Paper brief](paper-brief.md) | Reader, question, contribution, admissible evidence, and gaps |
 | 2 | [Venue](venue.md) | Official template, limits, anonymity, and submission stage |
 | 3 | [Writing](writing.md) | Clear prose, mathematical arguments, and annotated examples |
-| 4 | [Visuals](visuals.md) | Figure typography, palettes, dimensions, tables, and diagrams |
+| 4 | [Visuals](visuals.md) | Publication chart style, Matplotlib mean/SD figures, typography, palettes, tables, and diagrams |
 | 5 | [LaTeX](latex.md) | Compiler, packages, notation, equations, and references |
 | 6 | [Review](review.md) | Scientific support, reproducibility, PDF inspection, and completion |
-| Sample | [Sectioned report](../../report/README.md) | Editable manuscript under `report/`, using the supplied preprint style |
+| Report | [Sectioned baseline report](../../report/README.md) | Editable manuscript under `report/`; admitted two-episode smoke evidence, using the supplied preprint style |
 | Lookup | [Writing sources](sources/writing-sources.md) | Knuth; Peyton Jones; Gopen and Swan; Williams and Bizup; Pinker; The Craft of Research |
 | Lookup | [Visual sources](sources/visual-sources.md) | Rougier; Booktabs; PGF/TikZ |
 | Lookup | [LaTeX sources](sources/latex-sources.md) | AMS guide; The LaTeX Companion; official venue sources |
@@ -75,3 +75,16 @@ at its actual size, and apply [the review checklist](review.md). Generated PDFs
 and LaTeX build products belong in scratch/run output, not in this guide's
 source directory. The example is a smoke check of the conventions; it does not
 complete review of a future manuscript.
+
+## Changelog
+
+### 2026-10-25
+
+- Capture the baseline chart conventions as reusable report guidance: restrained
+  Matplotlib styling, manuscript-matched type, opaque same-hue SD fills, raw
+  observations, and explicit small-sample/N/A rules. Link them from writing and
+  review guidance so future reports preserve both visual quality and evidence.
+- Keep detailed chart rules in [visuals.md](visuals.md), with writing and review
+  guidance linking to that source. The current Times-based report uses STIX type
+  and opaque blue mean/SD colors `#0072B2` / `#DCECF5`; preserve that visual
+  convention when extending its figures.
