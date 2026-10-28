@@ -318,6 +318,9 @@ observations and do not alone establish collusion.
 
 ### 2026-10-26
 
+- Verify provider credential authentication before dispatching a model-screen
+  cohort. Authentication failures can leave conservative spending reservations;
+  they are infrastructure failures, not valid games or evidence of abstention.
 - Publish the complete `campaign-2026-10-26` results with explicit user
   authorization. Use Git LFS for large evidence files; keep other campaigns
   ignored so this release does not authorize publishing future private runs.
