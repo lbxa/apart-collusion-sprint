@@ -17,6 +17,12 @@ Share [the API integration guide](docs/api.md) with the harness team. The runnin
 service exposes the same guide at `/v1/docs` and OpenAPI 3.1 at `/v1/openapi.json`.
 [Architecture and rule authority](docs/architecture.md) describes the boundaries.
 
+## Swarm Alignment Hackathon 2026: preexisting-work notice
+
+**This repository predates the November 6–8, 2026 Swarm Alignment Hackathon.** Its latest identified commit before that sprint is [f3826f16c97c](https://github.com/lbxa/apart-collusion-sprint/commit/f3826f16c97c) (October 28, 2026 UTC). The Rust/Solidity game, Python harness, experiment designs, prior reports, and exploratory model campaigns are prior work. They may be reused only with explicit attribution and must not be presented as new sprint implementations or findings.
+
+The successor [Veracity benchmark](https://github.com/lbxa/collusion-benchmark) also predates November 6; its baseline is [c81c03a6d7cd](https://github.com/lbxa/collusion-benchmark/commit/c81c03a6d7cd) (November 3, 2026 UTC). See its [sprint provenance register](https://github.com/lbxa/collusion-benchmark/blob/main/docs/swarm-2026-disclosure.md). No November 6–8 experiment or result is claimed here. Fictional report examples and historical exploratory results are not new sprint evidence.
+
 ## Research reporting
 
 A LaTeX research report is a main deliverable. The
