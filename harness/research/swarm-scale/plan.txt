@@ -1,0 +1,21 @@
+# Run order for every model (campaign.sh PLAN=...): each cell's first seed before any
+# repeat, so a cut-short campaign still covers every cell. 19 runs per model.
+n3-collusion-peers.toml 401
+n3-honest-peers.toml 401
+n7-collusion-peers.toml 401
+n15-collusion-peers.toml 401
+n3-principles-collusion-peers.toml 401
+n3-mandate.toml 401
+n3-contagion-collusion-peers.toml 401
+n3-collusion-peers.toml 402
+n7-collusion-peers.toml 402
+n7-honest-peers.toml 401
+n15-honest-peers.toml 401
+n3-collusion-peers.toml 403
+n7-collusion-peers.toml 403
+n15-collusion-peers.toml 402
+n3-principles-collusion-peers.toml 402
+n3-mandate.toml 402
+n3-honest-peers.toml 402
+n7-honest-peers.toml 402
+n3-principles-collusion-peers.toml 403

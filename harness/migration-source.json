@@ -1,0 +1,740 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-11-17T01:48:09.244700-05:00",
+  "source_checkout": "apart-epistemics-sprint",
+  "source_head": "ad5b88d960592a7c6e9ea2479a3832f277c51679",
+  "source_had_working_tree_changes": true,
+  "target_base_commit": "41c641bdd0f1d2fee0161e3d3e282e738d98bce9",
+  "runtime_imports": [
+    {
+      "path": "harness/.python-version",
+      "source_sha256_at_import": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d"
+    },
+    {
+      "path": "harness/docker/Dockerfile",
+      "source_sha256_at_import": "8010d564a1ade7bab30f53690a0b7d79975001af09520e49da7a2c2d7fd41754"
+    },
+    {
+      "path": "harness/examples/case.md",
+      "source_sha256_at_import": "c10e3b27fa5f70bd75f3dc6613f9b0cc9d76fa91dec794cd4da36b9e24029439"
+    },
+    {
+      "path": "harness/examples/discovery.toml",
+      "source_sha256_at_import": "12ef24061a7092488ddb2c15c4d71462b5e15bf9cd93b1ac9bc0c55cf848f307"
+    },
+    {
+      "path": "harness/pyproject.toml",
+      "source_sha256_at_import": "e098f1961fdd1525257735cc52f5b3ef32bfdacbdcb9f5a47dc5ecf9227957c4"
+    },
+    {
+      "path": "harness/research/balanced-screen.toml",
+      "source_sha256_at_import": "c7c3ca293b95f68bb552154d23f94ca0c4f1733f2e3e70de467b24b42bd85cb0"
+    },
+    {
+      "path": "harness/research/clear-case.md",
+      "source_sha256_at_import": "82c0b6dda2c33bfbc9ee1c9d153121bb7101b0ef7e258c695112337be011ece2"
+    },
+    {
+      "path": "harness/research/clear-case.toml",
+      "source_sha256_at_import": "00a7eb7e427da3015e7eeadf088d1bd5e781cb198a84e8010856f878195e5c96"
+    },
+    {
+      "path": "harness/research/clear-no-communication.toml",
+      "source_sha256_at_import": "06d84fce442c2e3f042b1bc0b209781cb4ccf93acb32ebd752bc7dd2e27711fb"
+    },
+    {
+      "path": "harness/research/cloudflare-pilot-no-communication.toml",
+      "source_sha256_at_import": "28f0d29f4682236d8a8ac61d788915909e4f65d1f88f29d247e95de5ffffe029"
+    },
+    {
+      "path": "harness/research/cloudflare-pilot.toml",
+      "source_sha256_at_import": "816acca1926931a4792ea698eafd727dbbcf52bc6aa3195e3410cd854f3b42b4"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/baseline.toml",
+      "source_sha256_at_import": "b52cb9a7d300757c4333af19a5e7d7902bb7f388af0916f042ef7c4e0521895b"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/canonical-peer.toml",
+      "source_sha256_at_import": "902bca66766699bd0906fa61865929829b886198ce097a9bde16ccd92690ec72"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/false-offer.toml",
+      "source_sha256_at_import": "4362bebdafe398166635cbf2967a698f32bbf3fefe106cfd686af17c41bf03a7"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/false-peer.toml",
+      "source_sha256_at_import": "0b9040f021d2d9a8c7a6ee28595ce1b089c0171080e5bb284a45630aa9e8564e"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/quota-peer.toml",
+      "source_sha256_at_import": "4053239aa93715534f4dbb3af83f5edc42e2b875f2186368b0179d222f062763"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/true-offer.toml",
+      "source_sha256_at_import": "53bb70ec2e3d2b6fcfe98e494984b9c98add43d6799cc3b160981046485d6a25"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/verify-alone.toml",
+      "source_sha256_at_import": "8db8d019fb1a47fc320b197e9b4ffb2c493c4e52f43ad3b928d6f25448684849"
+    },
+    {
+      "path": "harness/research/frontier-2026-10-31/verify-peer.toml",
+      "source_sha256_at_import": "587a53d6ef068dece6dd9271c2e2f79f1a47b6d40ded304ea86a4bdf1f70e8b0"
+    },
+    {
+      "path": "harness/research/market-v1/deliveries.md",
+      "source_sha256_at_import": "6742eaaff1d2e0156f4cd4c09c2bc49946718ded4db6ed9b614597e51f13cf5c"
+    },
+    {
+      "path": "harness/research/market-v1/hidden.toml",
+      "source_sha256_at_import": "ccbef25f6cb24f09c68a52356371f88ee1d339f5546e4a7a28a58bcb86375ccf"
+    },
+    {
+      "path": "harness/research/market-v1/invoice.md",
+      "source_sha256_at_import": "9f9ad85a2e0e345951c02db57e27615645dc956d7b31d97abe5d630d6fbbfffd"
+    },
+    {
+      "path": "harness/research/market-v1/ledger.md",
+      "source_sha256_at_import": "7802e0b57325443cd938d4711b1f6a3fdefe194681bdad035fb9d7a728659f16"
+    },
+    {
+      "path": "harness/research/market-v1/timesheet.md",
+      "source_sha256_at_import": "fbe4234ad9a6fdecda997239cf753dd058003443a4614a9e851ac5179a2021e7"
+    },
+    {
+      "path": "harness/research/market/advanced.toml",
+      "source_sha256_at_import": "d6cfdc484e78164becd7fcf0fd9606fdda3859c9365ea43390351ebbb809d1b3"
+    },
+    {
+      "path": "harness/research/market/challenger-juror-offer.toml",
+      "source_sha256_at_import": "ff5400e03cb5e953298374361447eea882858a3c00165e0519d512555e3d4ed3"
+    },
+    {
+      "path": "harness/research/market/challenger-juror.toml",
+      "source_sha256_at_import": "c7997c628aa4f601892948482be05fe393b57490a6593174f9cdb3eac2ff853c"
+    },
+    {
+      "path": "harness/research/market/coalition.toml",
+      "source_sha256_at_import": "b73059901c6b19db1ecf29e2a22cd6278cdccf657df4e5d12df5212b849bd299"
+    },
+    {
+      "path": "harness/research/market/creator-juror-offer.toml",
+      "source_sha256_at_import": "9ff299bfca604e810191fe039f1c1385dc3eed7629e7e63522b27521fa364d4b"
+    },
+    {
+      "path": "harness/research/market/creator-juror.toml",
+      "source_sha256_at_import": "d87d633d7d2915ce070186120c801757eae093f0db371dbfb695bf5a4ef9342f"
+    },
+    {
+      "path": "harness/research/market/deliveries.md",
+      "source_sha256_at_import": "78d07e2cf7b6f92927aa2bcd7cb702f6ebc8667506eac92ed15bc23f7a5fa261"
+    },
+    {
+      "path": "harness/research/market/evaluation.toml",
+      "source_sha256_at_import": "7190190461e1670bdb68306ad9161c21babb8af082f40d56bddf708fe8094224"
+    },
+    {
+      "path": "harness/research/market/expenses.md",
+      "source_sha256_at_import": "be53258e5d31a645b31cc7b4b2d7eace2445ae9e07d5980337a7ae1e54fd9030"
+    },
+    {
+      "path": "harness/research/market/found-channel.toml",
+      "source_sha256_at_import": "8d11dacd3f4d32e44d9a0e37b872db9fa0c21d5eaeffffcafe89c46b69b6d4e4"
+    },
+    {
+      "path": "harness/research/market/hidden.toml",
+      "source_sha256_at_import": "dcd21e2adca247cf3febcceb3f3ee831ce592298880602d5748c5a1158a65813"
+    },
+    {
+      "path": "harness/research/market/history/freight.md",
+      "source_sha256_at_import": "08fafa6da99de31396ab5d49bca1e685b0600ebba2ad1c15520d5c8978e99c28"
+    },
+    {
+      "path": "harness/research/market/history/mileage.md",
+      "source_sha256_at_import": "ca7a14833ce102aab0eb4f6134069c3e9ba30d5aec89751de6eb908f6d1ff909"
+    },
+    {
+      "path": "harness/research/market/history/stock-count.md",
+      "source_sha256_at_import": "0fcfb7dce02043831bb7b125c6a70d5897f49ffa8667c2e4aa77dbaa0c72870e"
+    },
+    {
+      "path": "harness/research/market/incentive.toml",
+      "source_sha256_at_import": "0db2a7501318c8e430cfcb7655144fa1edeaf26fb9491f38204514633d331c14"
+    },
+    {
+      "path": "harness/research/market/invoice.md",
+      "source_sha256_at_import": "cf0651c8b5f913edf421c4c0e82b0930f917b4de7beca846bba4a3999ac42b2e"
+    },
+    {
+      "path": "harness/research/market/ledger.md",
+      "source_sha256_at_import": "4cd2394e99c29cb9e00a9bfbe75b4b7e303c3df0b0a665da9ad0685f1850d8fe"
+    },
+    {
+      "path": "harness/research/market/manifest.md",
+      "source_sha256_at_import": "f2efb26fa06866791295df2f9da678f35df12fbeb13641ea670b267cadfa7afd"
+    },
+    {
+      "path": "harness/research/market/meter.md",
+      "source_sha256_at_import": "69716058f7f08754981b74c062cc08870ffd2da33fe909c2f3d46ea1db98668b"
+    },
+    {
+      "path": "harness/research/market/no-communication.toml",
+      "source_sha256_at_import": "71e149ad633ae736f646d2ec7fd420c2cc57cba3f076a4c97864d7cdc581f385"
+    },
+    {
+      "path": "harness/research/market/overtime.md",
+      "source_sha256_at_import": "c57500ba6b04e4e7664e0379a0b95b081b460056075bacb111a50eb4a7f3358e"
+    },
+    {
+      "path": "harness/research/market/payments.toml",
+      "source_sha256_at_import": "b523bdc97d5b3d14aecc4bc43f9aaab30626e6c7899c6c247b7a41dc63c5c722"
+    },
+    {
+      "path": "harness/research/market/principal.toml",
+      "source_sha256_at_import": "cad37ccc25a113bf8f6488516a4d6855f12fa195a3d2d2799c02b5aa871bac6c"
+    },
+    {
+      "path": "harness/research/market/principles.toml",
+      "source_sha256_at_import": "962ae88c2d3f8fc194733f595c7a5f76c1bfd392b928d258eeb21ccd9178f26a"
+    },
+    {
+      "path": "harness/research/market/purchase-order.md",
+      "source_sha256_at_import": "bd16fbc640f77e1c476aeae68a1ea1716ffa33160c21ed3c131daa6f3eac9267"
+    },
+    {
+      "path": "harness/research/market/quota.toml",
+      "source_sha256_at_import": "21cc1f121380e4fb2ebb678f1ef5b7f90e6d01bb4be72198cc7aa536abadc73a"
+    },
+    {
+      "path": "harness/research/market/reconciliation.md",
+      "source_sha256_at_import": "29899bbc93e45e4118a72d63860ff14a3ea18ee12d0892f7f231ce2ae75951b4"
+    },
+    {
+      "path": "harness/research/market/records-v2/deliveries.md",
+      "source_sha256_at_import": "78d07e2cf7b6f92927aa2bcd7cb702f6ebc8667506eac92ed15bc23f7a5fa261"
+    },
+    {
+      "path": "harness/research/market/records-v2/expenses.md",
+      "source_sha256_at_import": "f028dd00c6e6cd2448c8d125ed9b5ded3a31ec0dcb95f73edb422a7f902e0c96"
+    },
+    {
+      "path": "harness/research/market/records-v2/history/freight.md",
+      "source_sha256_at_import": "d58c233a18af87a10b19bcd41b6dcdedf3534186d19f11c176b3e45adc1b3b43"
+    },
+    {
+      "path": "harness/research/market/records-v2/history/mileage.md",
+      "source_sha256_at_import": "bb626e9fd896686aa407e03b92d9b5c2c9506c5890f7f1c971baaff1186706e9"
+    },
+    {
+      "path": "harness/research/market/records-v2/history/stock-count.md",
+      "source_sha256_at_import": "2f9f245a6f8805e75e5e00c57145d504c1afa07a68b56e45be62d45fab219e63"
+    },
+    {
+      "path": "harness/research/market/records-v2/invoice.md",
+      "source_sha256_at_import": "1ca16d20398ee0c8af79817c4c28f101f42b2a9288f34a11010a6d1c011dd96f"
+    },
+    {
+      "path": "harness/research/market/records-v2/ledger.md",
+      "source_sha256_at_import": "4cd2394e99c29cb9e00a9bfbe75b4b7e303c3df0b0a665da9ad0685f1850d8fe"
+    },
+    {
+      "path": "harness/research/market/records-v2/manifest.md",
+      "source_sha256_at_import": "f2efb26fa06866791295df2f9da678f35df12fbeb13641ea670b267cadfa7afd"
+    },
+    {
+      "path": "harness/research/market/records-v2/meter.md",
+      "source_sha256_at_import": "b753e4d5ae770e706174c663a64c9aaec890e3a3bb9670cd23d105d70a9c028f"
+    },
+    {
+      "path": "harness/research/market/records-v2/overtime.md",
+      "source_sha256_at_import": "3ac60fa9d3a0ec228276ead26554c36480310ca60e8f31deeee4147d19a02772"
+    },
+    {
+      "path": "harness/research/market/records-v2/purchase-order.md",
+      "source_sha256_at_import": "bd16fbc640f77e1c476aeae68a1ea1716ffa33160c21ed3c131daa6f3eac9267"
+    },
+    {
+      "path": "harness/research/market/records-v2/reconciliation.md",
+      "source_sha256_at_import": "d829922c284e163358d8d215fc33e65284dc99f083c15efcbdb367f487968744"
+    },
+    {
+      "path": "harness/research/market/records-v2/timesheet.md",
+      "source_sha256_at_import": "84020abcd0176fb2e73c877062d81e37d92f5fe484bdb6a3477c6c2e0dfdbbb0"
+    },
+    {
+      "path": "harness/research/market/timesheet.md",
+      "source_sha256_at_import": "84020abcd0176fb2e73c877062d81e37d92f5fe484bdb6a3477c6c2e0dfdbbb0"
+    },
+    {
+      "path": "harness/research/market/verify-peer.toml",
+      "source_sha256_at_import": "ccd33bac035657eb48fc367c5d30df0dbc76760c55b529725353575a34525ea0"
+    },
+    {
+      "path": "harness/research/market/verify.toml",
+      "source_sha256_at_import": "cbec80ad1ad870e7921fac2b033748475e3e83a59b31df067579f89cbbcf1bf9"
+    },
+    {
+      "path": "harness/research/market/verify/batch-a.json",
+      "source_sha256_at_import": "6ca240254ac06e2d1baff0c1bbd3007a20aed5d47fea72ca610460a5d90faa78"
+    },
+    {
+      "path": "harness/research/market/verify/batch-a.md",
+      "source_sha256_at_import": "bfff6d66c02d7bd50653d90dec4ebe73f5c044d31a08cc4b176ee46ad8641a59"
+    },
+    {
+      "path": "harness/research/market/verify/batch-b.json",
+      "source_sha256_at_import": "8133127248b3dc210dcfbecc317dc9dfb43f7831dbd9112e96ce5edc9b2724f0"
+    },
+    {
+      "path": "harness/research/market/verify/batch-b.md",
+      "source_sha256_at_import": "f2dbdadee9054edd74d507348ed801b52d7ce3e48d4a2bfc9f4d5495089e741d"
+    },
+    {
+      "path": "harness/research/market/verify/batch-c.json",
+      "source_sha256_at_import": "08fa17b6eca7742520d1557fb94d3ded433fdb5429b7e7b726d7a88e4eca6fba"
+    },
+    {
+      "path": "harness/research/market/verify/batch-c.md",
+      "source_sha256_at_import": "934c698c1dd5a3fe42b9629f640af4ada18aad286cb8357de26aa97b07cb9c75"
+    },
+    {
+      "path": "harness/research/market/verify/batch-d.json",
+      "source_sha256_at_import": "dfe777a53bb869b6eab17cb27b60b5c44c3f914f361e30243630f3ffe429b3c3"
+    },
+    {
+      "path": "harness/research/market/verify/batch-d.md",
+      "source_sha256_at_import": "3be43bf43c4d92cf56379f6f5b0505879e5b2e639ffba5a9e92d6e09daa0b0c7"
+    },
+    {
+      "path": "harness/research/market/verify/batch-e.json",
+      "source_sha256_at_import": "27a4730ad0f5bf2048f3fca1f14a993e13b6a01215b2a0614a48f4b0edd4512b"
+    },
+    {
+      "path": "harness/research/market/verify/batch-e.md",
+      "source_sha256_at_import": "ddf2ca474f55e75ff77826c21bbfd876990f1f4229c9c06307d5992d076df844"
+    },
+    {
+      "path": "harness/research/market/verify/batch-f.json",
+      "source_sha256_at_import": "49c15d32120c5306898c831ccb86a8d4bce073b988950028edf7718c3075126e"
+    },
+    {
+      "path": "harness/research/market/verify/batch-f.md",
+      "source_sha256_at_import": "96d5afceeaac7b989d405efbb136ace4227e18e030782a031c8db90e5ba759d3"
+    },
+    {
+      "path": "harness/research/market/verify/batch-g.json",
+      "source_sha256_at_import": "63481c344f39b6841c14e00dcd28e2cf636a32126a892f1aae0285708af6ea03"
+    },
+    {
+      "path": "harness/research/market/verify/batch-g.md",
+      "source_sha256_at_import": "33eb6c0ac63b6c3b82acd5aa26650fd488f4bac9ba1ab828f76f55761cd81449"
+    },
+    {
+      "path": "harness/research/market/verify/batch-h.json",
+      "source_sha256_at_import": "ad51421bfadc1bb77b33d210a67318a680e01229dae42d96ebe9e65674a6d7f4"
+    },
+    {
+      "path": "harness/research/market/verify/batch-h.md",
+      "source_sha256_at_import": "07e4d6d11a6d6cede185d3376e52d277807619614853dbe9cb547cc75b35914f"
+    },
+    {
+      "path": "harness/research/market/verify/batch-i.json",
+      "source_sha256_at_import": "212e3c6765b1e621e65e210819231a5df5916cf1588b65836f12b51bbbcd5484"
+    },
+    {
+      "path": "harness/research/market/verify/batch-i.md",
+      "source_sha256_at_import": "0cce3d96227b29df2454cbe88ebf8f83cc9f64846e96e7fbf86b3df64b98f542"
+    },
+    {
+      "path": "harness/research/market/verify/batch-j.json",
+      "source_sha256_at_import": "694301a1acd7219817edd779f4adab19735e83ff1617b588d8be9812ba0e0ec5"
+    },
+    {
+      "path": "harness/research/market/verify/batch-j.md",
+      "source_sha256_at_import": "f13165c8f7638b7d4b6577af1e4e8d5455a3045743bf8244e09e5116a42092ea"
+    },
+    {
+      "path": "harness/research/market/verify/truth.json",
+      "source_sha256_at_import": "9361417d05982899b0373646f86accf6f63ede8005da846d738fd63d8dc6eb07"
+    },
+    {
+      "path": "harness/research/market/world/flat.md",
+      "source_sha256_at_import": "576ed08c2e6ad15636d094b23950ab1d8ca4d515b24b46e2c90c5cf923c21af4"
+    },
+    {
+      "path": "harness/research/market/world/round.md",
+      "source_sha256_at_import": "4ff28b7bb0714670af1c73f4047f6833b14fbdd1ae479689f98966f0c657b7ca"
+    },
+    {
+      "path": "harness/research/no-communication.toml",
+      "source_sha256_at_import": "d657e10780165c5bb4e968a4d063430b1797af3b2989a05015e98d43023f6977"
+    },
+    {
+      "path": "harness/research/no-memory.toml",
+      "source_sha256_at_import": "79e686ef0135e8836658d4050d36c8457dd4300c034fd39001d1bb2afc74c7f4"
+    },
+    {
+      "path": "harness/research/pilot.toml",
+      "source_sha256_at_import": "979f14d137fc094f639c814c02f80a9f1e90ca1d3967a34a37f73dd9315e261a"
+    },
+    {
+      "path": "harness/research/repeated.toml",
+      "source_sha256_at_import": "89319045667cf6cb9423f64ee6b7a58fe4467baba641991eca6fad9c5c6a2d6f"
+    },
+    {
+      "path": "harness/research/swarm-scale/n15-collusion-peers.toml",
+      "source_sha256_at_import": "461e06ca76bf9ee6d9edb5641262bb91b6d1de79ae141e1dc9464acb83205ff0"
+    },
+    {
+      "path": "harness/research/swarm-scale/n15-honest-peers.toml",
+      "source_sha256_at_import": "9df3e4ed840d70210a752adda65a6dc3ce2927995f99ac3917666612b9284ee4"
+    },
+    {
+      "path": "harness/research/swarm-scale/n3-collusion-peers.toml",
+      "source_sha256_at_import": "77a5a651eb99c5749c8fa3f38dbbe3fc7f6d6df00d6cec9d142806635d631466"
+    },
+    {
+      "path": "harness/research/swarm-scale/n3-contagion-collusion-peers.toml",
+      "source_sha256_at_import": "9b053f808fdb863410c5f8e203425dec7aa744ce7c4108e39abf9ce687fc838d"
+    },
+    {
+      "path": "harness/research/swarm-scale/n3-honest-peers.toml",
+      "source_sha256_at_import": "5e205d6fbc5f5c9ab9b4fddc99622074d8e97e18098348f90611f74fe1b1a276"
+    },
+    {
+      "path": "harness/research/swarm-scale/n3-mandate.toml",
+      "source_sha256_at_import": "8e3a22086e5de15661eb6b5d6ed9d840832d320d3933ddcc98178636c5d3e9ba"
+    },
+    {
+      "path": "harness/research/swarm-scale/n3-principles-collusion-peers.toml",
+      "source_sha256_at_import": "0de2ada71faee08d415181d7b526d8f0e009f373fe2f879cf21c9bd55ebf40a4"
+    },
+    {
+      "path": "harness/research/swarm-scale/n7-collusion-peers.toml",
+      "source_sha256_at_import": "036a0153d37e7454613ad062220ece976ed05a0b3467093aabd3f64bdbc31f2e"
+    },
+    {
+      "path": "harness/research/swarm-scale/n7-honest-peers.toml",
+      "source_sha256_at_import": "39911fcd3f027d965e14f11fae8d40d886c4dc47434bff80b8dbbc8b645f93e9"
+    },
+    {
+      "path": "harness/research/swarm/collusion-peers.toml",
+      "source_sha256_at_import": "ccc86717dde9b60c263427a69eed39782217c6f2b97719b2079ae7ef65f23219"
+    },
+    {
+      "path": "harness/research/swarm/honest-peers.toml",
+      "source_sha256_at_import": "6c9ba465d4f6aee0091b3b4f40af1236686ee100ca5ad2e3891a5d9408f83dd4"
+    },
+    {
+      "path": "harness/research/swarm7/collusion-peers.toml",
+      "source_sha256_at_import": "98617c93501ee9a491b8ba1bf1d78097831ab6fe26a862324506c2e1c8cb4a8c"
+    },
+    {
+      "path": "harness/research/swarm7/honest-peers.toml",
+      "source_sha256_at_import": "8faa2ee65d58323467ab3a40f92b2f19d488201ad68090f91effe34210e31d8d"
+    },
+    {
+      "path": "harness/src/game_api/__init__.py",
+      "source_sha256_at_import": "322c098da4ccf646e9ba1ba13d2d3b1db621ba96355b8efe544e1261ffbc8109"
+    },
+    {
+      "path": "harness/src/game_api/client.py",
+      "source_sha256_at_import": "90b86c8d39226559ec7978c4e13d3ca46bddb0743f83f52424e01f2da72565fe"
+    },
+    {
+      "path": "harness/src/game_api/core_types.py",
+      "source_sha256_at_import": "a07fc872103d6455e5986feb335de35915ff613b5443af17653174047df35c91"
+    },
+    {
+      "path": "harness/src/game_api/generated.py",
+      "source_sha256_at_import": "f34919d13370e482dba3ada261ad7866879d45cb4639a6903f3d714d78c5497b"
+    },
+    {
+      "path": "harness/src/game_api/local_engine.py",
+      "source_sha256_at_import": "84ea3af6e4b26fcd026819ef9e29e9a1bdb358e7299df12d8d95aac9e2bf0200"
+    },
+    {
+      "path": "harness/src/veracity_harness/__init__.py",
+      "source_sha256_at_import": "11dcaf9c09741c0fbbf0fb08ba05fc815f01b82acaf91cff9eabe61ece8e7c0e"
+    },
+    {
+      "path": "harness/src/veracity_harness/agents.py",
+      "source_sha256_at_import": "a676d247c11c6ef6de8771bf64a0152743e6d4eeae74db87b53e911d697aa12b"
+    },
+    {
+      "path": "harness/src/veracity_harness/analysis.py",
+      "source_sha256_at_import": "f83657c3e50fffca38544428e3ae7cfa7a079af46dab81b10eba91fe7ae89a5d"
+    },
+    {
+      "path": "harness/src/veracity_harness/cli.py",
+      "source_sha256_at_import": "1e9d40761be7a32de6adc0b84f5a140f3530aae30d2ab0119a4f761bec73c65e"
+    },
+    {
+      "path": "harness/src/veracity_harness/config.py",
+      "source_sha256_at_import": "c37162b384a9b9b95c4bc36465be2836d6c979b420820e1e2c06821819affa2a"
+    },
+    {
+      "path": "harness/src/veracity_harness/export.py",
+      "source_sha256_at_import": "cd8c8196219bfe41a1ae38d3893455cf13b854ef3eea7918111d2b140ec40dfb"
+    },
+    {
+      "path": "harness/src/veracity_harness/gateway.py",
+      "source_sha256_at_import": "fb1db575e4dd2ecbb53c2afd62021365c5b26feb9cfdd63d3ba8204e76431908"
+    },
+    {
+      "path": "harness/src/veracity_harness/materials.py",
+      "source_sha256_at_import": "cc2c9d74ef638efa97050ee1cef07ca00f987bc4127cd9793a9ffd462252351b"
+    },
+    {
+      "path": "harness/src/veracity_harness/ratelimit.py",
+      "source_sha256_at_import": "325add27a1e5b9564fb5662de69bc31e9f1a0ff528204b41eaeb230d8520f2f9"
+    },
+    {
+      "path": "harness/src/veracity_harness/resources/audit-standard.md",
+      "source_sha256_at_import": "f34638a4cd69adf59edbe7d7b9e7b5e917890384f366640d21f38a46068452bd"
+    },
+    {
+      "path": "harness/src/veracity_harness/resources/constitution-principles.md",
+      "source_sha256_at_import": "cf074c30f2069901b787a5c7abe75073fb30e23f3a313df167d07563acc98fe0"
+    },
+    {
+      "path": "harness/src/veracity_harness/resources/interface.md",
+      "source_sha256_at_import": "930d4aecce808e2ccf24d00b702e0514fef8f8783f77393620210345a1090102"
+    },
+    {
+      "path": "harness/src/veracity_harness/resources/rules.md",
+      "source_sha256_at_import": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283"
+    },
+    {
+      "path": "harness/src/veracity_harness/resources/terms.md",
+      "source_sha256_at_import": "65d3e13cb8b7c0c7a5c85cf206b2e159aaf08db86f161ae6b35f80b2aa86c423"
+    },
+    {
+      "path": "harness/src/veracity_harness/runner.py",
+      "source_sha256_at_import": "6e1c348f154f20aa700e02cee9041c044b23f48f6d3cfafdc24b26b68629b46e"
+    },
+    {
+      "path": "harness/src/veracity_harness/sandbox.py",
+      "source_sha256_at_import": "0ff555d0de1a83a5f6b07e49036a2b3a0a3ccd4f35c2ea5f0d09baf724d3769d"
+    },
+    {
+      "path": "harness/src/veracity_harness/scoring.py",
+      "source_sha256_at_import": "40689bc517b137e6a15b930c5cc5bcdba46b279ef00ed0bf99732ba05ef9f485"
+    },
+    {
+      "path": "harness/src/veracity_harness/spending.py",
+      "source_sha256_at_import": "70a931e465d0b4743fa4ed03c10a472a8a4d358bf6a0c876a559270f3926f704"
+    },
+    {
+      "path": "harness/src/veracity_harness/watch.py",
+      "source_sha256_at_import": "1e3f9914269f6228d006cd4b535e9b041ceca23bc90074341a25f1fcbcb6c2d8"
+    },
+    {
+      "path": "harness/tests/conftest.py",
+      "source_sha256_at_import": "b93169dbe8aab789e472f2a363256c58dfb63ec7ec0ab0b4289b8cac84adee61"
+    },
+    {
+      "path": "harness/tests/test_agents.py",
+      "source_sha256_at_import": "bb479bd0a555c301f88fb1489b0be3ecbd762d8267218edead149407fafea9aa"
+    },
+    {
+      "path": "harness/tests/test_analysis.py",
+      "source_sha256_at_import": "e748fb676c4edcbb6278a3ab38a6747a0e604fa98a91e7b2b7b74b4159f1e1dc"
+    },
+    {
+      "path": "harness/tests/test_campaign_observers.py",
+      "source_sha256_at_import": "7dfb4911dc3e19d1272c09ca4167734cc11c8ec56fd113c724a9d219147209e4"
+    },
+    {
+      "path": "harness/tests/test_chat_client.py",
+      "source_sha256_at_import": "a0fbdcf9004478db9fe968d4353faea280e98468debaf6f87e359bb8a7871fb3"
+    },
+    {
+      "path": "harness/tests/test_chat_client_integration.py",
+      "source_sha256_at_import": "1e0d7ee40349a733cf3ca078155dac0c286abac204ce27ef939c30b3afc7c402"
+    },
+    {
+      "path": "harness/tests/test_cli.py",
+      "source_sha256_at_import": "09cefbce55607cfb9e6e777b0ac1624b48e2b8ad7b44f9059282f8909331e9b1"
+    },
+    {
+      "path": "harness/tests/test_client.py",
+      "source_sha256_at_import": "2217f2055a8ea393e2a576e4830cec065b82b312b102dad0e880f6a7ceeeae99"
+    },
+    {
+      "path": "harness/tests/test_client_integration.py",
+      "source_sha256_at_import": "3f570453d8501b5bf0583ff0fbba509b1f8d91b860ad69cad5a366b069f903c4"
+    },
+    {
+      "path": "harness/tests/test_config.py",
+      "source_sha256_at_import": "ebecb58ad08ee84059b17e0d1366adabd3ac52d0f8957df21479e2165b9330d6"
+    },
+    {
+      "path": "harness/tests/test_execution_recovery.py",
+      "source_sha256_at_import": "9ecfba651c1300cb0738608ff85812392cf9b116102895ccbff3a790ad1d9e2c"
+    },
+    {
+      "path": "harness/tests/test_export.py",
+      "source_sha256_at_import": "8798dd722a013c2b7fcc2b77d7193012603474fe792ba036576463b03d16807e"
+    },
+    {
+      "path": "harness/tests/test_forum_client.py",
+      "source_sha256_at_import": "2008dde35c942894156eb6e5d40a69ebef62868d0fe89d3d45b03710d57592c9"
+    },
+    {
+      "path": "harness/tests/test_gateway.py",
+      "source_sha256_at_import": "1d2b0037a25633666d53e3cd6e6e87568e2ebadb88da48370fa45a021e4cf621"
+    },
+    {
+      "path": "harness/tests/test_generated_client.py",
+      "source_sha256_at_import": "8e519e41091f3d81ef9c9326616e78f80f6dd8c60f150cc6d98518b14ba64305"
+    },
+    {
+      "path": "harness/tests/test_inspection_prompt.py",
+      "source_sha256_at_import": "342c25648a8e92dfd82d292787ec78522d693938efe84368c7874fb4a62e9c0c"
+    },
+    {
+      "path": "harness/tests/test_integration.py",
+      "source_sha256_at_import": "c07b8091d83bfb198974cbc253e2263022f9d631cefc9b168dce63111a14d4cd"
+    },
+    {
+      "path": "harness/tests/test_local_engine.py",
+      "source_sha256_at_import": "bca379b1df6b895f7e6a144ba29c2df5176efabcd90d1d470ee58b3ec637dcc8"
+    },
+    {
+      "path": "harness/tests/test_malformed_history.py",
+      "source_sha256_at_import": "cd95759c008c96b1bafcee22078c6854d9404f623092140fc20c17024edfe941"
+    },
+    {
+      "path": "harness/tests/test_mandate_filing.py",
+      "source_sha256_at_import": "a7b26abbfa93a024866dbdba3862eaeb055d12f66de0145fc47f41701e903ead"
+    },
+    {
+      "path": "harness/tests/test_materials.py",
+      "source_sha256_at_import": "4e3f017434f6eb3c22861e5c0e5d7866c229591e481be58c0ee63a517a2a7fa2"
+    },
+    {
+      "path": "harness/tests/test_pooling_feasibility.py",
+      "source_sha256_at_import": "177d2db687f592017e823c6c8845f602d780970e8cf03f190b227b81c8615dc1"
+    },
+    {
+      "path": "harness/tests/test_ratelimit.py",
+      "source_sha256_at_import": "4772780d5cd3d8b3d83b0df24a52de8e7f76fc537f1f23c35d23019090a876d6"
+    },
+    {
+      "path": "harness/tests/test_relay.py",
+      "source_sha256_at_import": "1ff3cae4db2b1575a95e0b10581c9e7f39e82dd0a62908218ad29ba087f48ec1"
+    },
+    {
+      "path": "harness/tests/test_research_configs.py",
+      "source_sha256_at_import": "b82375ba12be3812050e51d161258530ea6cc44b9234bf481d473b7f87aba0a7"
+    },
+    {
+      "path": "harness/tests/test_sandbox_integration.py",
+      "source_sha256_at_import": "febaef9f5a2ff22245ce6ec8cf4dec1639e609208253103f30dcd36128aeadd1"
+    },
+    {
+      "path": "harness/tests/test_sandbox_lifecycle.py",
+      "source_sha256_at_import": "48319e001dc5b4bb5091eb669b02fbe282c3b6b0a225ab59ac4ee2aa32c5e24a"
+    },
+    {
+      "path": "harness/tests/test_scheduling.py",
+      "source_sha256_at_import": "4917d4070386e66bc336c9e818ca9832c08473322ee34487f3faafcd32ed0583"
+    },
+    {
+      "path": "harness/tests/test_scoring.py",
+      "source_sha256_at_import": "676e6f5a265d0534800ffc6cdd2e1916fa64f48288a24be07e7637f0dfeba777"
+    },
+    {
+      "path": "harness/tests/test_shared_cache.py",
+      "source_sha256_at_import": "578ae2cf6a63deb7e35f43e056086c7701103910abf46b35a684efaed4714b78"
+    },
+    {
+      "path": "harness/tests/test_spending.py",
+      "source_sha256_at_import": "30eba17144f101fb1a01185cd9831c4f36d00a00308dd44f3a812be76b57451e"
+    },
+    {
+      "path": "harness/tests/test_watch.py",
+      "source_sha256_at_import": "428175fc91312adef7e07741805f96e60b8d7edcc309dd9579d4e97fdd00b323"
+    },
+    {
+      "path": "harness/uv.lock",
+      "source_sha256_at_import": "921c177894f1e01e02d8a6e1a3503d72534d07e7e4eac5f25d386b0b73aa7e88"
+    }
+  ],
+  "engine_source_files": [
+    {
+      "path": "contracts/artifacts/Veracity.json",
+      "source_sha256": "32720e28f657aa39fd19be31e9ecd789015bc558bd1b3477d067bca185fb381a"
+    },
+    {
+      "path": "contracts/src/Veracity.sol",
+      "source_sha256": "4327d5e6307a657284a93c9bf6c4eeef8d4704c66892556461b654e492f394dc"
+    },
+    {
+      "path": "contracts/test/Veracity.t.sol",
+      "source_sha256": "8af9ce5388a51c3750a9935047d54b2e312219f05da0f50d2da76fc2a0c087ff"
+    },
+    {
+      "path": "contracts/test/VeracityInvariant.t.sol",
+      "source_sha256": "7822640f1fb063a573fdcbd4a55666ef57376751b25f4d4a83bab8c97c69ea68"
+    },
+    {
+      "path": "core/src/api/openapi.rs",
+      "source_sha256": "b384ffaa6b3e51cfc35e9388693866f32e0b65ed6a72414f5359e8a924497265"
+    },
+    {
+      "path": "core/src/api/routes.rs",
+      "source_sha256": "77d2a48ef372d888a30ec5734e9dca994aaf4f08e6023af2f3ee1ec9def9a89e"
+    },
+    {
+      "path": "core/src/chain/client.rs",
+      "source_sha256": "00dab2420f6208ff4ea963ff1f0128482793978e0bcbb81080294961e33f0b1f"
+    },
+    {
+      "path": "core/src/chain/types.rs",
+      "source_sha256": "2440fc2e9c87e76e23a60cc828cfabe031fbe9b8e4c0bbb013322090da172703"
+    },
+    {
+      "path": "core/src/config.rs",
+      "source_sha256": "66bdf64670d88e295ae1d3ee878bb2b724f637bb67a072a65e002eb25e0bb870"
+    },
+    {
+      "path": "core/src/game/execution.rs",
+      "source_sha256": "94f6e9ed2547940cd0c53cd2a91793ef17c8d8b3da08077f147da10f678e3d6d"
+    },
+    {
+      "path": "core/src/game/types.rs",
+      "source_sha256": "0433af9713c929a157942c66910b53ab0705b07696f0c28188c2abb302594395"
+    },
+    {
+      "path": "core/src/game/validation.rs",
+      "source_sha256": "7bd848fd19d3be4a487956b230c1e1045e91553af38a6b47688626c57cb3c599"
+    },
+    {
+      "path": "core/src/main.rs",
+      "source_sha256": "c27d4e1099fca4076f62cf88ef14b90c0d2cc8aa8ecb82d84bcfd0059b1003da"
+    },
+    {
+      "path": "core/tests/configuration.rs",
+      "source_sha256": "1b9a708572e0b37e81a113f111a21f6c2eff24825093336490729f37d80fd343"
+    },
+    {
+      "path": "core/tests/e2e_game.rs",
+      "source_sha256": "598cdc509189bba368d82d099be10efa90fb680f99666c345c0751c0a8442c67"
+    },
+    {
+      "path": "core/tests/game_validation.rs",
+      "source_sha256": "62ce9aa2da25761033f542dd1ce17c44606f9b620e9100cef5387dfa947019a9"
+    },
+    {
+      "path": "core/tests/support/mod.rs",
+      "source_sha256": "3121dd5dfb8869eb49ae94c909acfabdec4f4cb3becef9683973d21e05424747"
+    },
+    {
+      "path": "docs/openapi.json",
+      "source_sha256": "bd2e88c1a03fc0043c6e5dad983a6e7b7110d8fc91d2805e8423ba28d9c8d469"
+    }
+  ]
+}

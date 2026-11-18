@@ -1,0 +1,862 @@
+{
+  "format_version": 2,
+  "schema": "collusion-resistance-ingestion-v2",
+  "register_sha256": "344a522458236a8585b39965b6063dfc1b862d56ff1783a42e071561f1222fae",
+  "registry_sha256": "498dd170774635909148557a3e35c9b5053299c57ca1717c5ac53fd3ab3931a5",
+  "campaigns": [
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-deepseek",
+      "campaign_fingerprint": "d22b79807f6082a42aa147f0de967659d600001ac86b4a07dac6774c485e99e9",
+      "frozen_campaign_sha256": "2f4912ad0123cf002c9e3310b7a4fb0740df33744c783ef0003c70173372b9b0",
+      "journal_snapshot_sha256": "ad4f1d56d369d61a571121cd395843f783c354637fb3acec61550c5cfe243948",
+      "progress_sha256": "8995f515c46a38aebb6fc97454b0f760884e10105555dcb442cbc8228c75175a",
+      "journal_status_counts": {
+        "complete": 1,
+        "running": 1,
+        "pending": 28
+      },
+      "progress_status_counts": {
+        "complete": 1,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 28,
+        "running": 1
+      }
+    },
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-glm",
+      "campaign_fingerprint": "e1ae79f75a91cc5e47900ec2bf7122ff5beafbef886c002d3d14a5c3b5d93f7b",
+      "frozen_campaign_sha256": "698a20706d26d5a3aea34b685f106300e1ffc4cc758d962be5c8e44827599920",
+      "journal_snapshot_sha256": "f6ef65f7f9e167155f20a0e9282d4b79fbd2358f26c01098ab16349be342e482",
+      "progress_sha256": "5fbdb17644c684268327149f162eaa206faa802738e89b7566ffd0d7c6e50d75",
+      "journal_status_counts": {
+        "complete": 1,
+        "running": 1,
+        "pending": 28
+      },
+      "progress_status_counts": {
+        "complete": 1,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 28,
+        "running": 1
+      }
+    },
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-kimi",
+      "campaign_fingerprint": "19a8f4ec218a0e98d26d031cf924c71fca48e07010181f2292c9551b9fe4a675",
+      "frozen_campaign_sha256": "47b68a8cec2e6ce61f61bed9a92a896a19abbdaaabbe34044b2e07a33f5b0f94",
+      "journal_snapshot_sha256": "e24d645c677f694f74e3d7c2e18bb3825d2e25e214bd8b88971d1c28971ca675",
+      "progress_sha256": "e1614bd30a39085c621d004e2755d3b3535fd2f1a98618181ac214abc94f2197",
+      "journal_status_counts": {
+        "complete": 2,
+        "running": 1,
+        "pending": 27
+      },
+      "progress_status_counts": {
+        "complete": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 27,
+        "running": 1
+      }
+    },
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-gptoss",
+      "campaign_fingerprint": "8596146f1848c7414a7ee26be800664bd3698edbdfefc244e0fb591fe83a0699",
+      "frozen_campaign_sha256": "d1a2d878fd71bc9979f13a95ea5be0bce52304e807fd9051b9d302a8abdd9f1a",
+      "journal_snapshot_sha256": "fba2f7a3b3ce7c805f81f55995baa9a3be1a295c9e1bbf443cbc14fe7ad1b506",
+      "progress_sha256": "01a0ede4c4c991021ea7d3d21083cc28eba1134d06887511c6cf0ec443b8d79b",
+      "journal_status_counts": {
+        "complete": 2,
+        "running": 1,
+        "pending": 27
+      },
+      "progress_status_counts": {
+        "complete": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 27,
+        "running": 1
+      }
+    },
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-inkling",
+      "campaign_fingerprint": "9d0e699f2ac1b34fcc6e9c780810f98649b896ebf75ff86884fa57242447bfec",
+      "frozen_campaign_sha256": "b971ae75998c26af87983f8b72df8112926c70aacec863ac9aff546df9e99993",
+      "journal_snapshot_sha256": "a4b7e614fffaf206ed6f554b06b846bab5bccb9a164381d18eab15c8ab82bb93",
+      "progress_sha256": "1913f18c118e85bf0e93112d849130ec10d893d9cdeec035568f772f3c8691b1",
+      "journal_status_counts": {
+        "complete": 2,
+        "running": 1,
+        "pending": 27
+      },
+      "progress_status_counts": {
+        "complete": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 27,
+        "running": 1
+      }
+    }
+  ],
+  "runtime_root": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3",
+  "interpreter": "/Users/lucas/c/apart-collusion-sprint/harness/.venv/bin/python",
+  "python_version": "3.12.11 (main, Aug  8 2025, 16:50:44) [Clang 20.1.4 ]",
+  "operator_helper_sha256": "04a7572c46a1ea264b1f27d1dd2ae0178b9de467a3acd16bf40f1cc8bf37cb1d",
+  "operator_helper_path": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/operator/ingest-04a7572c46a1.py",
+  "runtime_sources": {
+    "harness/src/veracity_harness/resistance.py": "6f9114dfc26d49f404f197fac10896a781ee67c75a7932145e57833c2eba27a4",
+    "harness/src/veracity_harness/materials.py": "3268659925c0ae9dfb2438ac07a055f973d5152d05888f61c1c2033a48b5477e",
+    "harness/src/veracity_harness/resources/interface.md": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9"
+  },
+  "deferred_jobs": [
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-701",
+      "status": "running",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-701",
+      "status": "running",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-true-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-false-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-true-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-false-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-true-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-false-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-true-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-false-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-true-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-honest-false-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-701",
+      "status": "running",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-701",
+      "status": "running",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-701",
+      "status": "running",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-701",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-702",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-703",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-704",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-705",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    }
+  ],
+  "outputs_sha256": {
+    "assignment-register.json": "f823c50f918eea981044523262d4beee8110f4c0ecaaba7c280cdd850db18781",
+    "case-observations.json": "dfd492472b018f4cd7632037bea559863129afe9faf1fd6eb233d61d12cf0168",
+    "actor-mechanics.json": "3c9fa1c393657966849c5ea4749cb0b720ec0930c4c04f5b5f1ba040222859b0",
+    "operator-review-map.json": "10660b27282c8ff68dc029e44510d5009491a24b6b4bab6325e340f0ebb943bb",
+    "ingest.py": "04a7572c46a1ea264b1f27d1dd2ae0178b9de467a3acd16bf40f1cc8bf37cb1d",
+    "review-packets/packet-9afa122c31d2640c2d7f8947.json": "1498a1af8dae7fc50df2572354c659b3e356ba5084cbb07cddbd197139dcddfc",
+    "review-packets/packet-d95ba72696a50b0e042f07ec.json": "49d52547289f846e68309475a227e5a91a8ad66f7cf8935060b0717058ee81dd",
+    "review-packets/packet-50b062ec4327d0bbec3641c5.json": "4d1db4cbae956f1d3a158251438d4820c8750fb64835c48e1bfae763a1877305",
+    "review-packets/packet-e5655ffc8c9f415d026756a0.json": "924c16d801413885d044a66f31b4f732bd0b0b2fe68252a2961bf49b078f91ce",
+    "review-packets/packet-1b9d5b02bfadffce87983a4a.json": "5c9477001a1826809ea5ea91ab5befd23576696355ef765e671849fcc4c0726c",
+    "review-packets/packet-16f21faac1a4821433c43c56.json": "6d57cd99ebecfac383f7b3202b3c452c0b4f31ae842b40ee2a5af34b824716b2",
+    "review-packets/packet-df0706d1df94616509e26b75.json": "81c34a8e92b6998fe4c66ea01f16362a2836f937fc973fa06b35a50da86fe61f",
+    "review-packets/packet-e1022efa7f36c6e2f2465720.json": "9cc8194b88135a22a05543d9b4863c651306c6228eb5464d709419a8b75cc8c2",
+    "review-packets/packet-2eeecf921f5542fea726eae9.json": "c8bc8cffe5b396d79a6242907b9d2004469960c684fec6917fcee92551bd52dc",
+    "review-packets/packet-6fa67b94a31f8495fc21a09b.json": "219f50704d568b82cc73fd7980c7cc1a6acdb8350917ba0ff078598e6b99fd5d",
+    "review-packets/packet-37f3a66b5bff3c097ed6134f.json": "c5e2416f0df8ed438ed02a0097b9ce04559e68f7893aa50c72be48e5e4864ea6",
+    "review-packets/packet-ef20ee2cc127e6e135120bd3.json": "2ca4b98ceefc90c8685cd84ec214ae40490ccc4e090c4b4a4920622cb14a3136",
+    "review-packets/packet-c87556d5961a7d5fc59abb21.json": "279a27e586997acc25b67da8de299fc590718820e960e784baa1a7217b7ad0ea",
+    "review-packets/packet-dbd3c1fb40ae3042659ea002.json": "b2ff424c94342c36e7c76ff28f020092bd2554493d0878236d5bdec9e7779244",
+    "review-packets/packet-b069b78d9f82ee2e9fcb484f.json": "925c070e7b28b637ca48096d925e566303e6711fd4a5aaf070152541f092cacd",
+    "review-packets/packet-e4e6835e2444459a67ba8800.json": "7726088327e7d41bec25ad06c6ac4ca4fd1a178a0761393c409fb16a71e9dad7"
+  },
+  "run_status_matrix": {
+    "complete": [
+      "complete"
+    ],
+    "failed": [
+      "failed"
+    ],
+    "interrupted": [
+      "failed"
+    ]
+  },
+  "capability_evidence_gaps": [],
+  "review_packet_count": 16,
+  "semantic_labels_created": 0
+}

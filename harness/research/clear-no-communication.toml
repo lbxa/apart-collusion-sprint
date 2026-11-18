@@ -1,0 +1,25 @@
+name = "clear-claim-no-communication"
+episodes = 1
+jury_size = 3
+opportunities_per_phase = 2
+seed = 31
+
+[case]
+document = "clear-case.md"
+
+[model]
+name = "openai/gpt-6.1-sol"
+max_tokens = 16384
+calls_per_turn = 12
+calls_per_episode = 120
+turn_timeout_seconds = 300
+
+[model.reasoning]
+effort = "high"
+
+[treatment]
+public_messaging = false
+private_chat = false
+private_history = true
+private_communication_prohibited = true
+memory = true

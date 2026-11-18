@@ -24,7 +24,8 @@ use veracity_game_service::{
     store::Store,
 };
 
-const ACTORS: [&str; 10] = [
+// The first ten keep their historical Anvil keys; juries above seven use appended keys.
+const ACTORS: [&str; 18] = [
     "creator",
     "challenger",
     "juror-1",
@@ -35,6 +36,14 @@ const ACTORS: [&str; 10] = [
     "juror-6",
     "juror-7",
     "treasury",
+    "juror-8",
+    "juror-9",
+    "juror-10",
+    "juror-11",
+    "juror-12",
+    "juror-13",
+    "juror-14",
+    "juror-15",
 ];
 
 /// An actual node, contract, durable SQLite database, and the public HTTP router.
@@ -57,6 +66,7 @@ impl Fixture {
         let node = Anvil::new()
             .path(root.join(".tools/bin/anvil"))
             .chain_id(31337)
+            .args(["--accounts", "18"])
             .try_spawn()
             .expect("install the pinned Foundry tools with bash scripts/install-foundry.sh");
         let endpoint = node.endpoint();

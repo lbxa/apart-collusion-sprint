@@ -87,11 +87,21 @@ contract EpisodeHandler {
     }
 
     function withdraw(uint8 participantSeed) external {
-        uint256 slot = uint256(participantSeed) % 8;
-        address participant =
-            slot == 0 ? CREATOR : slot == 1 ? CHALLENGER : slot == 2 ? TREASURY : address(uint160(0x100 + slot - 3));
-        vm.prank(participant);
+        vm.prank(participant(participantSeed));
         try game.withdraw() {} catch {}
+    }
+
+    function transfer(uint8 senderSeed, uint8 recipientSeed, uint256 amountSeed) external {
+        address sender = participant(senderSeed);
+        uint256 available = game.credits(sender);
+        vm.prank(sender);
+        try game.transferCredits(participant(recipientSeed), available == 0 ? 0 : amountSeed % (available + 1)) {}
+            catch {}
+    }
+
+    function participant(uint8 seed) private pure returns (address) {
+        uint256 slot = uint256(seed) % 8;
+        return slot == 0 ? CREATOR : slot == 1 ? CHALLENGER : slot == 2 ? TREASURY : address(uint160(0x100 + slot - 3));
     }
 
     function sumCredits() external view returns (uint256 sum) {

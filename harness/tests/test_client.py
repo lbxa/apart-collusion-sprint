@@ -5,22 +5,38 @@ import unittest
 from aiohttp import web
 
 from game_api.client import (
-    CoreClient, CoreClientError, CoreHTTPError, CoreOperationError,
-    CoreOperationTimeout, CoreTransportError,
+    CoreClient,
+    CoreClientError,
+    CoreHTTPError,
+    CoreOperationError,
+    CoreOperationTimeout,
+    CoreTransportError,
 )
 
 
 def operation(status="accepted", *, operation_id="op-1", actor="juror-a"):
     return {
-        "operation_id": operation_id, "episode_id": "episode", "actor_id": actor,
-        "kind": "commit_vote", "status": status, "error": None,
-        "transaction": None if status == "accepted" else {
-            "transaction_hash": "0xtx", "sender": "0xactor", "nonce": 3,
+        "operation_id": operation_id,
+        "episode_id": "episode",
+        "actor_id": actor,
+        "kind": "commit_vote",
+        "status": status,
+        "error": None,
+        "transaction": None
+        if status == "accepted"
+        else {
+            "transaction_hash": "0xtx",
+            "sender": "0xactor",
+            "nonce": 3,
             "receipt": {
-                "transaction_hash": "0xtx", "success": status != "reverted",
-                "block_number": 3, "block_hash": "0xblock", "gas_used": "21000",
+                "transaction_hash": "0xtx",
+                "success": status != "reverted",
+                "block_number": 3,
+                "block_hash": "0xblock",
+                "gas_used": "21000",
                 "effective_gas_price": "10000000000000000000000000000000001",
-                "confirmations": 1, "confirmed": status == "confirmed",
+                "confirmations": 1,
+                "confirmed": status == "confirmed",
             },
         },
     }
@@ -41,7 +57,8 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
         await site.start()
         self.url = f"http://127.0.0.1:{site._server.sockets[0].getsockname()[1]}"
         self.client = CoreClient(
-            self.url, operator_token="operator-secret",
+            self.url,
+            operator_token="operator-secret",
             participant_tokens={"juror-a": "juror-secret", "creator-a": "creator-secret"},
             poll_interval=0.001,
         )
@@ -59,7 +76,10 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_commit_returns_handle_and_uses_configured_credential_and_caller_key(self):
         result = await self.client.commit(
-            "episode", "juror-a", "CREATOR_SUPPORTED", "Assessment with café.\n",
+            "episode",
+            "juror-a",
+            "CREATOR_SUPPORTED",
+            "Assessment with café.\n",
             idempotency_key="saved-command-key",
         )
         self.assertEqual(result.operation_id, "op-1")
@@ -69,24 +89,37 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((method, path), ("POST", "/v1/episodes/episode/commitments"))
         self.assertEqual(headers["Authorization"], "Bearer juror-secret")
         self.assertEqual(headers["Idempotency-Key"], "saved-command-key")
-        self.assertEqual(body, {"verdict": "CREATOR_SUPPORTED", "assessment": "Assessment with café.\n"})
+        self.assertEqual(
+            body, {"verdict": "CREATOR_SUPPORTED", "assessment": "Assessment with café.\n"}
+        )
 
     async def test_reveal_and_settle_only_submit_the_named_action(self):
         self.response = operation() | {"kind": "reveal_vote"}
         await self.client.reveal("episode", "juror-a", idempotency_key="reveal-key")
         self.response = operation() | {"kind": "settle", "actor_id": "operator"}
         await self.client.settle("episode", idempotency_key="settle-key")
-        self.assertEqual([r[1] for r in self.requests], [
-            "/v1/episodes/episode/reveals", "/v1/episodes/episode/settle"])
+        self.assertEqual(
+            [r[1] for r in self.requests],
+            ["/v1/episodes/episode/reveals", "/v1/episodes/episode/settle"],
+        )
         self.assertEqual([r[3] for r in self.requests], [{}, {}])
         self.assertEqual(self.requests[-1][2]["Authorization"], "Bearer operator-secret")
 
     async def test_action_response_must_belong_to_the_submitted_episode_actor_and_action(self):
-        for changed in ({"episode_id": "another"}, {"actor_id": "another"}, {"kind": "reveal_vote"}):
+        for changed in (
+            {"episode_id": "another"},
+            {"actor_id": "another"},
+            {"kind": "reveal_vote"},
+        ):
             self.response = operation() | changed
             with self.subTest(changed=changed), self.assertRaisesRegex(CoreClientError, "identity"):
-                await self.client.commit("episode", "juror-a", "CREATOR_SUPPORTED", "Assessment.",
-                                         idempotency_key="saved-key")
+                await self.client.commit(
+                    "episode",
+                    "juror-a",
+                    "CREATOR_SUPPORTED",
+                    "Assessment.",
+                    idempotency_key="saved-key",
+                )
 
     async def test_episode_response_must_belong_to_the_requested_episode(self):
         self.status = 200
@@ -104,11 +137,14 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_new_client_can_reconcile_saved_operation_without_python_episode_state(self):
         self.replies = [(operation("submitted"), 200), (operation("confirmed"), 200)]
-        async with CoreClient(self.url, operator_token="new-operator", poll_interval=0.001) as resumed:
+        async with CoreClient(
+            self.url, operator_token="new-operator", poll_interval=0.001
+        ) as resumed:
             result = await resumed.wait_operation("op-1")
         self.assertEqual(result.status, "confirmed")
-        self.assertEqual([r[1] for r in self.requests], [
-            "/v1/operations/op-1", "/v1/operations/op-1/reconcile"])
+        self.assertEqual(
+            [r[1] for r in self.requests], ["/v1/operations/op-1", "/v1/operations/op-1/reconcile"]
+        )
         self.assertEqual(self.requests[1][2]["Authorization"], "Bearer new-operator")
         self.assertTrue(self.requests[1][2]["Idempotency-Key"])
 
@@ -119,6 +155,7 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_reconciliation_cannot_replace_an_existing_transaction(self):
         from game_api.generated import OperationView
+
         previous = OperationView.model_validate(operation("submitted"))
         self.response = operation("confirmed")
         self.response["transaction"]["nonce"] += 1
@@ -127,6 +164,7 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def _accepted_handle(self):
         from game_api.generated import OperationView
+
         return OperationView.model_validate(operation())
 
     async def test_confirmed_requires_matching_successful_confirmed_receipt(self):
@@ -159,10 +197,17 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_structured_http_errors_remain_inspectable_but_are_safe_to_log(self):
         self.status = 409
-        self.response = {"error": {"code": "CONFLICT", "message": "A particular request conflicts."}}
+        self.response = {
+            "error": {"code": "CONFLICT", "message": "A particular request conflicts."}
+        }
         with self.assertRaises(CoreHTTPError) as error:
-            await self.client.commit("episode", "juror-a", "CREATOR_SUPPORTED", "private ballot",
-                                     idempotency_key="keep-this-key")
+            await self.client.commit(
+                "episode",
+                "juror-a",
+                "CREATOR_SUPPORTED",
+                "private ballot",
+                idempotency_key="keep-this-key",
+            )
         self.assertEqual(error.exception.status, 409)
         self.assertEqual(error.exception.problem.code, "CONFLICT")
         self.assertEqual(error.exception.problem.message, "A particular request conflicts.")
@@ -171,8 +216,11 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("secret", str(error.exception))
 
     async def test_strict_generated_response_validation_rejects_coercion_and_extra_fields(self):
-        for update in ({"status": "not-a-status"}, {"unexpected": "private response content"},
-                       {"actor_id": 42}):
+        for update in (
+            {"status": "not-a-status"},
+            {"unexpected": "private response content"},
+            {"actor_id": 42},
+        ):
             self.response = operation() | update
             with self.subTest(update=update), self.assertRaises(CoreClientError) as error:
                 await self.client.get_operation("op-1")
@@ -180,8 +228,9 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_participant_client_polls_public_evidence_without_operator_authority(self):
         self.replies = [(operation("submitted"), 200), (operation("confirmed"), 200)]
-        async with CoreClient(self.url, participant_tokens={"juror-a": "participant"},
-                              poll_interval=0.001) as participant:
+        async with CoreClient(
+            self.url, participant_tokens={"juror-a": "participant"}, poll_interval=0.001
+        ) as participant:
             result = await participant.wait_operation("op-1")
         self.assertEqual(result.status, "confirmed")
         self.assertEqual([r[0] for r in self.requests], ["GET", "GET"])
@@ -190,8 +239,11 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
     async def test_financial_values_cross_http_as_exact_integer_strings(self):
         exact = str(2**200 + 1)
         self.status = 200
-        self.response = {"episode_id": "episode", "entitlements": {"juror-a": exact},
-                         "withdrawal_credits": {"juror-a": exact}}
+        self.response = {
+            "episode_id": "episode",
+            "entitlements": {"juror-a": exact},
+            "withdrawal_credits": {"juror-a": exact},
+        }
         result = await self.client.get_balances("episode")
         self.assertEqual(result.entitlements["juror-a"], exact)
         self.assertEqual(result.withdrawal_credits["juror-a"], exact)
@@ -201,11 +253,20 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_transport_failure_preserves_command_key_without_automatic_resubmission(self):
         from unittest.mock import patch
+
         import aiohttp
-        with patch.object(self.client._session, "request", side_effect=aiohttp.ClientConnectionError("private")):
+
+        with patch.object(
+            self.client._session, "request", side_effect=aiohttp.ClientConnectionError("private")
+        ):
             with self.assertRaises(CoreTransportError) as error:
-                await self.client.commit("episode", "juror-a", "CREATOR_SUPPORTED", "private ballot",
-                                         idempotency_key="persisted-key")
+                await self.client.commit(
+                    "episode",
+                    "juror-a",
+                    "CREATOR_SUPPORTED",
+                    "private ballot",
+                    idempotency_key="persisted-key",
+                )
         self.assertEqual(error.exception.idempotency_key, "persisted-key")
         self.assertEqual(self.requests, [])
         self.assertNotIn("private", str(error.exception))
@@ -219,8 +280,13 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.requests)
 
     def test_urls_cannot_embed_credentials_or_ambiguous_resource_parts(self):
-        for url in ("https://user:password@example.com", "https://example.com?token=secret",
-                    "https://example.com#fragment", "file:///tmp/service", "https://example.com/v1"):
+        for url in (
+            "https://user:password@example.com",
+            "https://example.com?token=secret",
+            "https://example.com#fragment",
+            "file:///tmp/service",
+            "https://example.com/v1",
+        ):
             with self.subTest(url=url), self.assertRaises(ValueError):
                 CoreClient(url)
 

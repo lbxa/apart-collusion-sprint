@@ -6,7 +6,6 @@ trap 'rm -rf "$fixture"' EXIT
 mkdir -p "$fixture/repo with spaces/scripts" "$fixture/bin"
 cp "$repo_root/scripts/verify.sh" "$fixture/repo with spaces/scripts/verify.sh"
 cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/scripts/verify-harness.sh"
-cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/scripts/verify-harness-v2.sh"
 cp "$repo_root/scripts/agent-hooks/fixtures/cargo.sh" "$fixture/bin/cargo"
 chmod +x "$fixture/bin/cargo"
 export PATH="$fixture/bin:$PATH"
@@ -44,6 +43,18 @@ if VERIFY_EXIT=1 bash "$fixture/repo with spaces/scripts/verify.sh" >"$fixture/o
 fi
 [ "$(tail -n 1 "$CARGO_CALLS" | cut -d ' ' -f 1)" = build ]
 
+mkdir -p "$fixture/repo with spaces/docs/decisions"
+cp "$repo_root/scripts/decision-index.py" "$fixture/repo with spaces/scripts/decision-index.py"
+python3 "$fixture/repo with spaces/scripts/decision-index.py" >/dev/null
+bash "$fixture/repo with spaces/scripts/verify.sh" >/dev/null
+rm "$fixture/repo with spaces/docs/decisions/INDEX.md"
+: > "$CARGO_CALLS"
+if bash "$fixture/repo with spaces/scripts/verify.sh" >"$fixture/output" 2>&1; then
+  printf 'Verification hid a stale decision index\n' >&2
+  exit 1
+fi
+[ ! -s "$CARGO_CALLS" ]
+
 mkdir -p "$fixture/repo with spaces/.claude/hooks"
 cp "$repo_root/scripts/agent-hooks/fixtures/verify.sh" "$fixture/repo with spaces/.claude/hooks/failing.test.sh"
 : > "$CARGO_CALLS"
@@ -52,4 +63,4 @@ if VERIFY_EXIT=1 bash "$fixture/repo with spaces/scripts/verify.sh" >"$fixture/o
   exit 1
 fi
 [ ! -s "$CARGO_CALLS" ]
-printf 'Verification: hook, Forge, Cargo, and harness failures, gate order, and locked flags passed.\n'
+printf 'Verification: hook, decision index, Forge, Cargo, and harness failures, gate order, and locked flags passed.\n'

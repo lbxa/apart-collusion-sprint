@@ -1,0 +1,20 @@
+{
+  "input_sha256": "9a46d57ffdbaf7ad54c5b32e4ca84a3b0a2c88010801cc0cd278c8fb6c69fc64",
+  "numeric_input_hashes": {
+    "manifest": "732663d83485ace594aaa18c2130f52ba0cb943338ce25e99433dd506086fcd3",
+    "registry": "498dd170774635909148557a3e35c9b5053299c57ca1717c5ac53fd3ab3931a5"
+  },
+  "primary_phase": "confirmation",
+  "model_slots": [
+    "deepseek",
+    "glm",
+    "kimi",
+    "gptoss",
+    "inkling"
+  ],
+  "provisional": false,
+  "matplotlib_version": "3.11.2",
+  "collection_not_started": true,
+  "width_inches": 6.5,
+  "height_inches": 3.5
+}

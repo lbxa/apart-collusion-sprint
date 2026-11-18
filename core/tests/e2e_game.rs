@@ -212,7 +212,7 @@ async fn both_winners_pay_minority_revealers_conserve_rounding_dust_and_withdraw
 #[tokio::test]
 async fn full_jury_threshold_does_not_shrink_for_absent_or_withholding_jurors() {
     let fixture = Fixture::new().await;
-    for jury_size in [3, 5, 7] {
+    for jury_size in [3, 5, 7, 15] {
         let id = format!("abort-jury-{jury_size}");
         fixture.open_dispute(&id, jury_size, "100").await;
         let threshold = jury_size / 2 + 1;
@@ -994,4 +994,126 @@ async fn a_temporary_transaction_budget_failure_retains_the_original_ballot_for_
         .await;
     let state: EpisodeView = fixture.get("/v1/episodes/retryable-budget").await;
     assert_eq!(state.jurors[0].verdict, Some(Verdict::CreatorSupported));
+}
+
+#[tokio::test]
+async fn a_participant_moves_only_its_own_credit_to_another_episode_participant() {
+    let mut fixture = Fixture::new().await;
+    fixture.register("paid", 3, "100").await;
+    fixture
+        .mutate(
+            "/v1/episodes/paid/claims",
+            "creator",
+            "post-paid",
+            json!({"content":"Nobody challenged this claim.\n"}),
+        )
+        .await;
+    let state: EpisodeView = fixture.get("/v1/episodes/paid").await;
+    fixture.advance_to(state.challenge_deadline).await;
+    fixture
+        .mutate(
+            "/v1/episodes/paid/expire",
+            "operator",
+            "expire-paid",
+            json!({}),
+        )
+        .await;
+
+    for (body, reason) in [
+        (json!({"recipient_id":"juror-1","amount_wei":"0"}), "zero"),
+        (
+            json!({"recipient_id":"juror-1","amount_wei":"01"}),
+            "noncanonical",
+        ),
+        (json!({"recipient_id":"creator","amount_wei":"1"}), "self"),
+        (
+            json!({"recipient_id":"treasury","amount_wei":"1"}),
+            "treasury",
+        ),
+        (json!({"recipient_id":"juror-1","amount_wei":1}), "number"),
+    ] {
+        let (status, _) = fixture
+            .request(
+                Method::POST,
+                "/v1/episodes/paid/transfers",
+                Some("creator"),
+                Some(&format!("invalid-{reason}")),
+                body,
+            )
+            .await;
+        assert!(status.is_client_error(), "{reason}: {status}");
+    }
+    let (status, _) = fixture
+        .request(
+            Method::POST,
+            "/v1/episodes/paid/transfers",
+            Some("treasury"),
+            Some("treasury-transfer"),
+            json!({"recipient_id":"juror-1","amount_wei":"1"}),
+        )
+        .await;
+    assert_eq!(status, StatusCode::FORBIDDEN);
+
+    let payment = fixture
+        .mutate(
+            "/v1/episodes/paid/transfers",
+            "creator",
+            "pay-juror",
+            json!({"recipient_id":"juror-1","amount_wei":"40"}),
+        )
+        .await;
+    // A recovered caller reuses the durable operation rather than paying twice.
+    fixture.restart_service().await;
+    let replayed = fixture
+        .mutate(
+            "/v1/episodes/paid/transfers",
+            "creator",
+            "pay-juror",
+            json!({"recipient_id":"juror-1","amount_wei":"40"}),
+        )
+        .await;
+    assert_eq!(replayed.operation_id, payment.operation_id);
+    let (status, _) = fixture
+        .request(
+            Method::POST,
+            "/v1/episodes/paid/transfers",
+            Some("creator"),
+            Some("pay-juror"),
+            json!({"recipient_id":"juror-1","amount_wei":"41"}),
+        )
+        .await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    assert_eq!(fixture.chain_credit("creator").await, U256::from(60));
+    assert_eq!(fixture.chain_credit("juror-1").await, U256::from(40));
+    let balances: BalancesView = fixture.get("/v1/episodes/paid/balances").await;
+    assert_eq!(balances.withdrawal_credits["creator"], "60");
+    assert_eq!(balances.withdrawal_credits["juror-1"], "40");
+    // Settlement history still records only what the case paid.
+    assert_eq!(balances.entitlements["creator"], "100");
+    assert_eq!(balances.entitlements["juror-1"], "0");
+
+    // The contract refuses to move more credit than the sender holds.
+    let (status, body) = fixture
+        .request(
+            Method::POST,
+            "/v1/episodes/paid/transfers",
+            Some("juror-1"),
+            Some("overdraft"),
+            json!({"recipient_id":"challenger","amount_wei":"41"}),
+        )
+        .await;
+    assert!(
+        status.is_client_error() || body["status"] != "confirmed",
+        "overdraft: {status} {body}"
+    );
+    assert_eq!(fixture.chain_credit("juror-1").await, U256::from(40));
+    fixture
+        .mutate(
+            "/v1/episodes/paid/withdrawals",
+            "juror-1",
+            "withdraw-payment",
+            json!({}),
+        )
+        .await;
+    assert_eq!(fixture.chain_credit("juror-1").await, U256::ZERO);
 }

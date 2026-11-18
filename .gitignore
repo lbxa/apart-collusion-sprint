@@ -17,7 +17,15 @@
 /harness-v2/results/*
 !/harness-v2/results/campaign-2026-10-26/
 /harness/results/
+/harness/build/
+/harness/dist/
+/harness/*.egg-info/
 /results/
 /wandb/
 /harness/wandb/
 .DS_Store
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/

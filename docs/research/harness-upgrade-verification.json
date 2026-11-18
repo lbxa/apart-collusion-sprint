@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-17T02:02:59.915517-05:00",
+  "base_revision": "41c641bdd0f1d2fee0161e3d3e282e738d98bce9",
+  "working_tree_dirty": true,
+  "command": "bash scripts/verify.sh",
+  "exit_code": 0,
+  "tests_passed": {
+    "python_unit": 432,
+    "python_docker_anvil_integration": 36,
+    "rust": 113,
+    "foundry": 35
+  },
+  "additional_checks": [
+    "shell_hook_regressions",
+    "locked_dependency_sync",
+    "decision_index",
+    "generated_api_client",
+    "deployment_artifact",
+    "rust_and_solidity_formatting",
+    "clippy",
+    "ruff_lint_and_format",
+    "all_target_build"
+  ],
+  "wandb_read_only_scope_verified": {
+    "entity": "lbxa-corp",
+    "project": "apart-collusion-sprint",
+    "base_url": "https://api.wandb.ai"
+  },
+  "paid_model_requests": 0,
+  "experiment_launches": 0,
+  "remote_writes": 0,
+  "historical_paths_checked": [
+    "harness/historical-results",
+    "harness-v2/results",
+    "harness-v2/research",
+    "harness-v2/examples",
+    "report/data"
+  ],
+  "historical_paths_changed": [],
+  "file_sha256": {
+    "harness/src/veracity_harness/campaign.py": "84e7a99820ccf6421a7f9f9052ded11740f13eb5503e804f3e8a4fe2c6bbeb80",
+    "harness/src/veracity_harness/tracking.py": "a77b098ac7946dc97fe9497f5a14ccd529e05a48d1f7a3847b47698803e24837",
+    "harness/src/veracity_harness/agents.py": "a676d247c11c6ef6de8771bf64a0152743e6d4eeae74db87b53e911d697aa12b",
+    "harness/src/veracity_harness/runner.py": "6e1c348f154f20aa700e02cee9041c044b23f48f6d3cfafdc24b26b68629b46e",
+    "harness/src/game_api/local_engine.py": "83e11a30c8e33f3d5cdc481bd942722b2e18832734591a25c60483998f9acca3",
+    "harness/src/game_api/core_types.py": "53f2986579db266047a09ae4d5323e35ec5af2d087bb3a5d4795698d3e2573a2",
+    "harness/pyproject.toml": "167796e1a0dc62b4ec59c5ec254ecc911fb2de518fe164d01055ba3da63758c6",
+    "harness/uv.lock": "921c177894f1e01e02d8a6e1a3503d72534d07e7e4eac5f25d386b0b73aa7e88",
+    "core/src/main.rs": "c977dfea2a5aa2e4db58e5cd2c223de6bd3bf7c95927ffbf66fdaa8ab5d685d1",
+    "contracts/artifacts/Veracity.json": "32720e28f657aa39fd19be31e9ecd789015bc558bd1b3477d067bca185fb381a",
+    "scripts/verify.sh": "40a7c3af8f1989f7d2ba82d047810dd4ddb4642e32a3ad6991cec211815de13c",
+    "scripts/verify-harness.sh": "1ac64ed372b9d9a01b7ce3bbe974aced3034cd18dc409bf631eea274ee369b7e"
+  }
+}

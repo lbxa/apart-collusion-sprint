@@ -1,0 +1,35 @@
+{
+  "created_utc": "2026-11-18T03:56:48.051406+00:00",
+  "outputs_sha256": {
+    "snapshot.json": "fcb3b0bccdc4d29aeeb99b0877ae1c41f75bfa88a6acda0d400e12e72de6da1b",
+    "by-model-arm.csv": "d719277715391db31c76fb2468b906ec4eecc795c49b06bc00f0b641a4ac0017",
+    "primary-paid-by-model.csv": "2f2ce5f9b645dca4fdb384167b6c7595d6abf01e4cde3fefad7c77bdda5fef00",
+    "original_confirmation/archive-receipt.json": "9ea2e3af53cedb93b1618691b6c97ef0e38067650081d5df5921e2078e3bbcd6",
+    "original_confirmation/archive-manifest.json": "157c64bdd2c2f085026aa829aaf2fa6a785118904f24e29bb5fc14f0fedfe493",
+    "original_confirmation/selected-file-verification.json": "b079e78a86d64fd10783df766e06494139f99c0662540deb0bd5aa79fc67ded3",
+    "exploratory_recovery/archive-receipt.json": "045c88811e245028b3839aa1e89223ce526c3d1e7053a088c34728ccf419bd35",
+    "exploratory_recovery/archive-manifest.json": "53f640c1916539435ec4b7a772e6cca74b793ae291c55ca3c420a47faadc9bd3",
+    "exploratory_recovery/selected-file-verification.json": "2f15a997269ae888819d91f3fd785bce317243a1c939ecefa49a4c8d54de05e4",
+    "collection_snapshot.py": "64cfab11c04ed54ded70daf68ddc0b291faf117d81215136ce777770be8c2d7c",
+    "recovery-failure-stages.json": "c0e76db10a7d99eb7de03c6eaaf3474fa6c7d160921dd84fae678fd439c29ee7"
+  },
+  "frozen_ingest_sha256": "04a7572c46a1ea264b1f27d1dd2ae0178b9de467a3acd16bf40f1cc8bf37cb1d",
+  "exporter_sha256": "64cfab11c04ed54ded70daf68ddc0b291faf117d81215136ce777770be8c2d7c",
+  "project": {
+    "entity": "lbxa-corp",
+    "project": "apart-collusion-sprint",
+    "base_url": "https://api.wandb.ai"
+  },
+  "verification": {
+    "original_confirmation": {
+      "verification": "fresh_exact_remote_identity_then_selected_SDK_digest_and_archive_SHA256",
+      "cache_allowed": true,
+      "full_artifact_redownloaded": false
+    },
+    "exploratory_recovery": {
+      "verification": "fresh_exact_remote_identity_then_selected_SDK_digest_and_archive_SHA256",
+      "cache_allowed": true,
+      "full_artifact_redownloaded": false
+    }
+  }
+}

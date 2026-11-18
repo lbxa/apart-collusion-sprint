@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+output/
+.playwright-cli/
+*.log
+.env*
+.wrangler/
+.DS_Store

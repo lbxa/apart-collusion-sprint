@@ -18,7 +18,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "docs/openapi.json"
-CLIENT_PATH = ROOT / "harness/game_api/generated.py"
+CLIENT_PATH = ROOT / "harness/src/game_api/generated.py"
 SUPPORTED = {
     "$ref", "type", "format", "description", "title", "default", "required",
     "properties", "additionalProperties", "propertyNames", "items", "oneOf",

@@ -187,3 +187,24 @@ fn service_transaction_budget_is_retryable_infrastructure_policy_not_contract_re
         "budget policy must preserve retryable intent rather than report contract rejection"
     );
 }
+
+#[test]
+fn accepts_odd_juries_from_three_to_fifteen_only() {
+    let mut addresses = roster();
+    for i in 4..=17 {
+        addresses.insert(
+            format!("juror-{i}"),
+            Address::from_word(U256::from(100 + i).into()),
+        );
+    }
+    for size in 1..=17usize {
+        let mut request = registration();
+        request.juror_ids = (1..=size).map(|i| format!("juror-{i}")).collect();
+        let accepted = validate_registration(&request, &addresses).is_ok();
+        assert_eq!(
+            accepted,
+            (3..=15).contains(&size) && !size.is_multiple_of(2),
+            "jury of {size}"
+        );
+    }
+}

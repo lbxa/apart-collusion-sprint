@@ -1,0 +1,133 @@
+{
+  "protocol": "collusion-resistance-v1",
+  "phase": "exploratory",
+  "model_slots": [
+    {
+      "model_slot": "deepseek",
+      "family": "deepseek-ai",
+      "model_id": "@cf/deepseek-ai/deepseek-v4-pro-0813",
+      "provider": "cloudflare"
+    },
+    {
+      "model_slot": "glm",
+      "family": "zai-org",
+      "model_id": "@cf/zai-org/glm-5.3",
+      "provider": "cloudflare"
+    },
+    {
+      "model_slot": "kimi",
+      "family": "moonshotai",
+      "model_id": "@cf/moonshotai/kimi-k2.6",
+      "provider": "cloudflare"
+    },
+    {
+      "model_slot": "gptoss",
+      "family": "openai",
+      "model_id": "@cf/openai/gpt-oss-120b",
+      "provider": "cloudflare"
+    },
+    {
+      "model_slot": "inkling",
+      "family": "thinkingmachines",
+      "model_id": "@cf/thinkingmachines/inkling-2-small",
+      "provider": "cloudflare"
+    }
+  ],
+  "assignments": [
+    {
+      "job_id": "pilot-gptoss-0700",
+      "model_slot": "gptoss",
+      "arm": "honest-false",
+      "seed": 700,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v2/harness/research/collusion-resistance-v1/pilot-one-case.toml",
+      "sourcecases": [
+        "finance_return"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-first/jobs/pilot-gptoss-0700/run-166cdfe27597",
+      "status": "complete",
+      "phase": "exploratory",
+      "config_sha256": "cc936400994a1451c5271c91f067170dc0314038fdfa0e656ad9c24493968410",
+      "effective_config_sha256": "e02f5f0de746325c8249a04518e9e58c8abb06f0a6e19d0bb923879da00dc83f",
+      "job_fingerprint": "7fc804430db8d54097da579bf8fb573f0f03786873d6598c794596d8f3012fca",
+      "run_id": "run-166cdfe27597",
+      "run_manifest_sha256": "1dc0911f2319af64bbf78426e0117c3626b93c99d5b5e18b15c868d87326fbc9",
+      "session_sha256": "97ff00088f6d7510b5504773b29e38f9fc20501db0079901145c73bf370b3323"
+    },
+    {
+      "job_id": "pilot-inkling-0700",
+      "model_slot": "inkling",
+      "arm": "honest-false",
+      "seed": 700,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v2/harness/research/collusion-resistance-v1/pilot-one-case.toml",
+      "sourcecases": [
+        "finance_return"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-rest/jobs/pilot-inkling-0700/run-a743f20f5592",
+      "status": "complete",
+      "phase": "exploratory",
+      "config_sha256": "cc936400994a1451c5271c91f067170dc0314038fdfa0e656ad9c24493968410",
+      "effective_config_sha256": "31140d3bcaa6e143d15d18ff99c8e027ccc4de3eaee0a095a1eb92a723c643cf",
+      "job_fingerprint": "fa2fbba30ff3c720e960e02e1016943ce50bb5e09533e7b421e6a79b8804d434",
+      "run_id": "run-a743f20f5592",
+      "run_manifest_sha256": "1c2cf4231e218bca47ab1b922e7e4ab72a4e40ce694eae25d06d552e9f083aff",
+      "session_sha256": "7a787a185c0971c07ecafb895188602c2f2636ac5a874035c2423a0e1de43e1f"
+    },
+    {
+      "job_id": "pilot-deepseek-0700",
+      "model_slot": "deepseek",
+      "arm": "honest-false",
+      "seed": 700,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v2/harness/research/collusion-resistance-v1/pilot-one-case.toml",
+      "sourcecases": [
+        "finance_return"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-rest/jobs/pilot-deepseek-0700/run-ecb2094afa86",
+      "status": "complete",
+      "phase": "exploratory",
+      "config_sha256": "cc936400994a1451c5271c91f067170dc0314038fdfa0e656ad9c24493968410",
+      "effective_config_sha256": "45fd8041c27a210213d618f65dccbe4bcf47eda4423096db678329c03a056eb2",
+      "job_fingerprint": "0c2957c3a12fd8861ad70a1613750bdb8f2339b6c7d56c6267c204b0a7335f9b",
+      "run_id": "run-ecb2094afa86",
+      "run_manifest_sha256": "d7b202d8d27935c6b7796f5230774db07252d5e01e7aca1de9553668af0e17fa",
+      "session_sha256": "34c3d77b0f7bde53ae862bea00585422c59e2e4ce14fd55cf856c75533761529"
+    },
+    {
+      "job_id": "pilot-glm-0700",
+      "model_slot": "glm",
+      "arm": "honest-false",
+      "seed": 700,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v2/harness/research/collusion-resistance-v1/pilot-one-case.toml",
+      "sourcecases": [
+        "finance_return"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-rest/jobs/pilot-glm-0700/run-59c21a1c2e0b",
+      "status": "complete",
+      "phase": "exploratory",
+      "config_sha256": "cc936400994a1451c5271c91f067170dc0314038fdfa0e656ad9c24493968410",
+      "effective_config_sha256": "c03b912c1b452f86626954cc0e251b33613ed3f282eb67d0ee13862885c0016d",
+      "job_fingerprint": "3843d53c76d62b1262a1b8ace3a03a13a221226164355dd68d65b7fbf69475d2",
+      "run_id": "run-59c21a1c2e0b",
+      "run_manifest_sha256": "033bdd05d269d3ea878b4f716f5a16f90e1b45349786dc1b335ddfcca73d34e3",
+      "session_sha256": "8f2891dabeba971e0368ca382758285f202905805476a24234dac9e549523aad"
+    },
+    {
+      "job_id": "pilot-kimi-0700",
+      "model_slot": "kimi",
+      "arm": "honest-false",
+      "seed": 700,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v2/harness/research/collusion-resistance-v1/pilot-one-case.toml",
+      "sourcecases": [
+        "finance_return"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-rest/jobs/pilot-kimi-0700/run-b82fa0e217f9",
+      "status": "complete",
+      "phase": "exploratory",
+      "config_sha256": "cc936400994a1451c5271c91f067170dc0314038fdfa0e656ad9c24493968410",
+      "effective_config_sha256": "98ec9a1dceb8fcfd9e26545494e0c5364a64faaf5af584afbc2224b48d32a20e",
+      "job_fingerprint": "4f68316a2cb6ee4cbd9df99b306293c328c4c866db9295168732bea2355ffbee",
+      "run_id": "run-b82fa0e217f9",
+      "run_manifest_sha256": "7de99a14ec9bd0dfda05fcc061db2b954615748aa2291a0145cea61c7e964849",
+      "session_sha256": "08915e21fcde57e3ba8f5744d5f90a1b06a3da30359cc9e45a61f13b22ea1d06"
+    }
+  ]
+}

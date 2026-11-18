@@ -78,8 +78,10 @@ contract Veracity {
     error NothingToWithdraw();
     error TransferFailed();
     error ReentrantWithdrawal();
+    error InvalidTransfer();
+    error InsufficientCredits();
 
-    uint256 public constant ABI_VERSION = 1;
+    uint256 public constant ABI_VERSION = 2;
     address public immutable operator;
     mapping(address => uint256) public credits;
     mapping(bytes32 => mapping(address => uint256)) public entitlement;
@@ -119,6 +121,7 @@ contract Veracity {
     event JurorForfeited(bytes32 indexed episodeId, address indexed juror, uint256 amount);
     event CreditAccrued(bytes32 indexed episodeId, address indexed recipient, uint256 amount);
     event Withdrawn(address indexed recipient, uint256 amount);
+    event CreditsTransferred(address indexed sender, address indexed recipient, uint256 amount);
 
     constructor(address operator_) {
         if (operator_ == address(0)) revert InvalidConfiguration();
@@ -132,7 +135,7 @@ contract Veracity {
         if (
             config.creator == address(0) || config.challenger == address(0) || config.treasury == address(0)
                 || config.creator == config.challenger || config.creator == config.treasury
-                || config.challenger == config.treasury || config.jurors.length < 3 || config.jurors.length > 7
+                || config.challenger == config.treasury || config.jurors.length < 3 || config.jurors.length > 15
                 || config.jurors.length % 2 == 0
         ) revert InvalidConfiguration();
         if (
@@ -152,14 +155,14 @@ contract Veracity {
         // forge-lint: disable-end
         for (uint256 i; i < config.jurors.length; i++) {
             address juror = config.jurors[i];
-            // The roster is capped at seven; invalid eligibility must reject registration atomically.
+            // The roster is capped at fifteen; invalid eligibility must reject registration atomically.
             // forge-lint: disable-start(require-revert-in-loop)
             if (
                 juror == address(0) || juror == config.creator || juror == config.challenger || juror == config.treasury
             ) revert InvalidConfiguration();
             // forge-lint: disable-end
             for (uint256 j; j < i; j++) {
-                // At most 21 roster pairs are checked; a duplicate cannot be deferred past registration.
+                // At most 105 roster pairs are checked; a duplicate cannot be deferred past registration.
                 // forge-lint: disable-next-line(require-revert-in-loop)
                 if (juror == config.jurors[j]) revert InvalidConfiguration();
             }
@@ -338,6 +341,16 @@ contract Veracity {
         // Nested withdrawals are forbidden; record this withdrawal only after its transfer succeeds.
         // forge-lint: disable-next-line(reentrancy-events)
         emit Withdrawn(msg.sender, amount);
+    }
+
+    /// ABI version 2: move part of the caller's withdrawal credit to another account.
+    /// Liabilities are unchanged; episode entitlements keep recording settlement only.
+    function transferCredits(address recipient, uint256 amount) external {
+        if (amount == 0 || recipient == address(0) || recipient == msg.sender) revert InvalidTransfer();
+        if (credits[msg.sender] < amount) revert InsufficientCredits();
+        credits[msg.sender] -= amount;
+        credits[recipient] += amount;
+        emit CreditsTransferred(msg.sender, recipient, amount);
     }
 
     function getEpisode(bytes32 id) external view returns (EpisodeView memory episode) {

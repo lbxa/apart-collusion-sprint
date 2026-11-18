@@ -1,0 +1,17 @@
+# Offline validation example only, not an approved experiment or spending cap.
+# Replace the model and assignments with the frozen, reviewed study plan.
+name = "collusion-example"
+
+[[assignments]]
+id = "discovery-seed-41"
+config = "discovery.toml"
+model = "@cf/deepseek-ai/deepseek-v4.1-flash-1017"
+provider = "cloudflare"
+seed = 41
+
+[[assignments]]
+id = "discovery-seed-43"
+config = "discovery.toml"
+model = "@cf/deepseek-ai/deepseek-v4.1-flash-1017"
+provider = "cloudflare"
+seed = 43

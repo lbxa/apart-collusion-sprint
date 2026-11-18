@@ -1,0 +1,79 @@
+{
+  "format_version": 2,
+  "schema": "collusion-resistance-ingestion-v2",
+  "register_sha256": "6cfef470d5e10a0c04e79651a27eceaec66927eee0a5bfcfa4c3ad488512d2f2",
+  "registry_sha256": "498dd170774635909148557a3e35c9b5053299c57ca1717c5ac53fd3ab3931a5",
+  "campaigns": [
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-first",
+      "campaign_fingerprint": "4e3dc1f946a64857be1143dca130be81ede6a438e86f03a573016dea42b6b0d3",
+      "frozen_campaign_sha256": "1b779c5637c0c79c0df74cb3f0fa0fd418e3a3adf8cfd04721212fecfc462bec",
+      "journal_snapshot_sha256": "cc84d7f9334caa8f6f373b9437d8d1c35cca650845b58bf42779a519de75b3e6",
+      "progress_sha256": "1a483d6e14348693f4e4bdef5eeaceba9fa155d5f24d53ad3e9f4e95752ae472",
+      "journal_status_counts": {
+        "complete": 1
+      },
+      "progress_status_counts": {
+        "complete": 1,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 0,
+        "running": 0
+      }
+    },
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-rest",
+      "campaign_fingerprint": "0f67236bc0f81598145e89c4dc545df713086890688a99c527647bff5cd14191",
+      "frozen_campaign_sha256": "cd05f329bb2e69c7c042d293770bc22fed53941f069620b2f6659a63759a5c70",
+      "journal_snapshot_sha256": "fcacd7b8a8446bba0af60ba1c20ce51eb2d1f0eae44742572c70154350de9f80",
+      "progress_sha256": "544ac9f4c36c860d9763863037040d72ea990bc1c94b0f00aebd64ba4ea111c7",
+      "journal_status_counts": {
+        "complete": 4
+      },
+      "progress_status_counts": {
+        "complete": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 0,
+        "running": 0
+      }
+    }
+  ],
+  "runtime_root": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v2",
+  "interpreter": "/Users/lucas/c/apart-collusion-sprint/harness/.venv/bin/python",
+  "python_version": "3.12.11 (main, Aug  8 2025, 16:50:44) [Clang 20.1.4 ]",
+  "operator_helper_sha256": "04a7572c46a1ea264b1f27d1dd2ae0178b9de467a3acd16bf40f1cc8bf37cb1d",
+  "operator_helper_path": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/operator/ingest-04a7572c46a1.py",
+  "runtime_sources": {
+    "harness/src/veracity_harness/resistance.py": "6f9114dfc26d49f404f197fac10896a781ee67c75a7932145e57833c2eba27a4",
+    "harness/src/veracity_harness/materials.py": "cc2c9d74ef638efa97050ee1cef07ca00f987bc4127cd9793a9ffd462252351b",
+    "harness/src/veracity_harness/resources/interface.md": "930d4aecce808e2ccf24d00b702e0514fef8f8783f77393620210345a1090102"
+  },
+  "deferred_jobs": [],
+  "outputs_sha256": {
+    "assignment-register.json": "8de26be9014d6c13cc89c35fa733e114fe6e40d9a259af990d4a7a8da7b08720",
+    "case-observations.json": "a162a8cb836ffe40349bb3a40f2088813c24159d01baf8a08a1d2d43108bf201",
+    "actor-mechanics.json": "c37acbcb2408ef3bbcc76d6553f5ad3d40cf8ca51d316dd691e14436ae0a1925",
+    "operator-review-map.json": "41d3af0dc6dbf22494f1fd6b112f5625c680345eba42f55fcda57e672e6da235",
+    "ingest.py": "04a7572c46a1ea264b1f27d1dd2ae0178b9de467a3acd16bf40f1cc8bf37cb1d",
+    "review-packets/packet-65ff23767ee703f911d3713b.json": "fdf38862d75782a8cf0534f6137f33904439f95153944895edc05458f093bf31",
+    "review-packets/packet-74aed11f4ccb2f7d5910afe5.json": "a5ed1bd2701c935fefb5f3f5b0752a638b3f34129ac41b4989b960e72c9e20c5",
+    "review-packets/packet-c8c05be96669a090eb817470.json": "07b6c70cc9929cfa3b6ec758407254f766eec6d3e656b1cbd72ed844bdc8927d",
+    "review-packets/packet-0d8c4881d2687610a8645247.json": "5e7323df3bba72db82acef74995938f7f38f56f7aedb5a7615bd0116ecaa49fe",
+    "review-packets/packet-e43da71ad88f0228a27577ca.json": "595f259edddc4011034af7d113dca92c5d7d4c91646f4a32dc3d1814b581a72b"
+  },
+  "run_status_matrix": {
+    "complete": [
+      "complete"
+    ],
+    "failed": [
+      "failed"
+    ],
+    "interrupted": [
+      "failed"
+    ]
+  },
+  "capability_evidence_gaps": [],
+  "review_packet_count": 5,
+  "semantic_labels_created": 0
+}

@@ -1,5 +1,11 @@
 # Agentic Veracity harness
 
+**Historical archive.** This path is no longer an active Python package. Use the
+[current harness](../harness/README.md) for setup and execution. Retained research,
+results, and referenced example inputs preserve the original campaign paths and
+scope. The guide below describes the retired runtime; its commands and budgets
+do not authorize a new run or describe the current implementation.
+
 An independent Deep Agents experiment harness. Participants receive the rules,
 an identity, a case, and an address. They discover the interface and choose all
 of their own game actions with filesystem tools, a terminal, and HTTP.

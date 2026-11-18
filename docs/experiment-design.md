@@ -1,10 +1,15 @@
 # Experiment design reference
 
-Every experiment is one cell of a design with six core factors, three optional
-factors and a categorical Models factor. This document fixes what each factor level
-means, which parameters stay constant, and what the harness must implement. Build
-experiments from it. Change a level definition here first, in the same pull request
-as the code, so results from different cells stay comparable.
+**Historical structured-action design.** The factor definitions, commands,
+simulated utility, and implementation requirements below describe the retired
+harness and remain for interpreting its evidence. They are not the current
+runtime contract or authorization to rerun an old campaign. Use the
+[current harness guide](../harness/README.md) and
+[Collusion research contract](benchmark.md) for new designs. Preserve historical
+factor meanings when analyzing their original records.
+
+The historical design has six core factors, three optional factors and a
+categorical Models factor. The definitions below retain their original scope.
 
 ## Factors
 

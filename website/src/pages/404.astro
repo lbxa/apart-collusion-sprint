@@ -1,0 +1,55 @@
+---
+import ResearchLinks from "../components/ResearchLinks";
+import { Separator } from "../components/ui/separator";
+import "../styles/global.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#fafaf9" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Page not found · Collusion Resistance</title>
+  </head>
+  <body class="not-found-page">
+    <main class="not-found">
+      <p class="not-found-brand">AI Safety Research · Collusion</p>
+      <Separator tone="ink" className="data-horizontal:h-1" />
+      <div class="not-found-message">
+        <p class="not-found-code" aria-hidden="true">404</p>
+        <h1>Page not found.</h1>
+        <p class="not-found-description">This page may have moved, or the link may be incomplete.</p>
+        <nav aria-label="Return to the research">
+          <ResearchLinks links={[{ label: "Back to the research", href: "/" }]} variant="pill" size="compact" />
+        </nav>
+      </div>
+      <Separator tone="ink" className="data-horizontal:h-0.5" />
+      <p class="not-found-project">Collusion Resistance</p>
+    </main>
+  </body>
+</html>
+
+<style>
+  .not-found-page {
+    display: grid;
+    min-height: 100svh;
+    place-items: center;
+    padding: 2rem 1rem;
+  }
+  .not-found { width: 100%; max-width: 42rem; text-align: center; }
+  .not-found-brand { margin-bottom: 1.75rem; font-size: .75rem; text-transform: uppercase; }
+  .not-found-message { display: grid; justify-items: center; gap: 1.25rem; padding: clamp(2.5rem, 8vh, 4.5rem) 1rem; }
+  .not-found-code {
+    color: var(--primary);
+    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, "Times New Roman", serif;
+    font-size: clamp(6rem, 18vw, 9rem);
+    line-height: 1;
+    letter-spacing: -.06em;
+  }
+  h1 { padding: 0; font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; }
+  .not-found-description { max-width: 23rem; color: var(--muted-foreground); font-size: .9rem; line-height: 1.7; }
+  nav { margin-top: .5rem; }
+  .not-found-project { margin-top: 1.5rem; color: var(--muted-foreground); font-size: .75rem; }
+</style>

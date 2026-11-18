@@ -1,0 +1,30 @@
+% !TEX root = main.tex
+% Apart template layout with native Computer Modern text and mathematics.
+\usepackage[utf8]{inputenc}
+\usepackage{fix-cm}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,microtype,longtable,array}
+\usepackage{titlesec}
+\usepackage{placeins}
+\input{trace-panels}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{10pt}
+\clubpenalty=10000
+\widowpenalty=10000
+\setlength{\skip\footins}{14pt}
+\AtBeginDocument{\setlength{\baselineskip}{15.7pt}}
+\titleformat{\section}{\fontsize{14}{21}\selectfont\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\fontsize{13}{18}\selectfont\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{10pt}{10pt}
+\titlespacing*{\subsection}{0pt}{10pt}{10pt}
+\pagestyle{empty}
+
+\hypersetup{
+  pdftitle={Collusion Resistance: From Agreements to Actions},
+  pdfauthor={Lucas Barbosa, Stefan Gazzana, Sravika Linga, Muskaan Kumar, Jake Fogel},
+  pdfsubject={Five-model mechanical outcomes and paid wrong-verdict cases; semantic resistance review pending}
+}
+
+\newcommand{\draftnote}[1]{\textit{#1}}

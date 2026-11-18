@@ -1,0 +1,3048 @@
+{
+  "model_slots": [
+    {
+      "model_slot": "deepseek",
+      "family": "deepseek-ai",
+      "provider": "cloudflare",
+      "model_id": "@cf/deepseek-ai/deepseek-v4-pro-0813"
+    },
+    {
+      "model_slot": "glm",
+      "family": "zai-org",
+      "provider": "cloudflare",
+      "model_id": "@cf/zai-org/glm-5.3"
+    },
+    {
+      "model_slot": "kimi",
+      "family": "moonshotai",
+      "provider": "cloudflare",
+      "model_id": "@cf/moonshotai/kimi-k2.6"
+    },
+    {
+      "model_slot": "gptoss",
+      "family": "openai",
+      "provider": "cloudflare",
+      "model_id": "@cf/openai/gpt-oss-120b"
+    },
+    {
+      "model_slot": "inkling",
+      "family": "thinkingmachines",
+      "provider": "cloudflare",
+      "model_id": "@cf/thinkingmachines/inkling-2-small"
+    }
+  ],
+  "assignments": [
+    {
+      "job_id": "confirm-deepseek-honest-false-701",
+      "model_slot": "deepseek",
+      "arm": "honest-false",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-deepseek/jobs/confirm-deepseek-honest-false-701/run-0205d870add6",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "50500b304918a29bc6d548fa55316e138fd3ab83c8048943a2b7a64a3e8f7464",
+      "job_fingerprint": "88bd22e371b50b0ac579326cbfa52a4bf17f5a42f8bf57914bffa2db20fc6cfb",
+      "run_id": "run-0205d870add6",
+      "run_manifest_sha256": "92a3767220ec58f5ed5c6c085fcbe1aa5543591e7d879ebe10cd3e51fc848a64",
+      "session_sha256": "50203ce84a427845e37b998c38358038dd4ab58a8dcafb3ed27a24c98de6bb4f"
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-701",
+      "model_slot": "glm",
+      "arm": "paid-false-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-glm/jobs/confirm-glm-paid-false-basic-701/run-643f16cc49b4",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "30eb678a879957a216e7b370753749f5e0219cd151124119c3467f297607fe5c",
+      "job_fingerprint": "3c002f0bb79d844136e26e72d96dcaf03dadb32669d1d154478dadfc95e4aa25",
+      "run_id": "run-643f16cc49b4",
+      "run_manifest_sha256": "d3fafd22f2ea0d64879f625b5367bba99e8b3360a916daa3e4083632c4a155db",
+      "session_sha256": "4d31bd3cf522510dcbe3270b214774fb7d449e7a49de4c238f0449de0a8d8ec5"
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-701",
+      "model_slot": "kimi",
+      "arm": "paid-false-suppressed",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-701/run-006a2f2103e1",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "644d4bacbd62388855b57d2271e7e0302f3561b0b02940940da82dc0ec9834b5",
+      "job_fingerprint": "ab8f3da416cdaf116e161e59b2963c287a7873afa05b538d622b39ef61855163",
+      "run_id": "run-006a2f2103e1",
+      "run_manifest_sha256": "a8e4d19a8afd86f3b1205060eca87c5e57227201427820e8211a04fa89ade632",
+      "session_sha256": "a2a1665edbe755d68b9fe320b08d45cf964919a0b11cfd6b0b8ef2a2bb76f343"
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-701",
+      "model_slot": "gptoss",
+      "arm": "paid-false-principles",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-701/run-55463c0656c7",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "dceaa542ca6dbfacd959fc0ea92659ef1ad208ba7d756e940202b35c748f5091",
+      "job_fingerprint": "5031f9d0ce14b11a03753ebb7faab6e3ca31c29ad1d65d93bb7b92f5b715a763",
+      "run_id": "run-55463c0656c7",
+      "run_manifest_sha256": "405f0b5f30ba6d68fc2eebd1b67d98f93a18e8cc29bae5777d6c7d93bcf33391",
+      "session_sha256": "e804df769c9c66e2978e0edb08a16f4f3d831153467639bf076eaa6e0658f0d8"
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-701",
+      "model_slot": "inkling",
+      "arm": "honest-true",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-inkling/jobs/confirm-inkling-honest-true-701/run-401c033481e2",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "5f2062a1b1ca95e662d5f6cb494538276a4050a0cbaf52edd90dcf3324d98bb4",
+      "job_fingerprint": "315a651af7692440be0238ef18350a7e833992346cde46952ae377c7c44d57ab",
+      "run_id": "run-401c033481e2",
+      "run_manifest_sha256": "1ecf9afb65b9586ba3ec2f451a6b250074c05c9c7e41f807664d9a1461bfe23b",
+      "session_sha256": "0962334d0e7f53ee6b4bdbfde2a4453bbe4358b4613e60349d58d8d0e6c49abe"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-701",
+      "model_slot": "deepseek",
+      "arm": "paid-false-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "running",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "5b078fa698d5e5e2ea0cffc3f1946c25684c1dbcd9eb06dcbe0efae46c66fc1e",
+      "job_fingerprint": "7c37c42c28838c046f3f12a58d2a4fc1780dcdc0bd3527efe9f5004f809678de",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-701",
+      "model_slot": "glm",
+      "arm": "paid-false-suppressed",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "running",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "a5d387fefc351e3feaef6e020ef6fc7d384cb45316a27e6fc4067211ad80fd2d",
+      "job_fingerprint": "9b1f1f63bf34d3a4ca079f0fc76595084a79c83590f10d92579650b4a7aad5a4",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-701",
+      "model_slot": "kimi",
+      "arm": "paid-false-principles",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-701/run-eefea3e06069",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "e8ce2e6c4b9617500569bb8632691ca76258f4f6f0bb6685f2052c808ae64a64",
+      "job_fingerprint": "77c4474782ebcc2a382d83ea5f7bd27aa45e2f5363b1fc0125610b70bc30b581",
+      "run_id": "run-eefea3e06069",
+      "run_manifest_sha256": "1f0cdb210ba9c51e62f41a626a814f7eb982dea98b65c7454a5a4af042a1f7dd",
+      "session_sha256": "792ca5f80345c9e1648433df45b89da62810c9b0eba58c73f142d63508a22fca"
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-701",
+      "model_slot": "gptoss",
+      "arm": "honest-true",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-gptoss/jobs/confirm-gptoss-honest-true-701/run-83742ba3e8e2",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "b343d067889501f6f3f01fdbd67f5194f4e84419bca76c5e1652dfefe3edcb20",
+      "job_fingerprint": "9748d1dd0358591470ff0a2480680ea10c705e3fe2c2d9e757d1858d76bd112d",
+      "run_id": "run-83742ba3e8e2",
+      "run_manifest_sha256": "b5f796d218695dc5f5ffe32aed9e0c2133a69289c6b9089cbecabbb2c9f660c9",
+      "session_sha256": "d8c765e0fedec0d4ae5ddee1e751c990321a2b6d69d6bb9921641f03a2c26f34"
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-701",
+      "model_slot": "inkling",
+      "arm": "paid-rejection-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/confirmation-inkling/jobs/confirm-inkling-paid-rejection-basic-701/run-c813e5fbb078",
+      "status": "complete",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "ba81d03af64323272548bfc697b60f4a4694c802f538c5bc4e30ad4d0063d401",
+      "job_fingerprint": "78ab59bd37bc16444f4be84cb8771fb478e6ddd66489ef37ac877aaa897bb6fa",
+      "run_id": "run-c813e5fbb078",
+      "run_manifest_sha256": "39941f89bce1d1ac1fd5d9890414026ac474a8a329ebf6111a9e5752909414b1",
+      "session_sha256": "99bdc65a60c196f214500cad9bbd7ec2da44425c986fd81db119f5720d165579"
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-701",
+      "model_slot": "deepseek",
+      "arm": "paid-false-suppressed",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "a62e9bb1901ae2bc514b25eb0e85599ae495ac093d7a80068f79c3f5b0543b73",
+      "job_fingerprint": "e2982bf6a5fbe139f7ec9f933dc55fd3488312db1cd50724dfb149c17bf9e640",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-701",
+      "model_slot": "glm",
+      "arm": "paid-false-principles",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "5bb0f33014627385438f1814eb1a23e20c4f84aa10973795c80810e588a18625",
+      "job_fingerprint": "a091e164b7df1b07022ade7a5200f907371c6256275274b47799ea648419e429",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-701",
+      "model_slot": "kimi",
+      "arm": "honest-true",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "running",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "ed0b6680c16e85f7d7225f5a3749d8e778b0650e0272a4f403742ed139881561",
+      "job_fingerprint": "4b5a49e32d79a42a81c75dcd490040df9192e128132e7d1c4f422c9cfa45b083",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-701",
+      "model_slot": "gptoss",
+      "arm": "paid-rejection-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "running",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "9ff9135d4973e4c20c2f7f875a44d4ebd55341bb70ea347eaf5c6a8674c85fcc",
+      "job_fingerprint": "f576b6a799a2bb6217a472690e91e57bfdf388b92c1e65abe0e8b30b54a200a6",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-701",
+      "model_slot": "inkling",
+      "arm": "honest-false",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "running",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "a1029ac3bc59e3b9483554e141dc1d7337cc60cfcf6060545d39daddb67411a8",
+      "job_fingerprint": "096daab14e2abddba49a82a9a3ee11f02cd46344d188be6e2f2a77e4b8f31f4d",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-701",
+      "model_slot": "deepseek",
+      "arm": "paid-false-principles",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "6443eeb83eb7f52a6e428a247a658d920a06c7c24831917f69a0add72fc8db98",
+      "job_fingerprint": "47067f81db80e8fdc93c26a4ab462eb41b99b6ec50d34ed6bb888ff8b6d2e304",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-true-701",
+      "model_slot": "glm",
+      "arm": "honest-true",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "5e96ecb4bdb4ab1aed81b4635e28d522638659dffa50c29eb9ac708680489c02",
+      "job_fingerprint": "f6a3364bca999940953684a456e14f7df9033abc9c471686800160a750ef69f4",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-701",
+      "model_slot": "kimi",
+      "arm": "paid-rejection-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "5a49c32db29579d091166a5c529d5754e64a3b0418146433552c0c4165aeed44",
+      "job_fingerprint": "77614b2a906dc36f84e766857ac069ca783f9e50c94ad04961cdec33f85477a0",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-701",
+      "model_slot": "gptoss",
+      "arm": "honest-false",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "d669569be01ee043b6e6c0689ec54eac3387a66ccbf39b0b7b20e3c71fc1ac1a",
+      "job_fingerprint": "ce7da49d39ea3f377ae67d45d4fa80383ba9b184b98f566e79549b02fbbe30c5",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-701",
+      "model_slot": "inkling",
+      "arm": "paid-false-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "5368767df59b485b0c6a9a870b4d5e027a4069e22ec473ce816d72763fad2ce1",
+      "job_fingerprint": "d27a5aa8a716b24479f4d389b6ca67dd92c97f1056adcd669461c66dea9a2023",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-701",
+      "model_slot": "deepseek",
+      "arm": "honest-true",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "f46e4b0ef3281e361b448f935a059c361fab397894d94c7f9d7a95f94caf0b62",
+      "job_fingerprint": "1f2600872af3b3a3d487fd0a317aeff4eae28fc04c20b96e938312fdfe875f6a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-701",
+      "model_slot": "glm",
+      "arm": "paid-rejection-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "87c9e695b60c806efe5037615331cae62758cc409f547c89eb530cd1a4aaa90e",
+      "job_fingerprint": "3beaf43454d24bc53f6a347be93b7109f3b469c35742d0331092c12ee1c8cf0e",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-701",
+      "model_slot": "kimi",
+      "arm": "honest-false",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "986ed17f8cf922290334082c94320e2afc20514c09b11a36ba25f9ce30ee1b84",
+      "job_fingerprint": "cd7e47ee1e7f610cc12bf74f05d6b76adb094acb236cce45ef4eed7354e019a3",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-701",
+      "model_slot": "gptoss",
+      "arm": "paid-false-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "9f0f480c2f43e30eb8b570ceac6002fe43f5c6514cc2de4dba74b0d43dc228fa",
+      "job_fingerprint": "2e19dbc420d396342c4d138f61effda77e04c36b9241b727920fe89023464bd8",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-701",
+      "model_slot": "inkling",
+      "arm": "paid-false-suppressed",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "ea6c213b75efc1a6f3e93a02dfce72d28e3f7ba3e3efc93ed172224b75d0605c",
+      "job_fingerprint": "4efe1729b387f1fcbfdab6a00f7cdba230566675a34d61a46ee5df460d5c29e2",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-701",
+      "model_slot": "deepseek",
+      "arm": "paid-rejection-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "9148c097f2ac36ceab813d9723ed610e318c0c50dde12747425be8d2e4530143",
+      "job_fingerprint": "402efc6fb4233b33060a1db7bc902fc1571fd5068f35c8ecf12693708620b6e1",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-false-701",
+      "model_slot": "glm",
+      "arm": "honest-false",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "4c83e04c13ef81a20feb00f8fffcd468b9f480bea5e0d02a8b4eb6922061c25c",
+      "job_fingerprint": "b287d1b7b03414e601c68c9d833b0cf5eff58c85bcd1dd29d05c26c7766a0fa6",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-701",
+      "model_slot": "kimi",
+      "arm": "paid-false-basic",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "4b8724de8519e980998048efa900f3eb8dd629bbbeaafc9aa26ad29bda864780",
+      "job_fingerprint": "24e32d31e4b4432b2a7c0c35f9c6d6107fbb07a8a9e0e6824d86a1a44206a5b0",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-701",
+      "model_slot": "gptoss",
+      "arm": "paid-false-suppressed",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "41a67d5a9a887666307bfbfee64dff19df794d7649aaa0136f05f1e6901321b9",
+      "job_fingerprint": "f2d7f9c5c3b5e09ba3bcd3d72df80a366f648c3b1d0e4d7cf6e4200124e1e764",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-701",
+      "model_slot": "inkling",
+      "arm": "paid-false-principles",
+      "seed": 701,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "d529a9dd9ace2236978aca96f1db85aeef2f36b175dc258f9bae321ef705c7c9",
+      "job_fingerprint": "7650d24607239baeec181dee715ff233ecacc4af26d99f7921a9e5679ae47c9f",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-702",
+      "model_slot": "glm",
+      "arm": "paid-rejection-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "53857316078c5b6959f142073fad75b68be6584d4376da4d5786013960609777",
+      "job_fingerprint": "49cd40b98491efa30f7c00b74db683f9b352d7e548a48299fe9826aa92b9f277",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-702",
+      "model_slot": "kimi",
+      "arm": "paid-false-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "6bf7dcbf183d2a0c87a174fdeb3a56ad0c345e6b0f66c791dce95bbdaf93b557",
+      "job_fingerprint": "cb18e8f5ab16a9ed30d86ea6987c381389a11631fd052d920f27b24d78eb6b81",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-702",
+      "model_slot": "gptoss",
+      "arm": "paid-rejection-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "60eaffbb2b9f9843e1e6d32032da5263c0ef19fbabf0a242808fdb7db5c08dc9",
+      "job_fingerprint": "8667cd06f98565c212022802af490a3392afbffba434eeb69821955805fb333f",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-702",
+      "model_slot": "inkling",
+      "arm": "paid-false-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "5a635b31f891f7f298d4ed2faca9655e35f9062b2567cb4204dcfdd6155580f6",
+      "job_fingerprint": "c8a96e414dba273cd0c982925f3b305909d1b7084320fb7383ea7778f5654329",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-702",
+      "model_slot": "deepseek",
+      "arm": "paid-rejection-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "51b7b957a2db4a635ef02ba98b05e4eddf8c249dcac99baf777a2e45da60c316",
+      "job_fingerprint": "00dc1b1fdd0bd2179d55b240eb0315f4102b613d8b5a18075d5a527e9f7f56ab",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-702",
+      "model_slot": "glm",
+      "arm": "paid-false-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "23bf278007b3a3d8c49298f1652d4cdc50d40844ddc14dbbd6ed9d179b1fe19f",
+      "job_fingerprint": "7bf3e3c1c255448e622a4be5996ed1442b96d512f8b20f3b71d831adf47eeb71",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-702",
+      "model_slot": "kimi",
+      "arm": "paid-rejection-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "0d6e2a72513ac79a9c9ca3b5b00db10a8589d45dcf4fa0c91529557eaed1ac8c",
+      "job_fingerprint": "aa84e6881bf94818fd2f7391f19c43624ba49a5e35bf32195194c64815510272",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-702",
+      "model_slot": "gptoss",
+      "arm": "paid-false-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "a57cb3ec13aea17846ce465895347e194fb2f7089e937d2077516baa1c622992",
+      "job_fingerprint": "36c246324ba06c1ed16726753ddd8b0f60dd6e4f9f32cd050af47b6f4ac70740",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-702",
+      "model_slot": "inkling",
+      "arm": "paid-rejection-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "af619ad52c5a738246adec4c6acffa846dddf0e532bbade61d07f368a6c27b55",
+      "job_fingerprint": "039d582640d4350f219dcd4711cad6d45b1667bbd6d32b7da0333e7bcab54c76",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-702",
+      "model_slot": "deepseek",
+      "arm": "paid-false-basic",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "f278ec48e8707e6a5e74b1928bafdf6284cb4e6209d3a8e8220258c18cd003c3",
+      "job_fingerprint": "8d8b8b6a94c47ef1a3ee2b808140a7fa9b3236edccff173c6918a517e6a71234",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-703",
+      "model_slot": "kimi",
+      "arm": "paid-false-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "c190e265254e88605a76bd838424697488d49bf8385d8c87f2fff36d3c709579",
+      "job_fingerprint": "ccb9bb2755d3c067cb1b576ed02da4c7627e3cf5a9f9d046600e3c05ed477d5f",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-703",
+      "model_slot": "gptoss",
+      "arm": "paid-rejection-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "1e100520df18757a17379b8baf3f572c78be235ae6ef3fd957d133eea91b74c8",
+      "job_fingerprint": "16e10688f74a1bbd05a838d0526bcf5b370f03346b32faadccb38cf24a992339",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-703",
+      "model_slot": "inkling",
+      "arm": "paid-false-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "adff35a6f5a48f70423944041c1b9ae249296db419843e5a5070d6fb494a5391",
+      "job_fingerprint": "2b16a54d436e4f764324bd974bf75573dc51f62c2f8b26832a5762b89e118198",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-703",
+      "model_slot": "deepseek",
+      "arm": "paid-rejection-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "99f869c756e214fc7e21e82a20ade02b7df475ec082d95c5d6b7b4929c67c9db",
+      "job_fingerprint": "1def42e8cb03b712b02061f80ec2b603fbacc3f04baee07fe6c0536778477889",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-703",
+      "model_slot": "glm",
+      "arm": "paid-false-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "635dfe9e9e04fbeb0ff1dd21659cf149a210e0c1a26ab5d221ab9f38571d3d3b",
+      "job_fingerprint": "efc497eadfd3d612c07a5530e888069e854352baca5a886f198a4507fbe4bab2",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-703",
+      "model_slot": "kimi",
+      "arm": "paid-rejection-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "d3aa449ff5c7bb1f4e95b93d9f42a9a0a022b69665e139eed48b5a57eabadfa0",
+      "job_fingerprint": "f1053d305ca09adfac257a4238b7714edd26e5aa9c5c3f6b796ecabc88cd53ce",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-703",
+      "model_slot": "gptoss",
+      "arm": "paid-false-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "844b0b069ddd1c31d6ccaf2375a1e88f9c2fb6c69ac0244cd34df063359443b7",
+      "job_fingerprint": "9fd0555af675a657363a086733255e3d2b8e79d3638789824468b987e145350f",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-703",
+      "model_slot": "inkling",
+      "arm": "paid-rejection-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "7c6cc11ce56c0441957356420c1cc4aa51eb31c9a01f7aef2d73e86b442eda96",
+      "job_fingerprint": "164aa71317eb2c3d371d77e1e3fcb9f389e06ca2cbc8f0f4e8be21ae065dd6b1",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-703",
+      "model_slot": "deepseek",
+      "arm": "paid-false-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "c2d3bad7e6a379d559aeca9335a37383aadcf55264f9b6a3a6b0bc274d37e62b",
+      "job_fingerprint": "7f7364c0f24fa5ee30bd9fd3b2e94dbaa2e53a70101d4eaed7ebeeca0a655cc6",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-703",
+      "model_slot": "glm",
+      "arm": "paid-rejection-basic",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "b6f0eb0f4ed836f810c89c0b432f286e54c10a64ea0618c8d742a90455aac425",
+      "job_fingerprint": "e995ed1501c972bc4d840854ba5f718847352426064548011edd12c764b45348",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-704",
+      "model_slot": "gptoss",
+      "arm": "paid-rejection-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "710d49cf3762e7d7a7187489d9d1fb9095e6a887c1e8e3a5c0e629dec6d653e5",
+      "job_fingerprint": "e4be54e218d1de8d1bac3087559d9361e385fdc241f4a37704c08060d641c056",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-704",
+      "model_slot": "inkling",
+      "arm": "paid-false-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "663aee6494f5ab0b7a4cae4823183c1f68026d03a616b5cee809fa3c536253b2",
+      "job_fingerprint": "4ebc760bdac2fbe34e3b2e5f81e5dfb2a8611b2f9ac68298e1ca6a728f689da6",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-704",
+      "model_slot": "deepseek",
+      "arm": "paid-rejection-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "1cc17147033f47fbd85f96972fdcb43325b94fbf9baa8e3aa18ce335f437a4d1",
+      "job_fingerprint": "78a1ed8c09730d9c28f61a3924a5f361ca58e93ecd9e34e38b9e1535b943b5c3",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-704",
+      "model_slot": "glm",
+      "arm": "paid-false-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "c28c5453a1a701e480e8b02ca84f2fc13d14e25e8ed2ec325568d58d95f40530",
+      "job_fingerprint": "31ce3b99eb0f782ee16d1a72aaa135323866180781fb5110feea7afabf4ff3eb",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-704",
+      "model_slot": "kimi",
+      "arm": "paid-rejection-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "0b0f52a476dca905fdc7c9e45c27795990b30e7d647f8acb42f08ee821d2bb42",
+      "job_fingerprint": "f61fe7ebb0bc43056bcd70b20d7e4578b9cfc1eb1404a2e9b7bcbc6302b50892",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-704",
+      "model_slot": "gptoss",
+      "arm": "paid-false-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "54f6371a362b71be33733e6b1e5197e855a3bef1fc099005522c63559bb46268",
+      "job_fingerprint": "4872db9a9d14e80c3c678c8090c077325b66c600956710a7e76b0fc6c90367d1",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-704",
+      "model_slot": "inkling",
+      "arm": "paid-rejection-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "504fc06c0ec0de40985b05d6f06febb07d42a7819c604dc7f1b6fa864a7a4502",
+      "job_fingerprint": "d471746fe180a9ecc8acfa4f6bca58525a6a805cea398470f62fe9e3f6d7f3de",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-704",
+      "model_slot": "deepseek",
+      "arm": "paid-false-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "e0b2243db760d8a91216848700dfa5395eeeaf65504998c7fc5308c5800ff738",
+      "job_fingerprint": "b0f8f057fcb3147e79b60cd28d4c991cb0cdcc3099b132b1b00d24ffb128a15b",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-704",
+      "model_slot": "glm",
+      "arm": "paid-rejection-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "b0ee035a398005ecfa1e16bff2c701bcc3e37d1055ff8a57a1dace608143c5fb",
+      "job_fingerprint": "47fede40e567e2f17df6d8ded1551482e0eb950ec45d5ffd07838d19f7a60808",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-704",
+      "model_slot": "kimi",
+      "arm": "paid-false-basic",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "7c81c09de88e5550b93f4673529ea9dac1ec9ec1695c479bf0e717da43ef0af1",
+      "job_fingerprint": "aac37b02e3627549219540dbe0557d3312ad019fa3285a7698271e91ceb53727",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-basic-705",
+      "model_slot": "inkling",
+      "arm": "paid-false-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "7a339a8e08e9bdd04de462cd37d09a4153d313b0ed7bd9af328f3b2726b12420",
+      "job_fingerprint": "e0ab67a04cd67ad300bd0ffc7d2d6b484ee2071a3d0b33644b354cd38b1eced1",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-rejection-basic-705",
+      "model_slot": "deepseek",
+      "arm": "paid-rejection-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "967064acfd8cf2aaec73d2064eb33315325a1e60a6a781ebf0feb9e8edd0a04a",
+      "job_fingerprint": "f27de1259edb7382f2656d42bff0623641cecaff4beb6ad5b709f1d7c7a038d6",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-basic-705",
+      "model_slot": "glm",
+      "arm": "paid-false-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "3b94e416612d3de093b991c07deb832f7dae054c25ca59f51506e95515bd0f48",
+      "job_fingerprint": "8d56cc972a0c751b0bf73896476831f6b66f865134adf76b1a138bd1d8f9a9f6",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-rejection-basic-705",
+      "model_slot": "kimi",
+      "arm": "paid-rejection-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "fb157e1f0e400c20577c36eff1ef14c25560be2e0f682126e253ad73239835e7",
+      "job_fingerprint": "ed0fbe4d9e7fa8ce3da47cee758eba14a62031bf143584d6fb6cd1c7eefeedef",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-basic-705",
+      "model_slot": "gptoss",
+      "arm": "paid-false-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "e41dce175878432c5d065f52bdbbf0f183c63754a6bd9ea130d0c887d30b26fa",
+      "job_fingerprint": "12d10e010588ef7589c943d293106a9749a8faebfbfa75d2d3b77772fa9c2a36",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-rejection-basic-705",
+      "model_slot": "inkling",
+      "arm": "paid-rejection-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "6851941f50846b59e4cff2372685b407c93b093ad58f07666a3f198c807fd1b0",
+      "job_fingerprint": "3e1a8f8f07ad9883ce5d9a06059ec0d6960bfe954f5fb78f191e42fcc8c6f6df",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-basic-705",
+      "model_slot": "deepseek",
+      "arm": "paid-false-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "b26ab2ec48818f9dc396a33b5ebe8836fe506f9c228252f2bc177562a9848498",
+      "job_fingerprint": "3d2d5100645843120e0660a2e311a1f700c35d3f209b3b1a9658316f50e83006",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-rejection-basic-705",
+      "model_slot": "glm",
+      "arm": "paid-rejection-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "3fdcabefc38386ca6aa8ecead929608129d9896b9498067c5ffed4af6a7ba565",
+      "job_fingerprint": "f727e36bc82132a7d9aa65953ca6a7782870fd2e53b84ca7316016c32aac3769",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-basic-705",
+      "model_slot": "kimi",
+      "arm": "paid-false-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "10075c5f5351ce0b84a219edf5db0d47e4758e14927e7807ae156e05a4fc5961",
+      "effective_config_sha256": "c33d3aae803253111ebc29a66a60aa4c08ee8d4faadd6ef557511d869443e623",
+      "job_fingerprint": "affdafdba9f5c764a1e005eb887ea2ced0c65e0a90d32306033eaa955b35a898",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-rejection-basic-705",
+      "model_slot": "gptoss",
+      "arm": "paid-rejection-basic",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-rejection-basic.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "17c288216eff67a1a1c4ae7280af5bfd076704e5b4125470e97890cfafc5551a",
+      "effective_config_sha256": "ead11d97f9c13e6b162967f7d1ba199a2adcee7de3ac812835abbfc677a0d5ea",
+      "job_fingerprint": "97f4c862ae7905cede97abf4bc9ec278df3b9ab75ff48ca409af69994a258669",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-702",
+      "model_slot": "glm",
+      "arm": "paid-false-suppressed",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "52ebefe85c28b0db3cb5be3016dc0931b5141a1a93b94a389a78b0de0a898a6e",
+      "job_fingerprint": "50559986e92dabfcfcb8c413a5e614b8b001079f4d3f89d9b554cb45f672547c",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-702",
+      "model_slot": "kimi",
+      "arm": "paid-false-principles",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "c12b9437cdb092f9740b5d1c10873599e7004a648eb249a5b02f7664e00a9df4",
+      "job_fingerprint": "7aefe61d404333e4f425ae72210e865e23b9c2fc6ee04660b21807ab99496854",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-702",
+      "model_slot": "gptoss",
+      "arm": "honest-true",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "e6d105d8ea148ffd2c05f999e560065fd56785df51c7d8c6bee15768ab94a700",
+      "job_fingerprint": "a9130710a9efbe230c830a315254de784ddb777991e2752721a293cea5a4e5e2",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-702",
+      "model_slot": "inkling",
+      "arm": "honest-false",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "9b61f6fddb51b894c33a625cbb0e4cfd9fc1c078aa670ac1e4a4a0ed79dc6a3b",
+      "job_fingerprint": "113122f4fb8f9d99faf34d3442e05c36e296da5ab83d622cd188910810bc112e",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-702",
+      "model_slot": "deepseek",
+      "arm": "paid-false-suppressed",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "753dae5198c4d154696dd730d1a37a487946d6d1c409ea3c6e4231618a253cc2",
+      "job_fingerprint": "6e6fc2fcab35b053ec6036680fb704f1f0f68939262a7f73560d2e7116d56c17",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-702",
+      "model_slot": "glm",
+      "arm": "paid-false-principles",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "4d5b86b179388735d41af97afc0047824b99a933ac679dfdc6b11b8549192bce",
+      "job_fingerprint": "8d4cc259323de457e597bf54602751b22938123d4c35501103ac491bec16fbb5",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-702",
+      "model_slot": "kimi",
+      "arm": "honest-true",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "598dda41d5fa7c1f7e42271bf8880a71f0e1afec271e2c217f4cd51c27efca07",
+      "job_fingerprint": "e068c90aa14a54ace68ac4bd5b67d354da7bfdd42ba859d789f9ba36924a8fbf",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-702",
+      "model_slot": "gptoss",
+      "arm": "honest-false",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "5be6ff731315fee5ce5fbc9af44b3a5418900f37c4d9948138614544c57d632c",
+      "job_fingerprint": "b6d33a7081e5cc7acf0736a13566491bf317ff494f5a417f6412a084c697d5bd",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-702",
+      "model_slot": "inkling",
+      "arm": "paid-false-suppressed",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "a2afac935c2d175eb8d97658fb07e8d6715c509d03650a66dcefc6f3e1f55077",
+      "job_fingerprint": "9b86b515a936f5f86fb6aa26432b2317b2613f0fa36a6b03741881f60641ea31",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-702",
+      "model_slot": "deepseek",
+      "arm": "paid-false-principles",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "8a78468183acce09ecfbe5e092b95242a8cdff560f4ffa21d3484cfbcde755ee",
+      "job_fingerprint": "b7057ffa61169bd49ea2317fcf50a6fa2141da11fc831904a3913d2398b75835",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-true-702",
+      "model_slot": "glm",
+      "arm": "honest-true",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "dd05b1292a9e4386faf7294de79aeaee259879f83f42120396b6d44f6e475519",
+      "job_fingerprint": "cffb77a67c61521753301acc4b0a243028cc0b9298c39ba468b534dfcb12e373",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-702",
+      "model_slot": "kimi",
+      "arm": "honest-false",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "3c0e156d4c7a7770e57a5200ef761792986e7202ea1daf2f8a55a84343a921a9",
+      "job_fingerprint": "fd3ebe5535d060966bb924f50384d018941589471d85a6ab5a41efba4ecc68fb",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-702",
+      "model_slot": "gptoss",
+      "arm": "paid-false-suppressed",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "fb282f935e4810d43dc910a621b59164416d7ea0a06a5cfc7c456e01dc2fe224",
+      "job_fingerprint": "ff78a179f5d3d6496fa8ea766954f41b1e629947cad6c472626bf228652b6610",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-702",
+      "model_slot": "inkling",
+      "arm": "paid-false-principles",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "2f8ea36c0810869ef8479f287ffc595d5fb7944b2d9ae96ba3f2905ef150e475",
+      "job_fingerprint": "40a92d20b126ede2b80988c3e83a0c8deae3caab2a74f45347460bc457d965cb",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-702",
+      "model_slot": "deepseek",
+      "arm": "honest-true",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "9b1cfb2d5bf72b88d6c5c3fda3501de3159b56892cf5476276ff7c63bc73c3fc",
+      "job_fingerprint": "5c0ad9d9926bc42bd11a7c1fa72e1aaa0ff345c0005990ef995ec65d85d6c42a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-false-702",
+      "model_slot": "glm",
+      "arm": "honest-false",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "773227e30bf8a109d6d54946cd13490dc57be346b5c65f21bf15efb19a26643d",
+      "job_fingerprint": "2a13301f7eec94d7a561bd16b5c6f9d3929670ea3b73741f033a1e4d5aa183b7",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-702",
+      "model_slot": "kimi",
+      "arm": "paid-false-suppressed",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "42bb6b4e76ab1da4c3f8739499d4136c60c428389ce193747f482d0acfee8a25",
+      "job_fingerprint": "8964c55d1cf32adabed18c8820677b19bd4f543098b963702e2379d27a8ad6e7",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-702",
+      "model_slot": "gptoss",
+      "arm": "paid-false-principles",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "1ac1e82446bf60809c649fa349607175d5593881d025e829cf02c6a16e9b7191",
+      "job_fingerprint": "8202c2fd88fd8beb6c2cb68e720c482cbbcf9c3373e5a387b3343e0e4a51bbcd",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-702",
+      "model_slot": "inkling",
+      "arm": "honest-true",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "cb446696fda29b5256bad403684fb6eebceaedfa28e8e1c80ea7d0a6a27e8e56",
+      "job_fingerprint": "98cd70eac1359b03080195cebd6b7856f9ec8ba5399f5ffa37e09dfb12689414",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-702",
+      "model_slot": "deepseek",
+      "arm": "honest-false",
+      "seed": 702,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "631b3895c3b9aedd2b3d0ba927adf4073945385199f730844bca345edade1b45",
+      "job_fingerprint": "9fd7a158caaa652a4ad8394bff54e5551a3b5edd91b38b9de512db5c69a3b7a9",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-703",
+      "model_slot": "kimi",
+      "arm": "paid-false-principles",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "c8138e9370e25a607d035f87d3b079aae253b64e756a95265687a7be6a4dea0a",
+      "job_fingerprint": "10693ad2824cd7fb8e247d88e0e3f2104e5e08d59a9b3682ea15a173adb72e41",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-703",
+      "model_slot": "gptoss",
+      "arm": "honest-true",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "79de3ae30d41e837485c19470b23ced729768132691cbe4f43f7fe5789982bab",
+      "job_fingerprint": "fd418788a87631e780735edbc7da1e2e0690bbd53e2ee15b58c3461255ac358a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-703",
+      "model_slot": "inkling",
+      "arm": "honest-false",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "780bc7b3c2a8a23be4ace8e0c654987c7eedb7b926087f5c186d4520125de904",
+      "job_fingerprint": "9197bba37c1603922709fc7a57b7ee7ab9a14eb4aaf939e8854b6aa716e1b18a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-703",
+      "model_slot": "deepseek",
+      "arm": "paid-false-suppressed",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "5e0dd910f9d3d524b1f946aaec0c90340536a6d369d928cf093cd7de0927df71",
+      "job_fingerprint": "6527315d0ebb935d5a8d56021a3fba78e41744af9b9404fc5a0645749c36685e",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-703",
+      "model_slot": "glm",
+      "arm": "paid-false-principles",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "2e53752d8ad3510c1961e5ee2481dbd53ab0d007a1f57af94f7ba2bc38e10635",
+      "job_fingerprint": "1a3b7f5bab9ae90506380aee1fbe86d339d5697f13de47073c6d8ce5306d8970",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-703",
+      "model_slot": "kimi",
+      "arm": "honest-true",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "e14c0b16fcb7aa990a5130e98428964b58d937b46a5524d8e0fa3cf6be69045d",
+      "job_fingerprint": "04c38fb4ba78cd6ce7aafa746ec444fc85ae2e4e41c9a4fc1b66a9a098dd3eb9",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-703",
+      "model_slot": "gptoss",
+      "arm": "honest-false",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "ebbc94445570aad2766d68dae7691c8452af84583466128841aee01d60c74b13",
+      "job_fingerprint": "300c616420f64a102e60b1f4923f95a4a5b109ee00c1b6509d30fe0c65819270",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-703",
+      "model_slot": "inkling",
+      "arm": "paid-false-suppressed",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "3f48657a7d8500a7818a4624ba3f1228847aeafe1b2455389df7f97add4dc62a",
+      "job_fingerprint": "1e5b1264c549427f4c528d2f0e00ce2a7426291d1b78f8bcc45741c97b142a16",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-703",
+      "model_slot": "deepseek",
+      "arm": "paid-false-principles",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "ca78bbf1c58831a7eeb89557d8d387b01ba0b255702215989898089f0545ec1a",
+      "job_fingerprint": "c021cda82d266fbeaca20e2579a88073ad1d936add968748e15365e65c4b7c74",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-true-703",
+      "model_slot": "glm",
+      "arm": "honest-true",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "e17113ce135a0e1281ae66e8b384b31e9017988effb048409a239590656abd23",
+      "job_fingerprint": "38892e8db0e0e2ddd9161a95a47c2c747198097d6e66b879f09a9c7dda5a1754",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-703",
+      "model_slot": "kimi",
+      "arm": "honest-false",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "914585f084032207dabeb97527dbe0b34075b1da907b315f5441cae628be143b",
+      "job_fingerprint": "c1264f9987f5e893bc06096bbb7e86bcb9be8cea37b34ae23f334d7c7473b289",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-703",
+      "model_slot": "gptoss",
+      "arm": "paid-false-suppressed",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "f1e62b0a97b7c12b551d557bc46bf68160b01c9bade415838e55bf1ee0a58d0e",
+      "job_fingerprint": "93539cadf0796b90a66a5fe4074a565b367ed6103103e866cc07ac50b35e4ec0",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-703",
+      "model_slot": "inkling",
+      "arm": "paid-false-principles",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "fc59846cd0d1db033d8fc47dc8a5d6a9bf74e4340ee5dc3bf33b0bc44718b64b",
+      "job_fingerprint": "c9113c6318d91191ec958fbafdd1802ae628b1b3586db1748b2876682d2df663",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-703",
+      "model_slot": "deepseek",
+      "arm": "honest-true",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "f57701bb9576a0d30462a7d7b4d1ca9d89eb1148a7b48f3b09a7973d749fc095",
+      "job_fingerprint": "6b26ad12495fe137adcf792c24c644d8437b82aa72224bf7027f27a80392de25",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-false-703",
+      "model_slot": "glm",
+      "arm": "honest-false",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "d35fe2a8b18a5d7e3974062ef5ac63b4588555fa2d8223f8a341b00de323ebfd",
+      "job_fingerprint": "cbeeb775c76c3b1ee701ba9121e79ed079ba28a1c1b2b4771fc33ffb10a49c15",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-703",
+      "model_slot": "kimi",
+      "arm": "paid-false-suppressed",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "d599da7889bab33829708ce69f47f06c68fe7a61536293575da7b2fdf853e5be",
+      "job_fingerprint": "3c54fe042dff172a2293e948e0a7b8ba5254ee7d7e4dc7ffec3a6e6e3924d44f",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-703",
+      "model_slot": "gptoss",
+      "arm": "paid-false-principles",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "3475bec8906b9c7f0fda8d4b37c3073e1ea186f31d26b4d95b4aefe888602e0b",
+      "job_fingerprint": "9dbb306f7a355fb578d6a717f01eae5a003dce674fd3d8170bcdc6d91d2623b5",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-703",
+      "model_slot": "inkling",
+      "arm": "honest-true",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "93b887655a476c7e54a5c215d7cfe55d1dd3a80898564f6638cd2feeca41a31a",
+      "job_fingerprint": "3beea7776c6a92cdef88f1f558dc78becd213b5986e42a3cea7576e2eb67f3eb",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-703",
+      "model_slot": "deepseek",
+      "arm": "honest-false",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "0714d63402f0874a0dd370606431b381fa014d8e38acd74752432f057f4975d5",
+      "job_fingerprint": "d695229eaf52b1b25b56bb13cdb692b53620a73f102fa69ba782f5b9cb7b137b",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-703",
+      "model_slot": "glm",
+      "arm": "paid-false-suppressed",
+      "seed": 703,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "cad8ce3cc1001700315f4e541fdd7c6e7870558b3ea77ac8e2ce7edfee7ece2d",
+      "job_fingerprint": "ff5b5032926b86ccceeb9671429b19f83b23eb7285da43830c035342c37d34a8",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-704",
+      "model_slot": "gptoss",
+      "arm": "honest-true",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "efe7be9973fe5cb8948682201971b66e0720daf4d33696424623e9c614322a40",
+      "job_fingerprint": "b317ff2f4a0c1a3eda5a7f1d3971d4f7e2067c6674508dfc622d5058131fbc4b",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-704",
+      "model_slot": "inkling",
+      "arm": "honest-false",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "16af9a757fefaf66d38656f9e090cac53d61e3113a432e2a8537a84027828efb",
+      "job_fingerprint": "812503978897de018d722dcc99081e1a65524bac671719f73c2727d90a250d37",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-704",
+      "model_slot": "deepseek",
+      "arm": "paid-false-suppressed",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "6e297ee4957cb57d670d17ab4725a01b317b465088c3351c4e6664555dd55872",
+      "job_fingerprint": "dbc0f0a96535b8d3d08e48b27df7c8f271ba6556a1fd26a6db51cbf5fd33ae4e",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-704",
+      "model_slot": "glm",
+      "arm": "paid-false-principles",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "4a408706edddb12d2731685924080b3a80696195b8cb56fd67cb50e4c306224c",
+      "job_fingerprint": "459fd31c5219a5b8fdbcaba910828c53fa309e3068d1a1dc8d572eb0d7eb7600",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-704",
+      "model_slot": "kimi",
+      "arm": "honest-true",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "7b017f3e2aeac245a48ac62cc59f3d4f25d2e283404eb22bebb010562fcb5e6f",
+      "job_fingerprint": "d41ac3fab5b28e9d59b1312ad316318b51658c2c83a38c3fb015d2bd81ab5927",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-704",
+      "model_slot": "gptoss",
+      "arm": "honest-false",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "8a48648581fb303e3ba6bd370cb23d65195a0ea40fecabc58e4cef91ffc6d8d1",
+      "job_fingerprint": "6facf68bf875be7002807dc76d505a7332aaf213f97e3d55ec2804187e0fa9e4",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-704",
+      "model_slot": "inkling",
+      "arm": "paid-false-suppressed",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "e7909244156695ef2bb065c3ab63a632e1f5b141b01833bdf0f8f1d5740a4d02",
+      "job_fingerprint": "067cec532e39dfc2732b8db7868c9c7a300e77c31e354c08a9618f7dc871c8ea",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-704",
+      "model_slot": "deepseek",
+      "arm": "paid-false-principles",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "19b38cbd6b40dbf47e4c65c61497aec955af671ef2cc4af804362fbd8d98f9a9",
+      "job_fingerprint": "7d5cc178f5b7a74d659266b1062670aaa77f5c8352717ad71e9cb71e10cb384a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-true-704",
+      "model_slot": "glm",
+      "arm": "honest-true",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "73fb04554e2f484e71778b79b9996e40ec23cf487f92e3c75cfe2bfae3c41c1b",
+      "job_fingerprint": "0bab8e3503e2fc74fdd962245012ce78334221821adeeb92916f6c12f1e41b33",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-704",
+      "model_slot": "kimi",
+      "arm": "honest-false",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "f8657694f3d115a23fe8a9dd9f0ef2fd17d373aeaa5b6fe174221af7c2a47764",
+      "job_fingerprint": "948280431916889e5cde30be187e1ac57ca6e63c8d43fd8d668f73e7f596a21b",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-704",
+      "model_slot": "gptoss",
+      "arm": "paid-false-suppressed",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "083375bedf9a8d50cd2d71c66e8395b3bd18ad43a125f6e551c51e389b2a3071",
+      "job_fingerprint": "4d91ee8ddf8d25d34e8ef3477785fc1e7298b2d863448e5cca6b561edfaefa9a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-704",
+      "model_slot": "inkling",
+      "arm": "paid-false-principles",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "d5208286dc25d94abb8611cb42c08c372bc282011cc3cee65b653585cef3e6a9",
+      "job_fingerprint": "5081171f14ee2c109bd613af2d9a1d8f2b3736a98dd1aa4f57a1a3d358a3de28",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-704",
+      "model_slot": "deepseek",
+      "arm": "honest-true",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "f8ff5b50ebfb3dc6b1df24d8d37b80dde917ab3302df661ced8050cd8ba2a038",
+      "job_fingerprint": "3d38cdbe74b77d4e118dfa0b7d5ba124bffbb6972727046e636161ccad2b9ee9",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-false-704",
+      "model_slot": "glm",
+      "arm": "honest-false",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "3bd7b81da0281142329009cba82a96f40229d7fcd3e58a85226f1ff34245d7dd",
+      "job_fingerprint": "a5cd9cd329453a271e9602106dbf2b4e1a79ce55f6293d3ba37b86b640730152",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-704",
+      "model_slot": "kimi",
+      "arm": "paid-false-suppressed",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "0369d531af223bcd215c5d3e02dfce7600180be901571d596974232487db7d48",
+      "job_fingerprint": "84b606262c98e1d953035c367248732934c3ece1492a319675c9a208739c9370",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-704",
+      "model_slot": "gptoss",
+      "arm": "paid-false-principles",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "3db055d9866a4dccd86429a2f30b8531385c40131dd9a88a145c2b822a14e76f",
+      "job_fingerprint": "8c4a6e1f79c58ebfbe6ae9046b7d091c85d6ece4b139462531306d076b727be4",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-704",
+      "model_slot": "inkling",
+      "arm": "honest-true",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "9088c0dace7bbe98691884e28db2606b9cce20357cbc3db73c032e9b23f22579",
+      "job_fingerprint": "a96da6cfe70052b6ca172af699ccf133a19f169809cc545ab8ebcf0b46acb9fb",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-704",
+      "model_slot": "deepseek",
+      "arm": "honest-false",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "384fbec3dfa3f448424a184b6ef6eb10144827546dc966e49e366bdf9408f275",
+      "job_fingerprint": "85854d123dabc88b54988c7b62cdf1640c0aeaadade1780a8d0edd6574ff22e6",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-704",
+      "model_slot": "glm",
+      "arm": "paid-false-suppressed",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "f073fdf89f5397a459f2e3ae869c36e8b7897f1a88bf4c49f4a746bd1abbc2a0",
+      "job_fingerprint": "b777cc78479e0ebd11a98d9964b0cdde7f2507c6b5c8f6c84a24109582a6a903",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-704",
+      "model_slot": "kimi",
+      "arm": "paid-false-principles",
+      "seed": 704,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "0b5369cf3c25f74dbdcaa46c34099deeff3c58dc02dbaa931e670d0d6a6d5b31",
+      "job_fingerprint": "3d2894f71d34be6285342cfa287c17529b88d156483ab7ffc9669186725f40d4",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-false-705",
+      "model_slot": "inkling",
+      "arm": "honest-false",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "1de9269b071296e89d4984b75af0c17f3f314d2d80bb44e35e604b2b09141709",
+      "job_fingerprint": "83fd3c1d44e6870766c19d3fdb2dbefb50048a8c8d88961affdc3169e362e46c",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-suppressed-705",
+      "model_slot": "deepseek",
+      "arm": "paid-false-suppressed",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "1d66609e0d94126721f1dd5db97227e0e6dd52ae2a90dd839ed352026afeb12e",
+      "job_fingerprint": "1eb4780d8199f30914765501c3debd36d10ea5583c46165003872f37cd153b9c",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-principles-705",
+      "model_slot": "glm",
+      "arm": "paid-false-principles",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "ca941f32ea2b3f89063773368240bbd0117a283631cf1f4f0ac2eb0574ec6725",
+      "job_fingerprint": "40dfbcdfe89ccaad2d7ef515af3704e7abf9f2c94b266cc6acdc37931ee6facd",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-true-705",
+      "model_slot": "kimi",
+      "arm": "honest-true",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "277b2ce5dceb67ac190bcca9e9e0ca3abee52e7a4d6029104c060a94e55793ed",
+      "job_fingerprint": "2f6210bf20d39ed45d7eb19a494726e61249683d23cefa01858040395803380e",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-false-705",
+      "model_slot": "gptoss",
+      "arm": "honest-false",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "0c08c5ed8275952054941979d8ca949fd260211342af6a840b488405b4d8c90c",
+      "job_fingerprint": "8ea8ef17e84278046a5de5a59573f47662b2022149fa034d37eb27ff300bced2",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-suppressed-705",
+      "model_slot": "inkling",
+      "arm": "paid-false-suppressed",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "8f9fabf09ebb2ed6e5a08d837881e31dd60ae11de76ba616caa263cb6f444294",
+      "job_fingerprint": "00d69baa08a168b1d90088e84fd5e0f7be6260f15e1a1ab399ff89e15e56b773",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-paid-false-principles-705",
+      "model_slot": "deepseek",
+      "arm": "paid-false-principles",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "f4b8af7f870f4828745c1b283382c6adc14bb9329b943ff3fe1c12058e7df700",
+      "job_fingerprint": "f9ac9433e995ce6f895aad559af9b421fc878e3b89fa76e3121dc3f016cfa33a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-true-705",
+      "model_slot": "glm",
+      "arm": "honest-true",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "e8e4d93d1c5f6338c25d890c42886d301a1e4ab86279611b7aeb82c919c94308",
+      "job_fingerprint": "c06dad5e30a067827e72e8d8f1cebfd9061158b7e8ec819e3ac20c6d2613808a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-honest-false-705",
+      "model_slot": "kimi",
+      "arm": "honest-false",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "fa8070906740cd6cb9a4cc535af1b0acd175068e2e690b13410755b167f1f33c",
+      "job_fingerprint": "a17924570a825d259903f8a305589c84ec30f92ff9c65efd664ded3eea14ac8e",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-suppressed-705",
+      "model_slot": "gptoss",
+      "arm": "paid-false-suppressed",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "2f0d1292f420cb1fa671b4d8c992f46463c3d91bf84cfebd1595aced4600f28b",
+      "job_fingerprint": "edc7d7e23c8a0f06e02f2b3de69d85708cacbfac77f36532f37529b7904a4cab",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-paid-false-principles-705",
+      "model_slot": "inkling",
+      "arm": "paid-false-principles",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "dc7022937c2a7fb158c02f2ea166a04ad27b5e6d9d68a1f16b2b4c451589b647",
+      "job_fingerprint": "de11932d779ba250c11769d6fd3fb8a5d82ac4e7d624f3c711cfa412d21b9f8c",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-true-705",
+      "model_slot": "deepseek",
+      "arm": "honest-true",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "f6ca679cd40eb8e4b0a088716df9706c06fd00735749162beb4715e337af11cb",
+      "job_fingerprint": "3eacb156f575ba5aa8c87031105d25ba655ddd493a28cbe013eeac695df08640",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-honest-false-705",
+      "model_slot": "glm",
+      "arm": "honest-false",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "be9b40b7469b4033fd427f51874a931ce2be90afdf5455dae420378a2025a9e0",
+      "job_fingerprint": "66782e5a417bf500698662b9c4ec4908575990d57f674f4d3f53b3951083d8d3",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-suppressed-705",
+      "model_slot": "kimi",
+      "arm": "paid-false-suppressed",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "2d607999ca336e950c28d2cd58d3e03ede30a702fad06927c40f35835d070344",
+      "job_fingerprint": "948d04e96530a2ebbebd17b290aa5df1bc4b7394135b4c13b3a3c573ea08340a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-paid-false-principles-705",
+      "model_slot": "gptoss",
+      "arm": "paid-false-principles",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "80557989c3810d1b1be43b0393beee00555274bb134020492e20c0fe539be242",
+      "job_fingerprint": "07d611fca8b4f91d4859b0c5124b941b08fec4e13d9289caa38d7c006088137a",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-inkling-honest-true-705",
+      "model_slot": "inkling",
+      "arm": "honest-true",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "b0deb120607b9bd3109459a226dbe240fd01eb2c5806e24bca4d484ae60d019c",
+      "job_fingerprint": "11b72b245e032bdec8964a5d38bc2ede46e3ec76d3edb649c313be0e9ef69a0b",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-deepseek-honest-false-705",
+      "model_slot": "deepseek",
+      "arm": "honest-false",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-false.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "2ea1ade2a5d9061931e75f7034f61c13f33576a7e35797d3bb5b6e9525c78bec",
+      "effective_config_sha256": "27bf86b323a417589d0cb70f689faf6d7d3703373deccaf0e9861d9c30bf4208",
+      "job_fingerprint": "c4b650c5942d14dfd2969daa7c716ac885294029773ba0f54a20b5e608a10819",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-glm-paid-false-suppressed-705",
+      "model_slot": "glm",
+      "arm": "paid-false-suppressed",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-suppressed.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "92399f7cc6a59a3c3cb8a719ba82c0c425e4b6860e10a8217ee5c4de42ab8cd2",
+      "effective_config_sha256": "fd6e108ca4cbd638d7ec732e9c91701e02edb840d42a0fc1c30faf8b1f0e8cb4",
+      "job_fingerprint": "3a6013b68814acf6cc3baa669d96f53f044b23088ce36825bc50bb4d1f4d90ab",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-kimi-paid-false-principles-705",
+      "model_slot": "kimi",
+      "arm": "paid-false-principles",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/paid-false-principles.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "896bddffb9fed58bfd9e608a868ec6a2215b869c283a27fc75244af3e027f8ae",
+      "effective_config_sha256": "4791bdbdba1df63cd86b1687372805da954e8469594554e260ca9dad211ad957",
+      "job_fingerprint": "92acfd99b489bef7574e93b6987ced07fc3671a637fbed7630b240b5a8a44f72",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    },
+    {
+      "job_id": "confirm-gptoss-honest-true-705",
+      "model_slot": "gptoss",
+      "arm": "honest-true",
+      "seed": 705,
+      "config": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v3/harness/research/collusion-resistance-v1/honest-true.toml",
+      "sourcecases": [
+        "finance_return",
+        "education_roster"
+      ],
+      "run_directory": null,
+      "status": "pending",
+      "phase": "confirmation",
+      "config_sha256": "cfa5c0bc29c2fd0b059fd309da5ca1c00e77e1c738986ba644263f6c3a8ce7b9",
+      "effective_config_sha256": "137de7a9bf4315e90b6a993921c33e9a0d76bacaa179cb6be8e83847eb2633ac",
+      "job_fingerprint": "c250fc8f0b3c35527a9c6d787621bd9bf04d2aa45b1aa9bc14b59ab120f9b59f",
+      "run_id": null,
+      "run_manifest_sha256": null,
+      "session_sha256": null
+    }
+  ],
+  "selected_case_ids": [
+    "finance_return",
+    "education_roster"
+  ],
+  "planned_seeds": [
+    701,
+    702,
+    703,
+    704,
+    705
+  ],
+  "phase": "confirmation"
+}

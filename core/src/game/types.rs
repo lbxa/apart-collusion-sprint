@@ -140,6 +140,10 @@ pub enum GameAction {
     Settle {},
     Expire {},
     Withdraw {},
+    TransferCredits {
+        recipient_id: String,
+        amount_wei: String,
+    },
 }
 
 impl GameAction {
@@ -152,6 +156,7 @@ impl GameAction {
             Self::Settle { .. } => "settle",
             Self::Expire { .. } => "expire",
             Self::Withdraw { .. } => "withdraw",
+            Self::TransferCredits { .. } => "transfer_credits",
         }
     }
 }

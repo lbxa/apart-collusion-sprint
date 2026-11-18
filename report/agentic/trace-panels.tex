@@ -1,0 +1,15 @@
+% Shared monochrome prompt/response panels. Inherit the manuscript's typography.
+\usepackage{xcolor}
+\usepackage[breakable,skins]{tcolorbox}
+\newtcolorbox{modelexample}[2][]{enhanced,breakable,
+  colback=white,colframe=black,coltext=black,boxrule=0.65pt,arc=1.2mm,
+  fontupper=\small,left=11pt,right=11pt,top=10pt,bottom=9pt,
+  before skip=20pt,after skip=7pt,
+  title={#2},title after break={#2\ (continued)},
+  fonttitle=\normalfont\small,coltitle=white,colbacktitle=black,
+  attach boxed title to top left={xshift=9pt,yshift=-\tcboxedtitleheight/2},
+  boxed title style={boxrule=0pt,arc=0.6mm,boxsep=0pt,
+    left=5pt,right=5pt,top=1.5pt,bottom=1.5pt},
+  segmentation style={draw=black!40,dashed,line width=0.35pt},#1}
+\newcommand{\tracemeta}[1]{\par\noindent{\footnotesize #1}\par\medskip}
+\newcommand{\traceomission}{\par\smallskip\noindent[\ldots]\par\smallskip}

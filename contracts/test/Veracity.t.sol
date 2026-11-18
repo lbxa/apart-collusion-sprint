@@ -66,7 +66,7 @@ contract VeracityTest {
         vm.warp(1000);
         vm.deal(CREATOR, 100 ether);
         vm.deal(CHALLENGER, 100 ether);
-        for (uint256 i; i < 7; i++) {
+        for (uint256 i; i < 15; i++) {
             vm.deal(juror(i), 100 ether);
         }
     }
@@ -175,11 +175,28 @@ contract VeracityTest {
         c.treasury = c.jurors[0];
         vm.expectRevert(Veracity.InvalidConfiguration.selector);
         game.registerEpisode(ID, c);
-        for (uint256 n; n <= 8; n++) {
-            if (n == 3 || n == 5 || n == 7) continue;
+        for (uint256 n; n <= 17; n++) {
+            if (n >= 3 && n <= 15 && n % 2 == 1) continue;
             vm.expectRevert(Veracity.InvalidConfiguration.selector);
             game.registerEpisode(ID, config(1000, n));
         }
+    }
+
+    function test_fifteen_juror_jury_settles_on_an_eight_vote_majority() public {
+        challenged(1000, 15);
+        for (uint256 i; i < 15; i++) {
+            commit(i, i < 7 ? 0 : 1);
+        }
+        beginReveal();
+        for (uint256 i; i < 15; i++) {
+            reveal(i, i < 7 ? 0 : 1);
+        }
+        finishReveal();
+        game.settle(ID);
+        Veracity.EpisodeView memory e = game.getEpisode(ID);
+        eq(e.challengerVotes, 8);
+        eq(e.creatorVotes, 7);
+        eq(uint256(e.state), uint256(Veracity.State.SettledChallenger));
     }
 
     function test_registration_rejects_invalid_bonds_shares_durations_and_overflow() public {
@@ -431,6 +448,58 @@ contract VeracityTest {
         eq(game.totalWithdrawn(), 1000);
         eq(address(game).balance, 1);
         eq(game.entitlement(ID, CREATOR), 1000);
+    }
+
+    function test_credit_transfer_moves_own_credit_and_conserves_liabilities() public {
+        register(1000, 5);
+        vm.prank(CREATOR);
+        game.postClaim{value: 1000}(ID, CONTENT);
+        vm.warp(1020);
+        game.expire(ID);
+        vm.recordLogs();
+        vm.prank(CREATOR);
+        game.transferCredits(juror(0), 400);
+        eq(game.credits(CREATOR), 600);
+        eq(game.credits(juror(0)), 400);
+        eq(game.totalCredits(), 1000);
+        // Settlement history is unchanged: a transfer is not an episode entitlement.
+        eq(game.entitlement(ID, CREATOR), 1000);
+        eq(game.entitlement(ID, juror(0)), 0);
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+        eq(logs.length, 1);
+        eq(logs[0].topics[0], keccak256("CreditsTransferred(address,address,uint256)"));
+        eq(logs[0].topics[1], bytes32(uint256(uint160(CREATOR))));
+        eq(logs[0].topics[2], bytes32(uint256(uint160(juror(0)))));
+        eq(abi.decode(logs[0].data, (uint256)), 400);
+        uint256 beforeBalance = juror(0).balance;
+        vm.prank(juror(0));
+        game.withdraw();
+        eq(juror(0).balance, beforeBalance + 400);
+    }
+
+    function test_credit_transfer_rejects_overdraft_zero_amount_self_and_zero_recipient() public {
+        register(1000, 5);
+        vm.prank(CREATOR);
+        game.postClaim{value: 1000}(ID, CONTENT);
+        vm.warp(1020);
+        game.expire(ID);
+        vm.prank(CREATOR);
+        vm.expectRevert(Veracity.InsufficientCredits.selector);
+        game.transferCredits(juror(0), 1001);
+        vm.prank(CHALLENGER);
+        vm.expectRevert(Veracity.InsufficientCredits.selector);
+        game.transferCredits(juror(0), 1);
+        vm.prank(CREATOR);
+        vm.expectRevert(Veracity.InvalidTransfer.selector);
+        game.transferCredits(juror(0), 0);
+        vm.prank(CREATOR);
+        vm.expectRevert(Veracity.InvalidTransfer.selector);
+        game.transferCredits(CREATOR, 1);
+        vm.prank(CREATOR);
+        vm.expectRevert(Veracity.InvalidTransfer.selector);
+        game.transferCredits(address(0), 1);
+        eq(game.credits(CREATOR), 1000);
+        eq(game.totalCredits(), 1000);
     }
 
     function test_failed_recipient_keeps_credit_and_cannot_block_other_withdrawals() public {

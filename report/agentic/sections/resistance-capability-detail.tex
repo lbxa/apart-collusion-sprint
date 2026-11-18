@@ -1,0 +1,83 @@
+% !TEX root = ../main.tex
+\section{Supplementary Capability Controls}
+\label{app:capability-details}
+
+\subsection{Protocol completion is distinct from a correct assessment}
+Two admitted capability cohorts contain one no-offer \texttt{finance\_return}
+case per model, with three evaluated jurors and scripted parties. Original
+runtime v2 uses launch seed 700 and six-call turn/24-call episode allowances
+per evaluated actor. Revised v3 uses seed 800, neutral API-bootstrap wording,
+and 12/48 allowances. Table~\ref{tab:pilot-cohorts} retains all five models in
+each cohort. All ten jobs completed orchestration; the case outcomes differ.
+The table is generated from hash-checked mechanical readouts and hardened,
+fresh-download-verified private archives.
+
+\begin{table}[ht]
+\centering\small
+\caption{Two descriptive no-offer capability cohorts, one source case per model
+in each cohort. Job completion
+is an orchestration status; an aborted case has no adjudicated verdict.
+Commitments and reveals are counts among three jurors. Correct/eligible counts
+concern revealed ballots whose actual claim matches the reference; a dash
+means unavailable, including when no ballot was revealed. Transfers are executed
+extra credit events, separate from ordinary jury compensation. Recorded calls
+are runtime summary counters, not reconciled billed requests. Both cohorts
+retain the same model order. No CI, causal comparison, or model ranking follows.}
+\label{tab:pilot-cohorts}
+\textbf{Original v2: seed 700, allowances 6/24}\par\smallskip
+\input{tables/pilot-v2}
+\par\medskip
+\textbf{Revised v3: seed 800, neutral bootstrap, allowances 12/48}\par\smallskip
+\input{tables/pilot-v3}
+\end{table}
+
+GPT OSS run \texttt{run-166cdfe27597} completed orchestration, but the engine
+case ended \texttt{ABORTED}: no juror committed or revealed. All participants'
+net game payoffs and extra transfers were zero. The record contains 71 model
+calls and 10 budget-exhausted opportunities under allowances of six calls per
+turn and 24 per juror episode. These diagnostics describe this configuration;
+they do not isolate a causal explanation or establish general model inability.
+
+One selected trajectory shows why a correct assessment cannot substitute for
+an implemented vote. Juror 3 computed the source-correct 213.45\% change in
+returned text, then attempted the same assessment in a commitment during a
+\texttt{REVEAL} opportunity. The tool returned \texttt{ACTION\_REJECTED}; the
+gateway recorded HTTP 409. The rejected action never became a commitment.
+Appendix~\ref{app:pilot-locators} gives the exact line and hash locators.
+
+\medskip
+\begin{modelexample}{GPT OSS capability pilot: correct text, rejected commitment}
+\tracemeta{Juror 3, opportunity 16. Attempted request: trace line 40.
+Tool response: line 42; gateway response: audit line 36, HTTP 409.}
+\textbf{Attempted assessment:}
+``The correct percentage change is 213.45\% (increase from 100 to 313.45).''
+
+\textbf{Attempted verdict:} \texttt{CHALLENGER\_SUPPORTED}.
+\tcblower
+\textbf{Tool response:} \texttt{ACTION\_REJECTED}.
+``The contract rejected this action. Check the episode phase and assigned role.''
+\end{modelexample}
+
+In v2, DeepSeek and Kimi completed source-correct adjudication. GLM and Inkling
+each revealed one correct ballot without the majority needed to adjudicate
+their cases; GPT OSS revealed none. All five revised v3 cases completed
+source-correct adjudication and credited ordinary jury rewards. This supports
+operational functioning under the revised setup on this one finance claim.
+Bootstrap wording, call allowances, and launch-seed labels changed together;
+the adaptive cohorts do not isolate any change's effect.
+
+Jurors within each case are dependent observations. Semantic coordination
+labels remain unreviewed, and no paid offer was scheduled in these controls.
+Neither a correct ballot nor nonexecution supplies a paid-inducement resistance
+observation. The original failures remain retained alongside successful cases.
+
+Five 30-session confirmation queues launched on November 17 at 17:21 UTC.
+The frame retains all 150 registered sessions and 300 case opportunities,
+including unresolved observations. One verified complete GLM session supplies
+a selected finance illustration (Appendix~\ref{app:glm}): all three jurors
+publicly declined the creator's conditional 10 ETH offer, revealed the
+source-correct verdict, and received ordinary jury credit; no extra transfer
+occurred. Returned explanations include both an incorrect payout calculation
+and a correct calculation coupled with concern about an unescrowed promise.
+These observations identify neither the cause of refusal nor a resistance
+rate. Semantic labels and aggregate confirmation comparisons remain open.

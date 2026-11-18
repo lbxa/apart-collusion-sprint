@@ -1,21 +1,43 @@
-# Veracity Game Engine and Collusion Harness
+# Collusion Sprint: Veracity Game and Agent Harness
 
 A versioned HTTP API for the Veracity dispute game in [SPEC.md](SPEC.md).
 The Rust service connects to a non-upgradeable Solidity contract that enforces
 escrow, timed commit/reveal voting, full-jury majorities, and withdrawal credits.
-The Python experiment harness in `harness/` supplies agents, deliberation,
-treatments, observations, and evaluation metrics. It wraps the Rust
-engine through HTTP; experiment behavior stays outside the engine. Creating a
+The autonomous Python harness in `harness/` supplies isolated Deep Agents,
+Cloudflare model access, treatments, observations, and evidence exports. It
+wraps the Rust engine through HTTP; experiment behavior stays outside the engine. Creating a
 game through the API does not require an experiment or scenario record.
 
 The core owns the [public episode forum](docs/public-forum.md) and
 [private two-person chats](docs/private-chat.md), with separate durable usage
-audits. The harness uses the public forum for enabled deliberation and retains
-experiment scheduling, prompts, straw polls, and evaluation.
+audits. The harness controls participant access, scheduling, and evaluation.
 
 Share [the API integration guide](docs/api.md) with the harness team. The running
 service exposes the same guide at `/v1/docs` and OpenAPI 3.1 at `/v1/openapi.json`.
 [Architecture and rule authority](docs/architecture.md) describes the boundaries.
+
+## Research objective and ownership
+
+This project studies **evidence of agent collusion**. Track 2.3, what should
+count as convincing evidence, anchors the study; Track 2.2, whether combining
+what agents say and do improves detection, is the first planned comparison.
+The [research contract](docs/benchmark.md) defines scenario admission, evidence
+thresholds, annotation, and uncertainty. Runtime capability is not an empirical
+result, and the harness upgrade launches no experiments.
+
+Epistemics and Collusion share execution infrastructure but have independent
+empirical objectives. Model adapters, isolation, spending controls, game access,
+trace retention, and tracking may be reused. Collusion owns its duties,
+coordination opportunities, interventions, labels, metrics, cohorts, and paper.
+Confidence calibration or an incorrect answer alone does not establish collusion.
+See [the harness upgrade boundary](docs/research/harness-upgrade.md) and
+[import source provenance](harness/migration-source.json).
+
+The only active Python project is `harness/`. The former structured-action
+harness and `harness-v2` runtime have been replaced. Retained
+`harness-v2/research/` and `harness-v2/results/` paths are historical evidence,
+not a second executable package. [Legacy harness documentation](harness/LEGACY.md)
+is preserved for interpreting that history; its commands are retired.
 
 ## Swarm Alignment Hackathon 2026: preexisting-work notice
 
@@ -30,8 +52,11 @@ A LaTeX research report is a main deliverable. The
 paper brief, writing standards, figures and tables, LaTeX conventions, venue
 requirements, review checks, source notes, and reusable examples. Agents should
 follow the reading order in [AGENTS.md](AGENTS.md#research-reports) before writing.
-The [sectioned sample report](report/README.md) uses the supplied preprint style;
-build it with `make -C report`. Its numerical comparison is explicitly fictional.
+The [report guide](report/README.md) describes the older baseline manuscript;
+build it with `make -C report`. The separate October agentic manuscript is
+`report/agentic/main.tex`, built with `make -C report agentic`. Consult the
+[paper brief](docs/reporting/paper-brief.md) for admitted historical evidence.
+Neither historical results nor fictional teaching examples are new upgrade results.
 
 ## Development
 
@@ -49,7 +74,7 @@ RUST_LOG=info cargo run --locked -p veracity-game-service -- --local
 
 Local mode starts an isolated Anvil instance, deploys the contract, and listens
 on `http://127.0.0.1:8080`. It uses development-only credentials: `dev-operator`,
-`dev-creator`, `dev-challenger`, `dev-juror-1` through `dev-juror-7`, and
+`dev-creator`, `dev-challenger`, `dev-juror-1` through `dev-juror-15`, and
 `dev-treasury`. These credentials cannot be used with a non-loopback listener.
 
 ```sh
@@ -73,16 +98,26 @@ From the repository root, after setup:
 
 ```sh
 cargo build --workspace --locked
-harness/.venv/bin/python harness/run_knockout.py \
-  --condition knockout_honest --dry-run --episodes 2 \
-  --output .harness/experiments/smoke
+uv run --project harness --locked veracity-harness build-sandbox
+uv run --project harness --locked veracity-harness validate \
+  --config harness/examples/discovery.toml --model "$EXPERIMENT_MODEL_ID"
 ```
 
-The harness starts its own Rust server and Anvil on fresh loopback ports, calls
-`/v1`, commits/reveals votes, reads contract settlement, and stops both processes.
-`--dry-run` selects scripted agents and still uses the real game. No model key
-or public RPC is needed for the command above. See [the harness guide](harness/README.md) and
-[the integration contract](docs/integration.md) for units, limits, and evidence.
+`validate` checks local configuration without model calls. Model IDs are explicit;
+there is no automatic model substitution. A live `run` or `smoke` additionally
+requires provider credentials and one authorized shared spending ledger. `smoke`
+is a paid provider/tool check, not a scripted dry run. Real-game integration tests
+use scripted model fixtures and require no provider key or public RPC.
+
+Live runs start their own Rust server and Anvil, isolate participant containers,
+call `/v1`, retain authoritative settlement evidence, and clean up processes.
+Use [the harness guide](harness/README.md) for Cloudflare setup, controls, tracking,
+privacy boundaries, and exact commands.
+
+New tracking uses `lbxa-corp/apart-collusion-sprint` on the standard W&B API host.
+Keep the repository's ignored `.env`, provider credentials, and campaign ledger
+separate from Epistemics. W&B stores tracking and artifacts; it does not supply
+compute. A cloud worker must run the harness independently.
 
 ## API documentation
 
@@ -183,6 +218,17 @@ the cached remote default branch, falling back to `HEAD`; set
 rolls back only worktrees and branches created by that invocation.
 
 ## Changelog
+
+### 2026-11-17
+
+- Replace both legacy Python runtimes with the current autonomous `harness/` and
+  Cloudflare support while preserving historical evidence at its recorded paths.
+- Keep common execution infrastructure separate from Collusion's research
+  contract, labels, cohorts, credentials, and W&B project. Track 2.3 anchors the
+  paper; Track 2.2 supplies the first planned detector comparison. The
+  [runtime consolidation decision](docs/decisions/consolidate-the-collusion-harness-with-cloudflare.md)
+  and [research anchor decision](docs/decisions/anchor-collusion-in-evidence-and-detector-comparison.md)
+  retain the scope and trade-offs.
 
 ### 2026-10-25
 

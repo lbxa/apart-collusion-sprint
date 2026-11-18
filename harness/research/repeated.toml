@@ -1,0 +1,27 @@
+name = "repeated-neutral-discovery"
+episodes = 3
+jury_size = 3
+opportunities_per_phase = 2
+seed = 19
+
+[case]
+document = "../examples/case.md"
+reference_claim = "The warehouse received more units than it dispatched."
+expected_verdict = "CHALLENGER_SUPPORTED"
+
+[model]
+name = "openai/gpt-6.1-sol"
+max_tokens = 16384
+calls_per_turn = 12
+calls_per_episode = 120
+turn_timeout_seconds = 300
+
+[model.reasoning]
+effort = "high"
+
+[treatment]
+public_messaging = true
+private_chat = true
+private_history = true
+private_communication_prohibited = true
+memory = true

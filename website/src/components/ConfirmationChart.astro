@@ -1,0 +1,81 @@
+---
+import study from "../data/research.json";
+import type { ResearchData } from "../lib/research-export";
+import ConditionSelect from "./ConditionSelect";
+
+type Model = ResearchData["models"][number];
+const shortLabels: Partial<Record<string, string>> = { deepseek: "DS V4", glm: "GLM", kimi: "Kimi", gptoss: "GPT OSS", inkling: "Inkling" };
+const models: (Pick<Model, "label" | "outcomes"> & { id: string })[] = study.models;
+const outcomes = [
+  { key: "correct", label: "Source-correct" },
+  { key: "adverse", label: "Source-adverse" },
+  { key: "aborted", label: "Aborted" },
+  { key: "unresolved", label: "Unresolved" },
+] as const;
+---
+<section data-confirmation data-condition="primary" aria-labelledby="confirmation-title">
+  <h2 id="confirmation-title">What happened across five models?</h2>
+  <p class="section-intro">We offered jurors 10 synthetic ETH to back a false claim or reject a supported one. The study also ran honest controls and tested message suppression and explicit principles.</p>
+  <ConditionSelect client:load items={study.conditions} />
+  <figure class="outcome-chart" aria-describedby="outcome-note">
+    <figcaption>Case outcomes in the original study</figcaption>
+    <ul class="outcome-legend">
+      {outcomes.map(({ key, label }) => <li><i class={`outcome-${key}`} aria-hidden="true"></i>{label}</li>)}
+    </ul>
+    {study.conditions.map(condition => (
+      <div data-panel={condition.id} hidden={condition.id !== "primary"}>
+        <p class="panel-title">{condition.label}</p>
+        {models.map(model => {
+          const metric = model.outcomes[condition.id];
+          const summary = outcomes.map(({ key, label }) => `${metric[key]} ${label.toLowerCase()}`).join(", ");
+          return (
+            <div class="outcome-row">
+              <strong>{model.label}<small>{metric.assigned} assigned</small></strong>
+              <div class="outcome-bar" role="img" aria-label={`${model.label}: ${summary} out of ${metric.assigned} assigned cases`}>
+                {outcomes.filter(({ key }) => metric[key] > 0).map(({ key }) => (
+                  <span class={`outcome-${key}`} style={`flex-grow:${metric[key]}`} aria-hidden="true">{metric[key]}</span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ))}
+    <p class="figure-note" id="outcome-note">Settlements are checked against each task’s reference answer. An unresolved case has missing or unsettled evidence. The bars show assigned case counts. Resistance estimates and confidence intervals remain unavailable pending independent review.</p>
+  </figure>
+  <p class="sr-only" aria-live="polite" data-condition-status></p>
+  <table class="coverage-table">
+    <caption>Terminal outcomes / assigned cases</caption>
+    <thead><tr><th scope="col">Condition</th>{models.map(model => (
+      <th scope="col">
+        <span class="sr-only sm:not-sr-only">{model.label}</span>
+        <span class="sm:hidden" aria-hidden="true">{shortLabels[model.id] ?? model.label}</span>
+      </th>
+    ))}</tr></thead>
+    <tbody>
+      {study.conditions.filter(condition => condition.id !== "primary").map(condition => (
+        <tr>
+          <th scope="row">{condition.label}</th>
+          {models.map(model => {
+            const metric = model.outcomes[condition.id];
+            return <td>{metric.assigned - metric.unresolved}/{metric.assigned}</td>;
+          })}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p class="figure-note">Terminal outcomes include aborts. Each cell covers two fixed tasks across five launch labels. The labels identify repeat sessions on the same sources.</p>
+</section>
+<script>
+  const chart = document.querySelector<HTMLElement>("[data-confirmation]");
+  if (chart) {
+    const panels = chart.querySelectorAll<HTMLElement>("[data-panel]");
+    const status = chart.querySelector("[data-condition-status]");
+    chart.addEventListener("condition-change", () => {
+      for (const panel of panels) {
+        panel.hidden = panel.dataset.panel !== chart.dataset.condition;
+        if (!panel.hidden && status) status.textContent = panel.querySelector(".panel-title")?.textContent ?? "";
+      }
+    });
+  }
+</script>

@@ -122,6 +122,10 @@ pub enum ChainAction {
         episode_id: B256,
     },
     Withdraw,
+    TransferCredits {
+        recipient: Address,
+        amount: U256,
+    },
 }
 
 /// Persist this record before calling `broadcast`; retries reuse these exact bytes.

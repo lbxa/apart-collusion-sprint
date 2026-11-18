@@ -23,6 +23,9 @@ mod bindings {
     );
 }
 
+/// The contract ABI this adapter speaks; version 2 adds credit transfers.
+pub const ABI_VERSION: u64 = 2;
+
 /// One adapter owns the configured signers. Hold the application's operation
 /// mutex across preparation, durable persistence, and broadcast. The mutable
 /// preparation API and in-flight reservation prevent concurrent nonce reuse.
@@ -113,7 +116,7 @@ impl ChainClient {
         )
         .await
         .map_err(identity_call_error)?;
-        if abi != U256::from(1) {
+        if abi != U256::from(ABI_VERSION) {
             return Err(ChainError::IdentityMismatch);
         }
         let operator_address = retry_rpc(
@@ -129,10 +132,10 @@ impl ChainClient {
             chain_id,
             contract_address: config.contract_address,
             code_hash: config.expected_code_hash,
-            abi_version: 1,
+            abi_version: ABI_VERSION,
             confirmation_depth: config.confirmation_depth,
         };
-        tracing::info!(event = "chain.connected", chain_id, contract_address = %config.contract_address, abi_version = 1_u64, "Deployment identity verified");
+        tracing::info!(event = "chain.connected", chain_id, contract_address = %config.contract_address, abi_version = ABI_VERSION, "Deployment identity verified");
         Ok(Self {
             provider,
             config,
@@ -421,6 +424,13 @@ impl ChainClient {
                 (contract.expire(episode_id).calldata().clone(), U256::ZERO)
             }
             ChainAction::Withdraw => (contract.withdraw().calldata().clone(), U256::ZERO),
+            ChainAction::TransferCredits { recipient, amount } => (
+                contract
+                    .transferCredits(recipient, amount)
+                    .calldata()
+                    .clone(),
+                U256::ZERO,
+            ),
         };
         let mut request = TransactionRequest::default()
             .with_from(sender)
@@ -692,7 +702,7 @@ impl ChainClient {
             chain_id,
             contract_address,
             code_hash: keccak256(&code),
-            abi_version: 1,
+            abi_version: ABI_VERSION,
             confirmation_depth: 1,
         })
     }

@@ -24,7 +24,7 @@ commitment reveals, the full-roster majority, payout arithmetic, and credits.
 
 ## ABI and amounts
 
-`Config` fixes creator, challenger, a unique odd jury of 3–7, treasury,
+`Config` fixes creator, challenger, a unique odd jury of 3–15, treasury,
 configuration hash, party bond `beta`, basis-point shares, and four positive
 durations in seconds. Amounts are uint256 native base units, never floats.
 The verdict wire values are `0 = CREATOR_SUPPORTED` and
@@ -35,6 +35,10 @@ exposes the immutable terminal payout decomposition. Its `jurorReward`
 excludes the refunded juror bond, and `protocolFee` excludes forfeited bonds.
 `entitlement(episodeId, recipient)` is the historical episode entitlement;
 `credits(recipient)` is the currently withdrawable balance across episodes.
+ABI version 2 adds `transferCredits(recipient, amount)`, which moves the caller's
+existing withdrawal credit without changing total liabilities or historical
+episode entitlements. The HTTP API further restricts recipients to another
+participant in the selected episode. A transfer is not an escrowed promise.
 `totalDeposited`, `totalLocked`, `totalCredits`, and `totalWithdrawn` support
 liability checks. Unsolicited currency can make contract balance exceed them.
 
@@ -57,6 +61,16 @@ the compilation unit despite identical bytecode. Its runtime bytecode contains
 immutable placeholders; deployment identity uses the actual on-chain code hash.
 
 ## Changelog
+
+### 2026-11-17
+
+- Adopt the mature ABI 2 mechanism for future Collusion runs: permit odd juries
+  up to 15 and participant-owned credit transfers. Keep the ABI 1 campaigns
+  frozen; the financial mechanism change requires a fresh deployment and a
+  separately identified empirical cohort.
+- Preserve settlement entitlements independently from transferred credit so
+  research can distinguish protocol rewards, side payments and withdrawals.
+  Transfer tests and stateful invariants verify authorization and conservation.
 
 ### 2026-10-24
 

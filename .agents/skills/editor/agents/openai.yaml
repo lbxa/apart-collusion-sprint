@@ -1,0 +1,6 @@
+interface:
+  display_name: "Editor"
+  short_description: "Edit the research report for clarity and evidence"
+  default_prompt: "Use $editor to revise the Collusion Sprint report for clear reasoning and traceable claims while preserving the scope of each evidence cohort."
+policy:
+  allow_implicit_invocation: true

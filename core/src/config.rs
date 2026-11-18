@@ -23,10 +23,20 @@ pub struct Cli {
     pub database: Option<PathBuf>,
     #[arg(long, default_value = "contracts/artifacts/Veracity.json")]
     pub artifact: PathBuf,
+    /// Derive local accounts from this seed instead of Anvil's well-known defaults.
+    #[arg(long)]
+    pub local_key_seed: Option<u64>,
+    /// Unix timestamp of the local chain's genesis block.
+    #[arg(long)]
+    pub local_genesis_timestamp: Option<u64>,
 }
 
 impl Cli {
     pub fn validate(&self) -> Result<(), String> {
+        if !self.local && (self.local_key_seed.is_some() || self.local_genesis_timestamp.is_some())
+        {
+            return Err("local chain options require --local".into());
+        }
         if self.local && !self.bind.ip().is_loopback() {
             return Err("local development credentials require a loopback listener".into());
         }

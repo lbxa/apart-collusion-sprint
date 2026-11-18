@@ -4,6 +4,11 @@ Version 0.2
 
 Date 2026-10-24
 
+ABI 2 amendment 2026-11-17: prospective deployments support odd juries of 3–15
+and transfers of existing withdrawal credit. Historical ABI 1 deployments,
+recovery databases and empirical evidence remain frozen under their original
+mechanism; they are not upgraded in place.
+
 Status Draft for implementation
 
 Scope Rust game engine and versioned API, with Solidity contracts on Polygon Amoy
@@ -12,7 +17,7 @@ This revision supersedes version 0.1. It replaces the custom blockchain build wi
 
 This specification defines the game engine and its API. The separately owned
 experiment harness is integrated under `harness/`. Experiment execution, agent models,
-prompts, jury sampling, deliberation, simulated bribes, observation
+prompts, jury sampling, deliberation, declared payment offers, observation
 permissions, and research metrics belong to that external harness. Research
 requirements below describe its context, not additional engine components.
 
@@ -170,7 +175,7 @@ Deploy one non-upgradeable `Veracity` contract containing episode registration, 
 
 An operator may register new episodes. Registration fixes the creator, challenger, jury, treasury recipient, configuration hash, bond sizes, payout split, and phase durations. Existing episodes cannot be edited or cancelled by the operator.
 
-Require distinct nonzero creator and challenger addresses. Juror addresses must be unique, nonzero, and different from both parties. The treasury must be distinct from episode participants. Enforce an odd jury size from 3 to 7, with 5 as the default.
+Require distinct nonzero creator and challenger addresses. Juror addresses must be unique, nonzero, and different from both parties. The treasury must be distinct from episode participants. Contract ABI 2 enforces an odd jury size from 3 to 15; every episode explicitly registers its roster. ABI 1 allowed 3–7 and remains a separate historical mechanism.
 
 This is a controlled experiment roster, not proof of unique human identity or decentralised jury selection. A separate identity contract is unnecessary. The operator cannot choose verdicts, redirect credits, withdraw participant escrow, or override deadlines.
 
@@ -293,9 +298,28 @@ On expiry without a challenge, return the creator's full beta and charge no disp
 
 Settlement updates state and accrues credits once. It makes no external payments. Withdrawals use checks-effects-interactions and a reentrancy guard. A failed recipient transfer must revert without destroying the recipient's credit or blocking other withdrawals.
 
-For each episode, deposits equal remaining locked liabilities plus withdrawal credits plus amounts already withdrawn. Across the contract, its balance must cover locked liabilities and outstanding credits. Forced or unsolicited native currency may create surplus, so do not require exact equality with the raw contract balance.
+Across the contract, total deposits equal remaining locked liabilities plus
+outstanding withdrawal credits plus amounts already withdrawn. Each terminal
+episode's immutable entitlements sum to its deposits. Transfers and withdrawals
+change global credit balances without rewriting those historical entitlements.
+The contract balance must cover locked liabilities and outstanding credits.
+Forced or unsolicited native currency may create surplus, so do not require
+exact equality with the raw contract balance.
 
 There is no administrator sweep of escrow and no upgrade proxy. Bound every juror loop by the maximum jury size. A separate treasury contract is unnecessary because the treasury withdraws its own credits like any other recipient.
+
+### 9.4 ABI 2 credit transfers
+
+`transferCredits(recipient, amount)` moves only the caller's existing withdrawal
+credit. Reject a zero amount, zero recipient, self transfer or insufficient
+credit. No external payment occurs; total credits and historical episode
+entitlements remain unchanged. Emit `CreditsTransferred` as execution evidence.
+
+The HTTP transfer action additionally requires the caller and recipient to be
+distinct participants in the selected episode; neither is the treasury. It uses
+the same persisted intent and idempotency-key rules as other financial commands.
+Record transfers separately from settlement rewards and withdrawals. An offered
+future payment is not escrowed or executed merely because an agent promises it.
 
 ## 10. Jury assignment and trust assumptions
 
@@ -318,12 +342,15 @@ Start with claims that have independently checkable answers. Separate verdict ac
 | -------------------------- | -------------------------------------------------------------------------------------- |
 | Independent baseline       | How accurate are agents under the mechanism without an assigned adversarial objective? |
 | Individual juror objective | Does a privately assigned objective alter an individual juror's vote?                  |
-| Creator bribe offers       | Do jurors support a creator's false claim when given a simulated bribe offer?          |
+| Creator payment offers     | Do jurors support a creator's false claim after an offer, and is the promised credit transferred? |
 | Reveal withholding         | Can enough jurors withholding their reveals force aborts, and what bonds are lost?     |
 
 Compare minority and majority shares of adversarial jurors while keeping the total jury size fixed. Include scripted honest and adversarial policies to verify that the expected protocol outcomes are reachable before interpreting model behaviour.
 
-For the MVP, simulated bribe offers and side rewards are recorded in a separate experimental utility ledger. They are not enforced payouts from the Veracity contract. Label them as simulated and do not mix them into native-currency conservation or on-chain profit.
+Earlier ABI 1 experiments may retain simulated offers and utility ledgers as
+historical evidence. New ABI 2 experiments use contract credit transfers when
+their declared treatment permits side payments. Keep offers, executed transfers,
+ordinary settlement rewards and historical simulated utility distinguishable.
 
 Predefine trial counts, adversarial juror assignments, allowed channels, and success criteria. Log all completed, aborted, failed, and excluded episodes with reasons. A shared wrong answer alone is not evidence of collusion because agents can share errors or training data. Prompted coordination demonstrates behaviour under the specified treatment, not spontaneous emergence.
 

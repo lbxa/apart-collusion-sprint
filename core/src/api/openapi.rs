@@ -23,13 +23,13 @@ use utoipa::{
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "Veracity Game API", version = "1.2.0",
+    info(title = "Veracity Game API", version = "1.3.0",
         description = "The game engine API for SPEC.md v0.2. The Solidity contract owns escrow, immutable chain-time deadlines, commit/reveal voting, and settlement. Amounts are decimal base-unit strings. Operator and participant bearer tokens have distinct authority. Experiments, agent execution, and evaluation belong to the caller's external harness."),
     paths(
         routes::health, routes::openapi_document, routes::docs, routes::participants,
         routes::register, routes::episode, routes::claim, routes::challenge,
         routes::commitment, routes::reveal, routes::settle, routes::expire,
-        routes::withdraw, routes::settlement, routes::balances, routes::operation,
+        routes::withdraw, routes::transfer, routes::settlement, routes::balances, routes::operation,
         routes::reconcile, routes::replay, routes::events,
         chat::create, chat::list, chat::send, chat::messages, chat::transcript, chat::audit,
         forum::send_forum_message,forum::get_forum_messages,forum::get_forum_transcript,forum::get_forum_audit
@@ -39,7 +39,7 @@ use utoipa::{
         CommitmentRequest, EmptyRequest, RegisterEpisode, ProtocolParameters,
         Verdict, DeploymentView, ParticipantView, ReceiptView, TransactionView,
         OperationView, JurorView, EpisodeView, SettlementView, BalancesView,
-        routes::BlockRange, routes::ReplayResponse,
+        routes::BlockRange, routes::ReplayResponse, routes::TransferRequest,
         ChatActorUsage, ChatAuditEvent, ChatAuditKind, ChatAuditReport, ChatMessage,
         ChatPage, ChatView, CreateChat, MessagePage, SendMessage,
         ForumActorUsage,ForumAuditEvent,ForumAuditKind,ForumAuditReport,ForumMessage,ForumMessagePage,ForumSendMessage
@@ -107,6 +107,7 @@ mod tests {
             "/v1/episodes/{id}/settle",
             "/v1/episodes/{id}/expire",
             "/v1/episodes/{id}/withdrawals",
+            "/v1/episodes/{id}/transfers",
             "/v1/episodes/{id}/settlement",
             "/v1/episodes/{id}/balances",
             "/v1/operations/{id}",

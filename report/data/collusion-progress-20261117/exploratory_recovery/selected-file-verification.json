@@ -1,0 +1,1654 @@
+{
+  "archive-manifest.json": {
+    "archive_sha256": "483f6dfaa72af8ef1f16c0842edda52c8ceac952d749643240734d57bd74ed9c",
+    "sdk_digest": "UxyVllORgx8gFNsW+a7hhQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 805464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "campaign/assignment-register.json": {
+    "archive_sha256": "142623fc501554bec0809e5b57210e5437ee848648e3ec034080bb554bf8571f",
+    "sdk_digest": "89anDgFWZifbgfkyU6Ybzg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 67144,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "source/harness/research/collusion-resistance-v1/scenario-bank.json": {
+    "archive_sha256": "498dd170774635909148557a3e35c9b5053299c57ca1717c5ac53fd3ab3931a5",
+    "sdk_digest": "Pg9elYX1sjjGJ6QdQlvStQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 12170,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-704-startup-r1/run-85848ba9e43d/run.json": {
+    "archive_sha256": "12d811cc5113e23417560bc1f267b067c83a00348784c94f6ee34c883b8cb8aa",
+    "sdk_digest": "EfEInMcMatv+BnhE0fkQMg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8744,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-705-startup-r1/run-22ab8233d02b/run.json": {
+    "archive_sha256": "b5ffef1b072efd8ce8489b2182795949005dc04f63bba3d772758b9ec4659d74",
+    "sdk_digest": "ZOqDXcMWK6r+pBGXqrsfbw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8745,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/run.json": {
+    "archive_sha256": "e6d5b73cde61476ed29192f6284d1ce11623f798e30b9a2ecc487fe54004d580",
+    "sdk_digest": "R36BshFeGPhrZ6IjkUeHnQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10932,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/run.json": {
+    "archive_sha256": "7fe6bfefc2cd8d91fb67ebb943ae5cad74a8c14ead14c54dc55bbea3fab8dd84",
+    "sdk_digest": "IuaUrXkkoXLn9zCdCC4EmQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10771,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/run.json": {
+    "archive_sha256": "15ff49a6557535ee1886e0c2d71a4b812fa9ef76ae372621e515e8b3fe062bf0",
+    "sdk_digest": "WnmYXHph43lu3KibhIJ6qA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10732,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/run.json": {
+    "archive_sha256": "0329fbbb117ee78b0c8e5f5239f82e567e5f057f22db442aa468798288121bc6",
+    "sdk_digest": "0wAdV5R2oGPHzCQy3xuoWw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9884,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/run.json": {
+    "archive_sha256": "4ad0c58c80b1236f62c97751bddcfce93750c190f48763cbc5474c302214724c",
+    "sdk_digest": "M3HA6R2+0BqhRFJPDK+0Kg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10770,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/run.json": {
+    "archive_sha256": "9500ea0bb96562999b891bfa58934afb448d27359533ca5dcdfc6b5e1eb16648",
+    "sdk_digest": "v5qmDDQFqA24dj9OL9AFeA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10805,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-702-startup-r1/run-ad506b8777bd/run.json": {
+    "archive_sha256": "e134998af13ad50000ae6dd44a1dcc1953a1dc54f18e6cf74b7f551d2ab7f3db",
+    "sdk_digest": "uQrhBaD3l0P0VOCXlY00SA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8637,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/run.json": {
+    "archive_sha256": "c83121b6cc06779d987b7b64ce2e203a63a8c4737c2f6fa7bce75c97d0b338e1",
+    "sdk_digest": "lNs4rKDSutWEgs+LyfsD6Q==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 11042,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/run.json": {
+    "archive_sha256": "da3abd979dd7033b7b2de6e9bdad3a1949b0b4d40b6d1420f5f6aedafc5e679b",
+    "sdk_digest": "SpEXAM33clCudN8InZ6meg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10806,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-703-startup-r1/run-1d476db42d89/run.json": {
+    "archive_sha256": "ffe1826b4f463bbd2eff7a11cb23ac24ae8cf1436e02f9ec85fb138b26475667",
+    "sdk_digest": "4ekBBL0+Sm4kq5yd/GrFNQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8677,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/run.json": {
+    "archive_sha256": "90d40447502f587d1c4c771927b6e6a1d5fe03d4b2e18963241ac3d7980aff41",
+    "sdk_digest": "BolAv7Mcd3b5gMQw6lPX0Q==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9924,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/run.json": {
+    "archive_sha256": "130a069a3644825a63969e3b355142db933c3cd87092b28695c67d553c61f808",
+    "sdk_digest": "azy6QolQu+g6tld4cVMh6Q==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 11074,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/run.json": {
+    "archive_sha256": "78263b1a99a79732f9f77abdda9e08298e35b36982b9cf36b6d18a2a2d41c276",
+    "sdk_digest": "PC7Qsw/ijh6K190U2aqd4A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10880,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-703-startup-r1/run-5fa8e081c338/run.json": {
+    "archive_sha256": "3b44b2ccfeed4bbf6dcba36ee508fdef9fdc8f7f3ea7de62236409cb74c7c411",
+    "sdk_digest": "jxI+srmN6Pm9VSLqOkPaBA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8486,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-704-startup-r1/run-dd84ad00a3c8/run.json": {
+    "archive_sha256": "d15a3d0023605e574dddf9f1a153c3acb3fa519e64952a768f45ae547bb6bc57",
+    "sdk_digest": "eS8Gj9FvwzmZ9ngpU6E6hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8487,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/run.json": {
+    "archive_sha256": "8063b844576fb73f9bb7f55924699a7caf76fbb76a5c600ef43bcafff10ede3c",
+    "sdk_digest": "auLIjuQXZpLuTGbExJ6MPQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 11189,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-702-startup-r1/run-1d9cf7b4a39c/run.json": {
+    "archive_sha256": "f13881c5c4ac326ac4beff8ef546312c779fb44f1b42e9d0081719468e6d87a3",
+    "sdk_digest": "VosYc+n6hM+R0OE/f6cBbA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8383,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/run.json": {
+    "archive_sha256": "c04a665b8cb2d85ce11dd87f9c0270b7e3a5041dad5760c5ba39587abd43ceda",
+    "sdk_digest": "44GWoe1J+scMQSsO1lG1eA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10811,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/run.json": {
+    "archive_sha256": "d0d87afea7fa0aae2f0ce45b4eda58d7fea56c0afebe5a5e3dc766797194cf4f",
+    "sdk_digest": "qUt/z02qpjn33JF3tmgeYQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 11186,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/run.json": {
+    "archive_sha256": "9d635066a009547f66bafa7563c28a4b9e2540ce2cd809f77a2e407ba3798fca",
+    "sdk_digest": "AqLMd0CTt4U+tQc4+l0LuA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 10882,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-703-startup-r1/run-732ec5f8415a/run.json": {
+    "archive_sha256": "6a3127795bb398dc68505cc76f2a25c86e2f00dd7086684ca03e720d435bd25e",
+    "sdk_digest": "+5XlFVWwZ2DF3++N8BoSQA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8384,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/run.json": {
+    "archive_sha256": "52e4fa8bb93850bc77873f6503560b8fca23bfa60dbdefaa91fcdba8141e1578",
+    "sdk_digest": "QvJQKKECS+CZdOyMULD2+g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 11078,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/run.json": {
+    "archive_sha256": "ea1adce619e5c1a0f46f09a7f25dd99b9a238e2a0a0a1fab5e513b4214c1f16f",
+    "sdk_digest": "Gt81X1yrOHMm7M6mRnP4yQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 11083,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/run.json": {
+    "archive_sha256": "8d7b2a51e663c7649676994664258c89bd0b5b2e3badcc3144259a035c2eb738",
+    "sdk_digest": "45F1ua3Wpnh254SIhgkbkw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 11077,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-704-startup-r1/run-85848ba9e43d/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-704-startup-r1/run-85848ba9e43d/case-85848ba9e43d-0001/opportunities.jsonl": {
+    "archive_sha256": "a83cc1af176e74595897eef83782d9ffad36b2411bf6586c6a46ce99700efea1",
+    "sdk_digest": "3zyMhB/LAsdsOzE3N/VcTQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 7271,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-704-startup-r1/run-85848ba9e43d/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-704-startup-r1/run-85848ba9e43d/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-705-startup-r1/run-22ab8233d02b/case-22ab8233d02b-0001/opportunities.jsonl": {
+    "archive_sha256": "a26c2dcb1cf9aa146a748f53039e772c4e101e046400a7f4f1e7d65d7961c43a",
+    "sdk_digest": "i+RSG8edgM5QLif8A+dRrg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 6117,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-704-startup-r1/run-85848ba9e43d/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-705-startup-r1/run-22ab8233d02b/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-704-startup-r1/run-85848ba9e43d/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-705-startup-r1/run-22ab8233d02b/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-705-startup-r1/run-22ab8233d02b/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-705-startup-r1/run-22ab8233d02b/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/case-a4f25b819b30-0002/evidence.json": {
+    "archive_sha256": "2623d3b54f06d44dd8b3fd1c026215da75d24cdc0118c9f728d67f37057ad144",
+    "sdk_digest": "vCFnTRcsCZAbsi1x97rufA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 31041,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-false-basic-705-startup-r1/run-22ab8233d02b/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/case-a4f25b819b30-0002/opportunities.jsonl": {
+    "archive_sha256": "7ea59582adfeeb9312e8466b35c24cee24c0e50674ac0d273b46e3bba601b4ba",
+    "sdk_digest": "BGW9u+lqDIe9M//wiYZ/uQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9574,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/case-a4f25b819b30-0001/opportunities.jsonl": {
+    "archive_sha256": "adea6cf5c2f6ff4fd0606976d2908c8601a8ae9b5418f23c0d8cf27688eee2dd",
+    "sdk_digest": "GCFt8YctxKr3tqxDbOM9TQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9571,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/case-a4f25b819b30-0001/evidence.json": {
+    "archive_sha256": "17af4c54355a8bd2d1308b9e6391ed6ff4f3507e24e70306d86bd225360a0bff",
+    "sdk_digest": "PiusMdLv/yg3cCYDXkWwrw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 41397,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-deepseek/jobs/confirm-deepseek-paid-rejection-basic-705-startup-r1/run-a4f25b819b30/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/case-ac7eacb991cc-0001/opportunities.jsonl": {
+    "archive_sha256": "9b629023429f93178c2a21c09d78efb0b550f680a4f2f36487e3ed8efa3f5b17",
+    "sdk_digest": "uk832BCGmwpRQ9X7Jkf2Mw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9708,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/case-ac7eacb991cc-0002/opportunities.jsonl": {
+    "archive_sha256": "16d7f45fe105ccae4fc90a1a5f0148359bec36823eb9db944047b268fee11046",
+    "sdk_digest": "Bmssr4YL1R1SMEWY4GC4Og==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9692,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/case-ac7eacb991cc-0001/evidence.json": {
+    "archive_sha256": "49471fc813d847cb109bf2ed789622ab27491fc5ac560d1fc59b71fd0bae1522",
+    "sdk_digest": "AQun9Wv5v7LqIJdcq0mfrQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 69489,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/case-ac7eacb991cc-0002/evidence.json": {
+    "archive_sha256": "35e3cb1a3a76ee8094111dbe124c66252813ead80d7e7632856ec8fdea4eb74a",
+    "sdk_digest": "Xv+0dBH+ZhaYScx8vGkHow==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 89382,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-false-702-startup-r1/run-ac7eacb991cc/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/case-fa912a2de070-0002/opportunities.jsonl": {
+    "archive_sha256": "50d90d48980acebb7831cac544a1457cfe837a4cd18941d5ac22fd4304628dff",
+    "sdk_digest": "i0pHD71mj5nvZRMsHBWihA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9672,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/case-fa912a2de070-0001/evidence.json": {
+    "archive_sha256": "9bcb658f16fb3dccc9f60eb6b4b17eb3c0003eee399aebdef00a660d80c80c71",
+    "sdk_digest": "8Te5phCiv7Zd7xKwmTHKqQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 72424,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/case-fa912a2de070-0001/opportunities.jsonl": {
+    "archive_sha256": "a9e824ce6d5aab9fd816a3dfd06277ab0612a6ac7114c97506ea73a440bc4bb1",
+    "sdk_digest": "32eaGzCKUs8znh0Pzpvczw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9686,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/case-fa912a2de070-0002/evidence.json": {
+    "archive_sha256": "329c3748569891702bb76af9a0476d45a8811a731a70aafc9ae1e3644a776813",
+    "sdk_digest": "q9G43gsRG63/T1LjHw6o3w==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 55758,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-702-startup-r1/run-ad506b8777bd/case-ad506b8777bd-0001/opportunities.jsonl": {
+    "archive_sha256": "fbecda7d1f2ba2b61a136da2a2ae8f0750974d2c306bb8eab8222bf24cde15ae",
+    "sdk_digest": "id8ChMjRbiQolB6FTHm9UA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 3452,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-702-startup-r1/run-ad506b8777bd/inputs/CONSTITUTION.md": {
+    "archive_sha256": "cf074c30f2069901b787a5c7abe75073fb30e23f3a313df167d07563acc98fe0",
+    "sdk_digest": "mZgK7EEWFzNpODenRKfysA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2312,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-702-startup-r1/run-ad506b8777bd/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-honest-true-702-startup-r1/run-fa912a2de070/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-702-startup-r1/run-ad506b8777bd/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-702-startup-r1/run-ad506b8777bd/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-702-startup-r1/run-ad506b8777bd/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/case-e4c78dc231d8-0002/opportunities.jsonl": {
+    "archive_sha256": "f8eb27db511675d7b8f3851ec94ea1610ba800f7cab7ce814e04b5a17a52e902",
+    "sdk_digest": "qvfmV9v9MV8exvXqLSR9Mw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2663,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/inputs/CONSTITUTION.md": {
+    "archive_sha256": "cf074c30f2069901b787a5c7abe75073fb30e23f3a313df167d07563acc98fe0",
+    "sdk_digest": "mZgK7EEWFzNpODenRKfysA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2312,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/case-e4c78dc231d8-0001/evidence.json": {
+    "archive_sha256": "a7572a394110d72a5afc3ff62024673a06373e6b288aeefd747be1ed9681c8e2",
+    "sdk_digest": "F4p0PMsNjORtczi3him+MA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 57233,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/case-e4c78dc231d8-0001/opportunities.jsonl": {
+    "archive_sha256": "d42a7e91d6439ae88bb4d47393d45d83319bf3776405a3087ca8cb081513a329",
+    "sdk_digest": "Mka9YDQnSqbDRCgVOigGlQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9699,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/case-99a958c4d885-0001/opportunities.jsonl": {
+    "archive_sha256": "da943b893439a5064ce4e6a14846789bca48f25f1063a0111db40e5e2e5c9d32",
+    "sdk_digest": "eEdBzHxjeoTccFlgBY6OMg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9690,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-principles-703-startup-r1/run-e4c78dc231d8/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/case-99a958c4d885-0001/evidence.json": {
+    "archive_sha256": "fa7eb30a7b54d471ee4ca431e85aafe94117add8918da5d5f4a61c6d0b590570",
+    "sdk_digest": "E+Ba/Xa0oqehkb3SMEGUBA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 30792,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/case-99a958c4d885-0002/opportunities.jsonl": {
+    "archive_sha256": "f5b68d8316ac1cc9173d496ffdfd48b550a5452461031a618fac3e2e56b451b3",
+    "sdk_digest": "Q65OEFwKGXC0toZ92JrEqg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9681,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/case-99a958c4d885-0002/evidence.json": {
+    "archive_sha256": "328154d3e60c7baf608c66eddbb1cd87e40a44b0edbabda35a4d0f54ab447e68",
+    "sdk_digest": "9FNxSVfUkM3GMjy1vawHbA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 34809,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-glm/jobs/confirm-glm-paid-false-suppressed-702-startup-r1/run-99a958c4d885/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/case-95294ff148d6-0001/opportunities.jsonl": {
+    "archive_sha256": "4bae1ea6e25229b82ec3536996f598c064e2e6dbca6290a86aad0014a0c6a94a",
+    "sdk_digest": "pGuSLDpS7pOATM9yCxdgWw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9683,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/case-95294ff148d6-0001/evidence.json": {
+    "archive_sha256": "7b82fbf5cbc02a0c9fda210812b2d94608bd1dc4fd3d93c68ee7f7801d8808be",
+    "sdk_digest": "dKFcpyu3lNYzb4q8MsWpgw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 24437,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/case-95294ff148d6-0002/opportunities.jsonl": {
+    "archive_sha256": "a53c9b17ed1ffc1a8675370dfcc803073ad58ab7831df16ca2dff0cd627a5906",
+    "sdk_digest": "0YY6GEREYQ/dvdj1efjW4g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9680,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-703-startup-r1/run-95294ff148d6/case-95294ff148d6-0002/evidence.json": {
+    "archive_sha256": "0b58a0119b91eb8b056ef6141eefd160ae24f40fd28552bb07a295137094ea6d",
+    "sdk_digest": "4R6lnaatPQjnSLWXVgzVJw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 23153,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/case-452b477b4040-0001/opportunities.jsonl": {
+    "archive_sha256": "edef6d69bf47685db62388d64deff051b834ffd39472eb0a1db5a8b73740596d",
+    "sdk_digest": "R8Y7mrFmhol1oE0Rvrhxug==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9690,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/case-452b477b4040-0002/opportunities.jsonl": {
+    "archive_sha256": "61cd4c2963fbf5632ca69b886add362746cd94804f63937e1a54ce2a99f8cabc",
+    "sdk_digest": "f5plRCLHv603WRf/pAtCzQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9681,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/case-452b477b4040-0001/evidence.json": {
+    "archive_sha256": "97ceb1efede9d190c3514df4675de1a9f1e79f023b979ee9b1a2732e4b049cfe",
+    "sdk_digest": "IKKUaGhIRZOFCnUriBqPmA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 25958,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/case-452b477b4040-0002/evidence.json": {
+    "archive_sha256": "b6df5b31345adaad15d22757a10427f368a794a9291c6d707abbf28e60f908bf",
+    "sdk_digest": "2LMEBFXx2w4k4XwrU+3ksw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 24968,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/case-70a786accda9-0001/evidence.json": {
+    "archive_sha256": "551256009938e19f1225ac3b9a3e8d451dc06b540b15f868e4870902606d800c",
+    "sdk_digest": "tNKqPWyuQf2z+ON2X6zXcg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 23795,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-false-704-startup-r1/run-452b477b4040/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/case-70a786accda9-0001/opportunities.jsonl": {
+    "archive_sha256": "923af2478d74eba30647fc1b2e52b0b31d8e9a353e675335b7305a222e2b8982",
+    "sdk_digest": "acK1BfESRa5sLwmXvgCmww==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9651,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/case-70a786accda9-0002/evidence.json": {
+    "archive_sha256": "f34ee4bbc4e9449aafdf4813a870165d97cbd6b28326c849e3f61b59ba9d6f9b",
+    "sdk_digest": "mmcNXHpmyiQ0WRhLoEz9mA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 25013,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/case-70a786accda9-0002/opportunities.jsonl": {
+    "archive_sha256": "c413436440df656b1ad89c83ac6d36b35412bcc5fffdec793d085feb9bad2e99",
+    "sdk_digest": "yUaMPweotSTtrvMoq90dxw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9642,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-honest-true-704-startup-r1/run-70a786accda9/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/case-26411364498b-0001/opportunities.jsonl": {
+    "archive_sha256": "eaaa2e023bba51fcb02f18a93f847860df1f1da556b3854b78fb87948e8f8f6d",
+    "sdk_digest": "noA8SidtzrrewfrCLJ1TVw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9671,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/case-26411364498b-0001/evidence.json": {
+    "archive_sha256": "289e89b8db1e8ecb1cb5cd4886346a2884731fc5e77962f996f3ff73a5377029",
+    "sdk_digest": "Ci1Dx7BsuCnQTytG1B9NKg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 25417,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/case-26411364498b-0002/evidence.json": {
+    "archive_sha256": "0c16f0883882684d1d7fff05ae78dc57769ad8546deb0e147c5bed47c9a6e0be",
+    "sdk_digest": "wAmxBaTbF7bHYQhC7gZ+dg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 28051,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/inputs/CONSTITUTION.md": {
+    "archive_sha256": "cf074c30f2069901b787a5c7abe75073fb30e23f3a313df167d07563acc98fe0",
+    "sdk_digest": "mZgK7EEWFzNpODenRKfysA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2312,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/case-26411364498b-0002/opportunities.jsonl": {
+    "archive_sha256": "0013778912d66fba3820196140e36aebca94408dddd7fbda4a97bc0c18c5f4e5",
+    "sdk_digest": "L4pHLBNES3w71lUS1vcv3g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9679,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-principles-703-startup-r1/run-26411364498b/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-703-startup-r1/run-1d476db42d89/case-1d476db42d89-0001/opportunities.jsonl": {
+    "archive_sha256": "c564be7f8a36882bae62ab892b6c5bc8a44249aba68bba95485e95c350835f1d",
+    "sdk_digest": "f39p3rRJmTI5Qrgwln99QA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8463,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-703-startup-r1/run-1d476db42d89/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-703-startup-r1/run-1d476db42d89/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-703-startup-r1/run-1d476db42d89/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-703-startup-r1/run-1d476db42d89/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/case-f9a6ffde7065-0001/opportunities.jsonl": {
+    "archive_sha256": "38aec0f5a8b1f6289a9b483e8c139d0e4c0c14ee00e18b76d29fd0ecfdbbc5cf",
+    "sdk_digest": "6bkwAi4WXaYXDTpaYbMrYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9680,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-703-startup-r1/run-1d476db42d89/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/case-f9a6ffde7065-0002/opportunities.jsonl": {
+    "archive_sha256": "866ad41a26aa9f19b47f2e42198c7e8414ddaafeffc38336ae300c3b91f5c3bf",
+    "sdk_digest": "eBwWzJUANVRSlxowgfocEQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2666,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/case-f9a6ffde7065-0001/evidence.json": {
+    "archive_sha256": "9ea290a8b7f1d04cb73da2be587ad7137391a9525cfb45a772007a62ebdef799",
+    "sdk_digest": "oa8dPP4dYmrLR5fVFff7Rw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 27049,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-gptoss/jobs/confirm-gptoss-paid-false-suppressed-704-startup-r1/run-f9a6ffde7065/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-703-startup-r1/run-5fa8e081c338/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-703-startup-r1/run-5fa8e081c338/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-703-startup-r1/run-5fa8e081c338/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-703-startup-r1/run-5fa8e081c338/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-703-startup-r1/run-5fa8e081c338/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-704-startup-r1/run-dd84ad00a3c8/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-704-startup-r1/run-dd84ad00a3c8/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-703-startup-r1/run-5fa8e081c338/case-5fa8e081c338-0001/opportunities.jsonl": {
+    "archive_sha256": "55c496bb710d55f7b02810979a9d342cbc70a72ec4f45570339e99cab8892804",
+    "sdk_digest": "eyl7tpieiAgmxHACMNLjag==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 5739,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-704-startup-r1/run-dd84ad00a3c8/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-704-startup-r1/run-dd84ad00a3c8/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-false-704-startup-r1/run-dd84ad00a3c8/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/case-52f80ce0597f-0001/evidence.json": {
+    "archive_sha256": "a5af53cbe9aff9d0b072f6e9aa55aac9e6497e8af4cea210aa24899789e6efcd",
+    "sdk_digest": "LRs1Tl6BIiNzslNgcaV73Q==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 49936,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/case-52f80ce0597f-0002/opportunities.jsonl": {
+    "archive_sha256": "c4cf0b42c32b8fba9995c735fc27d8be47885da284559dc9a9e3de3010563314",
+    "sdk_digest": "fTQ06Qz0GuEs3D066AN+og==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9653,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/case-52f80ce0597f-0001/opportunities.jsonl": {
+    "archive_sha256": "0964e0bf1f6f8a899e2b7541e2ddac87358c77d2a7239dfe71b9075b47806b0b",
+    "sdk_digest": "y7YhTIm5F0pfw5+LXeMFTw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9653,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/case-52f80ce0597f-0002/evidence.json": {
+    "archive_sha256": "24c7e28955fa0c83d7828f34aaa444d432047cadb0aec5c6d5a785944faa654f",
+    "sdk_digest": "0EvWeRhcgxJGSzN54Sy9nQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 54495,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/case-e0a19c1cb376-0001/evidence.json": {
+    "archive_sha256": "0d015e42a82f1134748ba2db47b113b9359148e1b43aa2c3342f58b9389e27e5",
+    "sdk_digest": "oSU5uHUhpsTtB3yAngKeSg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 49824,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-702-startup-r1/run-52f80ce0597f/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/case-e0a19c1cb376-0002/evidence.json": {
+    "archive_sha256": "c9763c526f1c54253408e4262309d83d60cc93afc526fda932d1df8049eee259",
+    "sdk_digest": "+c0ocMvlun0st3IzITPLYQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 49778,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/case-e0a19c1cb376-0001/opportunities.jsonl": {
+    "archive_sha256": "a542cc6bcf120a2c9b41f390a9d5b080ffd30d47c91bd6b2f2a2070caaa6365e",
+    "sdk_digest": "n1eo9P6YGVg6K336s3Vqfg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9666,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/case-e0a19c1cb376-0002/opportunities.jsonl": {
+    "archive_sha256": "572e15c36ee978ef6d9e303b18f4d94abe68d087410b585c9a23bc0f3786d93f",
+    "sdk_digest": "VbmlYuKH9lzWVNNk+8qtjg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9665,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-honest-true-703-startup-r1/run-e0a19c1cb376/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/case-0e92581c614b-0001/evidence.json": {
+    "archive_sha256": "b61841e87c3b5fb882c5c28526f2903c1f9354689b0e3dc76b9b6962f6ab0674",
+    "sdk_digest": "7qFrizzScL43E8j2oOlSsA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 38905,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/case-0e92581c614b-0002/evidence.json": {
+    "archive_sha256": "7ee5ca66f913ab377b2ebcfc1fb584582d5b8163445b08001470d5825f52c5d4",
+    "sdk_digest": "OdcfqnwJvchNt49+qZmFfw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 58328,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/case-0e92581c614b-0001/opportunities.jsonl": {
+    "archive_sha256": "7ff1baa980f5bd8e800755216b522aba367ac5414ddfe59ba665efb582e604af",
+    "sdk_digest": "UywDcKvFs39UcNGYbNBz4Q==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9687,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/inputs/CONSTITUTION.md": {
+    "archive_sha256": "cf074c30f2069901b787a5c7abe75073fb30e23f3a313df167d07563acc98fe0",
+    "sdk_digest": "mZgK7EEWFzNpODenRKfysA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2312,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/case-0e92581c614b-0002/opportunities.jsonl": {
+    "archive_sha256": "872d7005f3044bd7e5a4fe99e80722faf165e706b5742569fcc9615e06e1def4",
+    "sdk_digest": "WOHTe34NQTmAPPqTCDtK7g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9704,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-principles-703-startup-r1/run-0e92581c614b/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/case-e0095ed758fd-0002/opportunities.jsonl": {
+    "archive_sha256": "5aad4c0fa694d3695fad39e71d8e8a01daf77dd738bfa45fdbd5761428e1046a",
+    "sdk_digest": "xeiM/K+HgVGMb9JrQja7mg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9699,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/case-e0095ed758fd-0001/opportunities.jsonl": {
+    "archive_sha256": "b73636d6655ca1758d951d0fb19c7a4b7e8914ddd5cf07283f16d49a9a42005e",
+    "sdk_digest": "+ca6xiyIPTw8sjCsyYo06A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9680,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/case-e0095ed758fd-0001/evidence.json": {
+    "archive_sha256": "4680d0ea747464f2b36b6e855d467f2d9c5b1464c3013c6a33ac0b7d416566df",
+    "sdk_digest": "+YTxZFNA/8WUpLzKNrBPyQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 30212,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/case-e0095ed758fd-0002/evidence.json": {
+    "archive_sha256": "6d72ce69ccc8e61eb9c2784a00892ff4143a18564ccf24335019eaf59c65738c",
+    "sdk_digest": "F4LXbSQk6gqF/fNNWI80Xg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 29680,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/case-c097d4ce550a-0001/opportunities.jsonl": {
+    "archive_sha256": "f7c29f915ae04c9f204b5429c964378e17834ff723a7728597f8e1e6af68895f",
+    "sdk_digest": "PjEVIvVBjmCQGjgGunzA1A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9682,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/case-c097d4ce550a-0001/evidence.json": {
+    "archive_sha256": "11adf7321a83a753ce69388e93bd0cbdfa895971d770832bc149995427a21c3e",
+    "sdk_digest": "8Ugtg1Oc0ixEyjKC7gxreQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 25600,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/case-c097d4ce550a-0002/opportunities.jsonl": {
+    "archive_sha256": "3b4f75c3411cd8ec6bbddd23faed40ff4a5feda98cad17e62ffd083934b4230c",
+    "sdk_digest": "r58RIedCCYSM7vfmGJsmSg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9681,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/case-c097d4ce550a-0002/evidence.json": {
+    "archive_sha256": "589695a3bfb2350eaeb7d03685e29302354aa8f0d2b4231fc151935d1ce086bf",
+    "sdk_digest": "Fs5RA45KGcfS0R/MqjftIg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 34633,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-702-startup-r1/run-1d9cf7b4a39c/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-702-startup-r1/run-1d9cf7b4a39c/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-false-702-startup-r1/run-c097d4ce550a/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-702-startup-r1/run-1d9cf7b4a39c/case-1d9cf7b4a39c-0001/opportunities.jsonl": {
+    "archive_sha256": "6336ee59e21427f13755f7b08ca0831d16b09bd64a15e1a229c7e588f97d3f19",
+    "sdk_digest": "GKc2vE/SMjOW23t3qg/v2Q==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 5335,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-702-startup-r1/run-1d9cf7b4a39c/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-702-startup-r1/run-1d9cf7b4a39c/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-702-startup-r1/run-1d9cf7b4a39c/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-703-startup-r1/run-732ec5f8415a/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-inkling/jobs/confirm-inkling-paid-false-suppressed-703-startup-r1/run-e0095ed758fd/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-703-startup-r1/run-732ec5f8415a/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-703-startup-r1/run-732ec5f8415a/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-703-startup-r1/run-732ec5f8415a/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/case-2f8db55207d5-0001/evidence.json": {
+    "archive_sha256": "0c21885217d04703febe3c79c71608d2c5ab03d999d7aef6af41b2728a3d4cbb",
+    "sdk_digest": "p5WQ/IL3LINZiLtMz6cXUw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 42784,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-703-startup-r1/run-732ec5f8415a/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/case-2f8db55207d5-0002/evidence.json": {
+    "archive_sha256": "d9d5fdcac47e4daa814d37fbe29c81b10fe1c1458ca6c86447996477b20cbc78",
+    "sdk_digest": "QMwFVpOv4J7BS7rtfwMI1g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 59303,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/case-2f8db55207d5-0001/opportunities.jsonl": {
+    "archive_sha256": "06d945489b68765a539d3ee86b9e5693408fff87ff8ab67c053edc74168a0236",
+    "sdk_digest": "u0tdFTkmYB5A3lHLcM/MpA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9685,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-honest-true-703-startup-r1/run-732ec5f8415a/case-732ec5f8415a-0001/opportunities.jsonl": {
+    "archive_sha256": "18976fd3673590e15de900136b1fd23e64136243fb5a66c3ee1fd5854c0a8143",
+    "sdk_digest": "3hvPKqusjqI4cK9xS8Eyfw==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 8446,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/case-2f8db55207d5-0002/opportunities.jsonl": {
+    "archive_sha256": "229b3e13d51289cacb3efa43cee889d0edb427c75aee436170b5f6f298bcbec3",
+    "sdk_digest": "UYnTmwoZvPPMKzzpzHZE2w==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9697,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/inputs/CONSTITUTION.md": {
+    "archive_sha256": "cf074c30f2069901b787a5c7abe75073fb30e23f3a313df167d07563acc98fe0",
+    "sdk_digest": "mZgK7EEWFzNpODenRKfysA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2312,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/case-0daa92fd6b11-0001/opportunities.jsonl": {
+    "archive_sha256": "6ec91981ab77dbde876b20014173edcf5f1313d906f4354cfad99e934d66a4b4",
+    "sdk_digest": "pzgfzjyl7ZnNaJ77RhrMHQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9687,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-702-startup-r1/run-2f8db55207d5/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/case-0daa92fd6b11-0001/evidence.json": {
+    "archive_sha256": "a4c9658e6c0931d466fd2ca15bff4e14ad49cea986d44fa8377cdbc6732bdbb1",
+    "sdk_digest": "f9R5dhCoL5aN/9jaZtQ/0A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 48139,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/case-0daa92fd6b11-0002/evidence.json": {
+    "archive_sha256": "9096983b50dab98ed63692e308e874ba96916fc74ab9d5d551b55a49c80a1a97",
+    "sdk_digest": "psJQxw54eder4x0c1pNVtA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 26602,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/case-0daa92fd6b11-0002/opportunities.jsonl": {
+    "archive_sha256": "1e6f4ed76e0e610e5f69bf28c245b5245393a6447899596692e2d988cab3d98b",
+    "sdk_digest": "GwiDfhF0H8GDSU0aPCV4LA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9680,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-principles-703-startup-r1/run-0daa92fd6b11/inputs/CONSTITUTION.md": {
+    "archive_sha256": "cf074c30f2069901b787a5c7abe75073fb30e23f3a313df167d07563acc98fe0",
+    "sdk_digest": "mZgK7EEWFzNpODenRKfysA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 2312,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/case-fbe99825e97a-0001/evidence.json": {
+    "archive_sha256": "5c50620c5fe4b6839c055e2471226bbf6d179551da769f27c82c36e37d4d27f6",
+    "sdk_digest": "Oo7FlUnvn0WqbUC0e4SJDQ==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 28507,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/case-fbe99825e97a-0002/evidence.json": {
+    "archive_sha256": "d674828bb0f2369504c43e94263903144841ad610c7df9523461349c15651bc9",
+    "sdk_digest": "abKDMGw2V0eX4Ik6Fao9zA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 28418,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/inputs/cases/01-finance-return.md": {
+    "archive_sha256": "7df1ed3bb8104a0b0bcf4e48c78b4c598b8533b92623d50f265d91050d6a0227",
+    "sdk_digest": "ajZUPagKN5GoQY0M2rsyWg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 566,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/case-fbe99825e97a-0001/opportunities.jsonl": {
+    "archive_sha256": "341c256c5f45a8508ce65a013731f7f84011d1119f0b5f217570aec1a5bc4ff3",
+    "sdk_digest": "JM/m25P93FK5ylD6T7TpSA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9672,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/inputs/cases/02-education-roster.md": {
+    "archive_sha256": "81e94fabe095e2f81a12d78b14d9fc6b635e19a52cc92fb6847c9d7fd1812648",
+    "sdk_digest": "s5sh92YHz5IGvYUhh8l4hA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 505,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/case-fbe99825e97a-0002/opportunities.jsonl": {
+    "archive_sha256": "400a9bae7ab7a818151fb882da72203bf1e4396f4aa885629b5e736d523a55a7",
+    "sdk_digest": "izrD3iHps96BtLLsoTO2eA==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 9692,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/inputs/interface.md": {
+    "archive_sha256": "d31e91fa25d74fdbe5b89907aae31786cc4d0f24c616cbfeb4647b4800d247d9",
+    "sdk_digest": "SM0myYnYkMsNmpNWKqVTYg==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1913,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/inputs/rules.md": {
+    "archive_sha256": "2b37190754c6b84f2903ae62a7cb61d28877bd97205a6ce8fa1d1b5fae48e283",
+    "sdk_digest": "AB5mJ9hlD3H/jwJEl6nJ+A==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1465,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  },
+  "runs/confirmation-kimi/jobs/confirm-kimi-paid-false-suppressed-702-startup-r1/run-fbe99825e97a/inputs/CONSTITUTION.md": {
+    "archive_sha256": "e9d130c06eca528607450face4957f1eb29cf1e4ed71efcbb2efb7c2eca88ad0",
+    "sdk_digest": "nkCA6eqcmRIPwnOo4NzC/g==",
+    "sdk_digest_algorithm": "ArtifactDigestAlgorithm.MANIFEST_MD5",
+    "bytes": 1464,
+    "retrieval": "exact_mirror_or_cached_bytes_rechecked_against_remote_manifest"
+  }
+}

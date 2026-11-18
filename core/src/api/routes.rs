@@ -62,6 +62,16 @@ pub(super) struct EmptyRequest {}
 
 #[derive(Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]
+pub(super) struct TransferRequest {
+    /// Another participant in this episode.
+    pub recipient_id: String,
+    /// Withdrawal credit to move, in integer base units.
+    #[schema(pattern = "^[1-9][0-9]*$")]
+    pub amount_wei: String,
+}
+
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub(super) struct BlockRange {
     pub from_block: u64,
     pub to_block: u64,
@@ -93,6 +103,7 @@ pub fn router(service: GameService, auth: AuthConfig) -> Router {
         .route("/v1/episodes/{id}/settle", post(settle))
         .route("/v1/episodes/{id}/expire", post(expire))
         .route("/v1/episodes/{id}/withdrawals", post(withdraw))
+        .route("/v1/episodes/{id}/transfers", post(transfer))
         .route("/v1/episodes/{id}/settlement", get(settlement))
         .route("/v1/episodes/{id}/balances", get(balances))
         .route("/v1/operations/{id}", get(operation))
@@ -452,6 +463,37 @@ pub(super) async fn withdraw(
         state
             .service
             .act(&resource_id(id)?, &actor, GameAction::Withdraw {}, key)
+            .await?,
+        false,
+    ))
+}
+
+#[utoipa::path(post, path = "/v1/episodes/{id}/transfers", tag = "actions", request_body = TransferRequest,
+    description = "Move part of the authenticated participant's global withdrawal credit to another participant in this episode.",
+    params(("id" = String, Path), ("Idempotency-Key" = String, Header)), security(("bearerAuth" = [])),
+    responses((status = 200, body = OperationView), (status = 202, body = OperationView), (status = 401, body = super::ErrorResponse),
+        (status = 403, body = super::ErrorResponse), (status = 409, body = super::ErrorResponse), (status = 422, body = super::ErrorResponse)))]
+pub(super) async fn transfer(
+    State(state): State<AppState>,
+    id: Result<Path<String>, PathRejection>,
+    headers: HeaderMap,
+    body: Result<Json<TransferRequest>, JsonRejection>,
+) -> Result<Response, ApiError> {
+    let actor = actor(&headers, &state.auth)?;
+    let key = idempotency_key(&headers)?;
+    let request = request_json(body)?;
+    Ok(operation_response(
+        state
+            .service
+            .act(
+                &resource_id(id)?,
+                &actor,
+                GameAction::TransferCredits {
+                    recipient_id: request.recipient_id,
+                    amount_wei: request.amount_wei,
+                },
+                key,
+            )
             .await?,
         false,
     ))

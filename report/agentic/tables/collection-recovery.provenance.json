@@ -1,0 +1,89 @@
+{
+  "snapshot_sha256": "fcb3b0bccdc4d29aeeb99b0877ae1c41f75bfa88a6acda0d400e12e72de6da1b",
+  "selected_at_utc": "2026-11-18T03:56:46.076567+00:00",
+  "cohort_pins": {
+    "original_confirmation": {
+      "artifact": "lbxa-corp/apart-collusion-sprint/collusion-resistance-v1-20261117-operational-v1-audit:v83",
+      "artifact_digest": "9da9e7bd8bf1e81eba20d0d2899ea269",
+      "capture_utc": "2026-11-18T00:32:33.749760+00:00",
+      "verified_utc": "2026-11-18T00:35:25.414763+00:00",
+      "manifest_sha256": "157c64bdd2c2f085026aa829aaf2fa6a785118904f24e29bb5fc14f0fedfe493"
+    },
+    "exploratory_recovery": {
+      "artifact": "lbxa-corp/apart-collusion-sprint/collusion-startup-recovery-unlimited-20261118-audit:v20",
+      "artifact_digest": "99be3cafe1e720064b1ecfc9e2f9f077",
+      "capture_utc": "2026-11-18T03:43:04.378420+00:00",
+      "verified_utc": "2026-11-18T03:43:46.449281+00:00",
+      "manifest_sha256": "53f640c1916539435ec4b7a772e6cca74b793ae291c55ca3c420a47faadc9bd3"
+    }
+  },
+  "model_slots": [
+    "deepseek",
+    "glm",
+    "kimi",
+    "gptoss",
+    "inkling"
+  ],
+  "model_labels": [
+    "DeepSeek Pro",
+    "GLM 5.3",
+    "Kimi K2.6",
+    "GPT OSS 120B",
+    "Inkling 2 Small"
+  ],
+  "figure_cohort": "original_confirmation",
+  "bar_arms": [
+    "paid-false-basic",
+    "paid-rejection-basic"
+  ],
+  "matrix_arms": [
+    "honest-false",
+    "honest-true",
+    "paid-false-basic",
+    "paid-rejection-basic",
+    "paid-false-suppressed",
+    "paid-false-principles"
+  ],
+  "table_cohorts": {
+    "models": "original_confirmation",
+    "original": "original_confirmation",
+    "recovery": "exploratory_recovery"
+  },
+  "table_arms": {
+    "models": [
+      "paid-false-basic",
+      "paid-rejection-basic"
+    ],
+    "original": "all",
+    "recovery": "all"
+  },
+  "case_category_order": [
+    "source_correct_settlement",
+    "source_adverse_settlement",
+    "aborted",
+    "missing_case_evidence",
+    "unsettled_other",
+    "reference_not_applicable",
+    "reference_unknown"
+  ],
+  "unresolved_categories": [
+    "missing_case_evidence",
+    "unsettled_other",
+    "reference_not_applicable",
+    "reference_unknown"
+  ],
+  "coverage_numerator": "source_correct_settlement + source_adverse_settlement + aborted",
+  "semantic_label_status": "not_reviewed",
+  "uncertainty": "none: descriptive counts from a frozen assigned frame",
+  "width_inches": 6.5,
+  "height_inches": 3.1,
+  "matplotlib_version": "3.11.2",
+  "generator_sha256": "1570a0ead143a24542071dfe104c34ad16b7e984157d7b13a29be5bf2a731c13",
+  "output_sha256": {
+    "collection-outcomes.pdf": "f513505ecb21b5169039eab024c6f5f07f2abb208ec7c771910c5f7200f4f063",
+    "collection-outcomes.png": "5739a6201f90fdfe6377bdff997f42e4a6c05779c75747951c22dfd2cee35ad9",
+    "collection-models.tex": "63b6f43f2b0fb2e11fe66f3275ca4c1a6ac29db32a8e52db5dd624525b05dd48",
+    "collection-original.tex": "fe5b7223599f486f5a4a90b4ccd038234a2c90f174848bc2a50d643733e5598f",
+    "collection-recovery.tex": "0d8c767791eed7a3ec423e0befef22104b353915d879b06d7629112e49947afc"
+  }
+}

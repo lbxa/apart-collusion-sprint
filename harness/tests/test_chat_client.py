@@ -1,6 +1,7 @@
 """Private chat uses explicit credentials and immediate, validated API responses."""
 
 import unittest
+from unittest.mock import AsyncMock, patch
 
 from aiohttp import web
 
@@ -8,17 +9,34 @@ from game_api.client import CoreClient, CoreClientError, CoreHTTPError
 
 
 def chat(**changes):
-    return {"chat_id": "chat-1", "episode_id": "episode", "participant_ids": ["alice", "bob"],
-            "history_enabled": False, "created_at_ms": 1} | changes
+    return {
+        "chat_id": "chat-1",
+        "episode_id": "episode",
+        "participant_ids": ["alice", "bob"],
+        "history_enabled": False,
+        "created_at_ms": 1,
+    } | changes
 
 
 def message(**changes):
-    return {"message_id": "message-1", "sequence": 1, "sender_id": "alice", "recipient_id": "bob",
-            "content": "  Private café e\u0301 🧪.\n", "content_hash": "0xhash", "created_at_ms": 2} | changes
+    return {
+        "message_id": "message-1",
+        "sequence": 1,
+        "sender_id": "alice",
+        "recipient_id": "bob",
+        "content": "  Private café e\u0301 🧪.\n",
+        "content_hash": "0xhash",
+        "created_at_ms": 2,
+    } | changes
 
 
 def messages(items=None, **changes):
-    return {"chat_id": "chat-1", "messages": items or [], "next_after": 0, "has_more": False} | changes
+    return {
+        "chat_id": "chat-1",
+        "messages": items or [],
+        "next_after": 0,
+        "has_more": False,
+    } | changes
 
 
 class ChatClientTests(unittest.IsolatedAsyncioTestCase):
@@ -34,9 +52,12 @@ class ChatClientTests(unittest.IsolatedAsyncioTestCase):
         site = web.TCPSite(self.runner, "127.0.0.1", 0)
         await site.start()
         self.url = f"http://127.0.0.1:{site._server.sockets[0].getsockname()[1]}"
-        self.client = CoreClient(self.url, operator_token="operator-secret",
-                                 participant_tokens={"alice": "alice-secret", "bob": "bob-secret"},
-                                 poll_interval=0.001)
+        self.client = CoreClient(
+            self.url,
+            operator_token="operator-secret",
+            participant_tokens={"alice": "alice-secret", "bob": "bob-secret"},
+            poll_interval=0.001,
+        )
         await self.client.start()
 
     async def asyncTearDown(self):
@@ -45,34 +66,49 @@ class ChatClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def serve(self, request):
         body = await request.json() if request.can_read_body else None
-        self.requests.append((request.method, request.path, dict(request.headers), body, dict(request.query)))
+        self.requests.append(
+            (request.method, request.path, dict(request.headers), body, dict(request.query))
+        )
         value, status = self.replies.pop(0) if self.replies else (self.response, self.status)
         return web.json_response(value, status=status)
 
-    async def test_create_defaults_prohibited_latest_only_and_returns_chat_without_operation_polling(self):
-        created = await self.client.create_chat("episode", ["alice", "bob"],
-                                                idempotency_key="chat-key", actor_id="alice")
+    async def test_create_defaults_prohibited_latest_only_without_operation_polling(self):
+        created = await self.client.create_chat(
+            "episode", ["alice", "bob"], idempotency_key="chat-key", actor_id="alice"
+        )
         self.assertEqual(created.chat_id, "chat-1")
         self.assertEqual(len(self.requests), 1)
         method, path, headers, body, query = self.requests[0]
         self.assertEqual((method, path), ("POST", "/v1/episodes/episode/chats"))
         self.assertEqual(headers["Authorization"], "Bearer alice-secret")
         self.assertEqual(headers["Idempotency-Key"], "chat-key")
-        self.assertEqual(body, {"participant_ids": ["alice", "bob"], "history_enabled": False,
-                                "communication_prohibited": True})
+        self.assertEqual(
+            body,
+            {
+                "participant_ids": ["alice", "bob"],
+                "history_enabled": False,
+                "communication_prohibited": True,
+            },
+        )
 
     async def test_operator_can_provision_immutable_permitted_history_control(self):
         self.response = chat(history_enabled=True)
-        created = await self.client.create_chat("episode", ["alice", "bob"], history_enabled=True,
-            communication_prohibited=False, idempotency_key="control-key")
+        created = await self.client.create_chat(
+            "episode",
+            ["alice", "bob"],
+            history_enabled=True,
+            communication_prohibited=False,
+            idempotency_key="control-key",
+        )
         self.assertTrue(created.history_enabled)
         self.assertEqual(self.requests[-1][2]["Authorization"], "Bearer operator-secret")
         self.assertFalse(self.requests[-1][3]["communication_prohibited"])
 
     async def test_send_preserves_content_and_participant_identity_without_operation_polling(self):
         self.response = message()
-        sent = await self.client.send_message("chat-1", "alice", self.response["content"],
-                                             idempotency_key="message-key")
+        sent = await self.client.send_message(
+            "chat-1", "alice", self.response["content"], idempotency_key="message-key"
+        )
         self.assertEqual(sent.content, self.response["content"])
         self.assertEqual(sent.sequence, 1)
         self.assertEqual(len(self.requests), 1)
@@ -92,7 +128,10 @@ class ChatClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.requests[-1][2]["Authorization"], "Bearer bob-secret")
 
     async def test_polling_only_reads_participant_history_and_preserves_cursor(self):
-        self.replies = [(messages(next_after=4), 200), (messages([message(sequence=5)], next_after=5), 200)]
+        self.replies = [
+            (messages(next_after=4), 200),
+            (messages([message(sequence=5)], next_after=5), 200),
+        ]
         received = await self.client.poll_messages("chat-1", "bob", after=4, timeout=1)
         self.assertEqual(received.next_after, 5)
         self.assertEqual(len(received.messages), 1)
@@ -102,7 +141,12 @@ class ChatClientTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_empty_poll_timeout_returns_latest_valid_empty_page(self):
         self.response = messages(next_after=3)
-        result = await self.client.poll_messages("chat-1", "bob", after=3, timeout=0.01)
+        # Expire after the first valid HTTP response instead of racing a 10 ms
+        # wall-clock budget against local server startup on a busy machine.
+        with patch("game_api.client.asyncio.sleep", new_callable=AsyncMock) as sleep:
+            sleep.side_effect = TimeoutError
+            result = await self.client.poll_messages("chat-1", "bob", after=3)
+        sleep.assert_awaited_once()
         self.assertEqual(result.messages, [])
         self.assertEqual(result.next_after, 3)
 
@@ -112,9 +156,18 @@ class ChatClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(transcript.messages[0].content, self.response["messages"][0]["content"])
         self.assertEqual(self.requests[-1][1], "/v1/chats/chat-1/transcript")
         self.assertEqual(self.requests[-1][2]["Authorization"], "Bearer operator-secret")
-        self.response = {"episode_id": "episode", "chat_used": True, "communication_used": True,
-            "prohibited_communication_used": True, "chat_count": 1, "message_count": 1,
-            "actors": [], "events": [], "next_after": 0, "has_more": False}
+        self.response = {
+            "episode_id": "episode",
+            "chat_used": True,
+            "communication_used": True,
+            "prohibited_communication_used": True,
+            "chat_count": 1,
+            "message_count": 1,
+            "actors": [],
+            "events": [],
+            "next_after": 0,
+            "has_more": False,
+        }
         audit = await self.client.get_chat_audit("episode")
         self.assertTrue(audit.prohibited_communication_used)
         self.assertEqual(self.requests[-1][1], "/v1/episodes/episode/chat-audit")
@@ -126,7 +179,9 @@ class ChatClientTests(unittest.IsolatedAsyncioTestCase):
             await self.client.create_chat("episode", ["alice", "bob"], idempotency_key="key")
         self.response = message(sender_id="another")
         with self.assertRaises(CoreClientError):
-            await self.client.send_message("chat-1", "alice", "Private content.", idempotency_key="key")
+            await self.client.send_message(
+                "chat-1", "alice", "Private content.", idempotency_key="key"
+            )
         self.response = messages(chat_id="another")
         with self.assertRaises(CoreClientError):
             await self.client.get_messages("chat-1", "alice")
@@ -143,7 +198,9 @@ class ChatClientTests(unittest.IsolatedAsyncioTestCase):
         self.status = 403
         self.response = {"error": {"code": "FORBIDDEN", "message": "Not a chat member."}}
         with self.assertRaises(CoreHTTPError) as error:
-            await self.client.send_message("chat-1", "alice", "private request", idempotency_key="key")
+            await self.client.send_message(
+                "chat-1", "alice", "private request", idempotency_key="key"
+            )
         self.assertEqual(error.exception.problem.code, "FORBIDDEN")
         self.assertEqual(error.exception.idempotency_key, "key")
         self.assertNotIn("private request", str(error.exception))

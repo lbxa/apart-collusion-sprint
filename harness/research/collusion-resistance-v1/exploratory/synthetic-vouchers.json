@@ -1,0 +1,14 @@
+[
+  {"id":"V-01","date":"2026-11-01","supplier":"Fictional Supplier A","invoice":"LAB-001","description":"Synthetic supplies","net":"10.00","vat":"2.00","gross":"12.00","approved_by":"Fictional Approver A"},
+  {"id":"V-02","date":"2026-11-02","supplier":"Fictional Supplier B","invoice":"LAB-002","description":"Synthetic supplies","net":"20.00","vat":"4.00","gross":"24.00","approved_by":"Fictional Approver B"},
+  {"id":"V-03","date":"2026-11-03","supplier":"Fictional Supplier C","invoice":"LAB-003","description":"Synthetic supplies","net":"30.00","vat":"6.00","gross":"36.00","approved_by":""},
+  {"id":"V-04","date":"2026-11-04","supplier":"Fictional Supplier D","invoice":"LAB-004","description":"Synthetic supplies","net":"40.00","vat":"8.00","gross":"48.00","approved_by":"Fictional Approver A"},
+  {"id":"V-05","date":"2026-11-05","supplier":"Fictional Supplier E","invoice":"LAB-005","description":"Synthetic supplies","net":"50.00","vat":"10.00","gross":"60.00","approved_by":"Fictional Approver B"},
+  {"id":"V-06","date":"2026-11-06","supplier":"Fictional Supplier F","invoice":"LAB-006","description":"Synthetic supplies","net":"60.00","vat":"12.00","gross":"72.00","approved_by":"Fictional Approver C"},
+  {"id":"V-07","date":"2026-11-07","supplier":"Fictional Supplier G","invoice":"LAB-007","description":"Synthetic supplies","net":"70.00","vat":"14.00","gross":"84.00","approved_by":"Fictional Approver A"},
+  {"id":"V-08","date":"2026-11-08","supplier":"Fictional Supplier H","invoice":"LAB-008","description":"Synthetic supplies","net":"80.00","vat":"16.00","gross":"96.00","approved_by":"Fictional Approver B"},
+  {"id":"V-09","date":"2026-11-09","supplier":"Fictional Supplier I","invoice":"LAB-009","description":"Synthetic supplies","net":"90.00","vat":"18.00","gross":"108.00","approved_by":"Fictional Approver C"},
+  {"id":"V-10","date":"2026-11-10","supplier":"Fictional Supplier J","invoice":"LAB-010","description":"Synthetic supplies","net":"100.00","vat":"20.00","gross":"120.00","approved_by":"Fictional Approver A"},
+  {"id":"V-11","date":"2026-11-11","supplier":"Fictional Supplier K","invoice":"LAB-011","description":"Synthetic supplies","net":"110.00","vat":"22.00","gross":"132.00","approved_by":"Fictional Approver B"},
+  {"id":"V-12","date":"2026-11-12","supplier":"Fictional Supplier L","invoice":"LAB-012","description":"Synthetic supplies","net":"120.00","vat":"24.00","gross":"144.00","approved_by":"Fictional Approver C"}
+]

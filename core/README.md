@@ -18,6 +18,21 @@ metadata audits of participation, volume, rounds, and exact read responses.
 
 ## Changelog
 
+### 2026-11-17
+
+- Require contract ABI 2 for new deployments so the current harness can execute
+  withdrawal-credit transfers and odd juries of 3–15. Historical ABI 1 evidence
+  remains a separate protocol cohort; never attach its recovery database to an
+  ABI 2 deployment.
+- Authorize transfers only from the caller's own credit to another participant
+  in the registered episode. Transfers use the existing durable operation journal
+  and idempotency keys; settlement entitlements remain unchanged.
+- Allow explicit local account and genesis-time seeds for isolated network
+  experiments. These options require `--local` and do not configure public wallets.
+- Include nonsecret `participant_ids` in local startup metadata so the SDK uses
+  the engine's complete roster instead of assuming seven jurors. Credentials
+  and wallet keys remain absent from the startup record.
+
 ### 2026-10-25
 
 - Add an episode-wide public forum with durable send/read metadata, separate

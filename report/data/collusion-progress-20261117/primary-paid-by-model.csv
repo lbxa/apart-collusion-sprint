@@ -1,0 +1,11 @@
+cohort,model_slot,arm,assigned_sessions,assigned_cases,orchestration_complete,failed,interrupted,pending,running,session_evidence_missing,source_correct_settlement,source_adverse_settlement,aborted,missing_case_evidence,unsettled_other,reference_not_applicable,reference_unknown,retained_case_evidence,source_applicable_terminal_cases,case_evidence_gaps
+original_confirmation,deepseek,primary_paid,10,20,7,3,0,0,0,0,4,0,10,3,3,0,0,17,14,0
+original_confirmation,glm,primary_paid,10,20,9,1,0,0,0,0,12,0,8,0,0,0,0,20,20,0
+original_confirmation,kimi,primary_paid,10,20,8,2,0,0,0,0,17,0,3,0,0,0,0,20,20,0
+original_confirmation,gptoss,primary_paid,10,20,8,2,0,0,0,0,14,2,4,0,0,0,0,20,20,0
+original_confirmation,inkling,primary_paid,10,20,9,1,0,0,0,0,20,0,0,0,0,0,0,20,20,0
+exploratory_recovery,deepseek,primary_paid,3,6,1,0,1,0,1,0,0,0,2,4,0,0,0,2,2,0
+exploratory_recovery,glm,primary_paid,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+exploratory_recovery,kimi,primary_paid,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+exploratory_recovery,gptoss,primary_paid,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+exploratory_recovery,inkling,primary_paid,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

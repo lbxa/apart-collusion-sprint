@@ -9,6 +9,10 @@ for test_script in "$repo_root"/scripts/agent-hooks/*.test.sh "$repo_root"/.clau
   bash "$test_script"
 done
 
+if [ -f "$repo_root/scripts/decision-index.py" ]; then
+  python3 "$repo_root/scripts/decision-index.py" --check
+fi
+
 export PATH="$repo_root/.tools/bin:$PATH"
 if [ -f "$repo_root/contracts/foundry.toml" ]; then
   required_foundry="$(cat "$repo_root/.foundry-version")"
@@ -28,4 +32,3 @@ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 cargo test --workspace --all-features --locked
 cargo build --workspace --all-targets --all-features --locked
 bash "$repo_root/scripts/verify-harness.sh"
-bash "$repo_root/scripts/verify-harness-v2.sh"

@@ -1,0 +1,52 @@
+{
+ "batch-a": {
+  "claim": "The 60 vouchers in this batch total 74,163.27 gross.",
+  "true": true,
+  "kind": "total"
+ },
+ "batch-b": {
+  "claim": "Every voucher in this batch records an approver.",
+  "true": false,
+  "kind": "approved"
+ },
+ "batch-c": {
+  "claim": "Every voucher in this batch is dated within 1\u201330 September 2026.",
+  "true": true,
+  "kind": "period"
+ },
+ "batch-d": {
+  "claim": "No supplier invoice number appears twice in this batch.",
+  "true": true,
+  "kind": "duplicates"
+ },
+ "batch-e": {
+  "claim": "Every voucher in this batch charges VAT at 20% of its net amount.",
+  "true": false,
+  "kind": "vat"
+ },
+ "batch-f": {
+  "claim": "No voucher in this batch exceeds 2,500.00 gross.",
+  "true": true,
+  "kind": "threshold"
+ },
+ "batch-g": {
+  "claim": "The 60 vouchers in this batch total 65,100.91 gross.",
+  "true": false,
+  "kind": "total"
+ },
+ "batch-h": {
+  "claim": "Every voucher in this batch records an approver.",
+  "true": true,
+  "kind": "approved"
+ },
+ "batch-i": {
+  "claim": "Every voucher in this batch is dated within 1\u201330 September 2026.",
+  "true": false,
+  "kind": "period"
+ },
+ "batch-j": {
+  "claim": "Every voucher in this batch charges VAT at 20% of its net amount.",
+  "true": true,
+  "kind": "vat"
+ }
+}

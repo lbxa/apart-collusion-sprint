@@ -1,0 +1,76 @@
+{
+  "format_version": 1,
+  "register_sha256": "6cfef470d5e10a0c04e79651a27eceaec66927eee0a5bfcfa4c3ad488512d2f2",
+  "registry_sha256": "498dd170774635909148557a3e35c9b5053299c57ca1717c5ac53fd3ab3931a5",
+  "campaigns": [
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-first",
+      "campaign_fingerprint": "4e3dc1f946a64857be1143dca130be81ede6a438e86f03a573016dea42b6b0d3",
+      "frozen_campaign_sha256": "1b779c5637c0c79c0df74cb3f0fa0fd418e3a3adf8cfd04721212fecfc462bec",
+      "journal_snapshot_sha256": "cc84d7f9334caa8f6f373b9437d8d1c35cca650845b58bf42779a519de75b3e6",
+      "progress_sha256": "572f4d0aa07ff21d1266e2db5df3b8402c24e2eba810e1064d494ba7ceaa690d",
+      "journal_status_counts": {
+        "complete": 1
+      },
+      "progress_status_counts": {
+        "complete": 1,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 0,
+        "running": 0
+      }
+    },
+    {
+      "campaign_directory": "/Users/lucas/c/apart-collusion-sprint/harness/results/collusion-resistance-v1-20261117/pilot-rest",
+      "campaign_fingerprint": "0f67236bc0f81598145e89c4dc545df713086890688a99c527647bff5cd14191",
+      "frozen_campaign_sha256": "cd05f329bb2e69c7c042d293770bc22fed53941f069620b2f6659a63759a5c70",
+      "journal_snapshot_sha256": "ec445df6a5e0a836814efa5e3b024e65dc7b3792b5cceb3c57fa9e2c6821f473",
+      "progress_sha256": "61c23e949f1e4bee6ec7ce67eb1ac7d2892d26073231ecfe075d282f641d5cb6",
+      "journal_status_counts": {
+        "complete": 2,
+        "running": 1,
+        "pending": 1
+      },
+      "progress_status_counts": {
+        "complete": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "pending": 1,
+        "running": 1
+      }
+    }
+  ],
+  "runtime_root": "/Users/lucas/c/apart-collusion-sprint/.harness/collusion-resistance-v1-20261117/runtime-pilot-v2",
+  "interpreter": "/Users/lucas/c/apart-collusion-sprint/harness/.venv/bin/python",
+  "python_version": "3.12.11 (main, Aug  8 2025, 16:50:44) [Clang 20.1.4 ]",
+  "operator_helper_sha256": "843e70a5e9f98b5655cb630df7c40a38dc5333c62b4b99c4d53a65359d31a3d5",
+  "runtime_sources": {
+    "harness/src/veracity_harness/resistance.py": "6f9114dfc26d49f404f197fac10896a781ee67c75a7932145e57833c2eba27a4",
+    "harness/src/veracity_harness/materials.py": "cc2c9d74ef638efa97050ee1cef07ca00f987bc4127cd9793a9ffd462252351b",
+    "harness/src/veracity_harness/resources/interface.md": "930d4aecce808e2ccf24d00b702e0514fef8f8783f77393620210345a1090102"
+  },
+  "deferred_jobs": [
+    {
+      "job_id": "pilot-glm-0700",
+      "status": "running",
+      "reason": "mutable_or_unstarted_run"
+    },
+    {
+      "job_id": "pilot-kimi-0700",
+      "status": "pending",
+      "reason": "mutable_or_unstarted_run"
+    }
+  ],
+  "outputs_sha256": {
+    "assignment-register.json": "2bd34b4faf0a30b156ab515ef0bfd308da19d896fd3020f2f5694683eeba0e4b",
+    "case-observations.json": "8513c9338390acb7d3adde9a83cf5e5fb87fb3fa541fb2ea2be2acd44e861eec",
+    "actor-mechanics.json": "2fcce7e036829c8c0782a0db3d00a42af64af6cdab707f2c4fedc3a9970ff0fa",
+    "operator-review-map.json": "24684d5b7ef01238dc4ba41de4f4f7c320a2534a933029972f245f825e362181",
+    "ingest.py": "843e70a5e9f98b5655cb630df7c40a38dc5333c62b4b99c4d53a65359d31a3d5",
+    "review-packets/packet-65ff23767ee703f911d3713b.json": "a912af734f0c39b14036050c66087dfb0d7603e9d5882c5d998ae61afe76b9c7",
+    "review-packets/packet-74aed11f4ccb2f7d5910afe5.json": "e4dfdef25e1bdf58431a31d1163c4831e63596a0419d486ec5b9df3cde3b56bb",
+    "review-packets/packet-c8c05be96669a090eb817470.json": "d88dee82b8189ee7a3cd5023c9f9dc32b6a6250bb68bee09b9af7d5a774d49ba"
+  },
+  "review_packet_count": 3,
+  "semantic_labels_created": 0
+}

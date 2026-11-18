@@ -2,7 +2,9 @@
 
 ## Scope and rule authority
 
-`SPEC.md` version 0.2 defines the game rules. The HTTP API requested by the user
+`SPEC.md` version 0.2 defines the contract mechanism; `CONSTITUTION.md` is the
+canonical participant constitution. `docs/benchmark.md` owns experimental design
+and evaluation thresholds. The HTTP API
 replaces the spec's CLI-first presentation. The external experiment harness owns
 models, deliberation, private observations, and evaluation metrics.
 The game service owns episode registration, validated actions, chain submission,
@@ -21,12 +23,12 @@ data, retained for stored-configuration compatibility. They do not drive game
 rules, scheduling, agent execution, or evaluation. The engine owns no experiment
 or scenario lifecycle. Tests must exercise registration without these tags.
 
-`harness/GAME_BUILDER_HANDOFF.md` describes the harness's desired interface, but differs
-from the protocol: it suggests floating-point money, juries above seven, separate
-juror deposits, direct votes, and manually advanced phases. Version 1 preserves
-the spec's integer base units, odd juries of three through seven, deposit-with-
-commit, domain-separated commit/reveal, and immutable chain-time deadlines.
-Integration documentation must explain these differences explicitly.
+The retired hackathon handoff is not an interface contract. Contract ABI 2
+preserves integer base units, deposit-with-commit, domain-separated commit/reveal,
+and immutable chain-time deadlines. It extends the ABI 1 mechanism with odd
+juries of three through fifteen and transfers of existing withdrawal credit.
+New deployments require ABI 2; historical ABI 1 evidence and recovery databases
+remain separate and are not migrated into a new financial world.
 
 ## Ownership and boundaries
 
@@ -49,16 +51,18 @@ Integration documentation must explain these differences explicitly.
 - `harness/`: Python agent execution, observations, treatments, and metrics.
   `CoreClient` owns HTTP sessions and operation recovery over generated, validated
   `/v1` calls. `LocalEngine` owns development processes and Anvil time control;
-  `CoreEngineAPI` adapts these to the experiment interface. See
+  both live in `harness/src/game_api/`. Isolated participants discover and call
+  the HTTP interface themselves. See
   [the integration contract](integration.md).
 
-The harness contains no alternative game engine. Scripted agents and demos use
+The harness contains no alternative game engine. Scripted test fixtures use
 the same Rust/Solidity path as live agents. Experiment configuration describes
 stakes and payout shares without computing a verdict, payout, refund, or bond
-forfeiture. Deliberation rounds and simulated side-payment/bonus utility remain
-harness policy; their ledger never changes contract entitlements. Read-only
+forfeiture. There are no simulated side payments or majority bonuses; side
+payments, where a treatment allows them, are contract credit transfers. Read-only
 historical export conversion preserves recorded settlements without executing
-the protocol.
+the protocol. The root constitution is retained and delivered verbatim; evaluator
+labels and scenario coalition plans remain outside participant observations.
 
 Keep one crate and one process. Create modules for these real ownership
 boundaries; do not introduce generic repository or service hierarchies.

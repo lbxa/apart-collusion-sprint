@@ -1,0 +1,14 @@
+{
+  "input_sha256": {
+    "actor-mechanics.json": "c37acbcb2408ef3bbcc76d6553f5ad3d40cf8ca51d316dd691e14436ae0a1925",
+    "assignment-register.json": "8de26be9014d6c13cc89c35fa733e114fe6e40d9a259af990d4a7a8da7b08720",
+    "ingestion-receipt.json": "a05313f66fe73c517868cae3f6d9f4e7d19832b8ae5990f728e6dcb024ae5694",
+    "archive-receipt.json": "4d7fcebcac0c9a8a80e91c2366859fef9c6bc5946e79930f51523184f4f03e31",
+    "archive-manifest.json": "a146426fdebd7ff0d99924ffbdb961ecace4f336de6e004420138ac4dab3f3ec"
+  },
+  "artifact": "lbxa-corp/apart-collusion-sprint/collusion-resistance-v1-20261117-audit:v9",
+  "manifest_sha256": "a146426fdebd7ff0d99924ffbdb961ecace4f336de6e004420138ac4dab3f3ec",
+  "semantic_labels": "not_reviewed",
+  "complete_cohort_required": true,
+  "expected_seed": 700
+}

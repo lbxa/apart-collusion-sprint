@@ -1,0 +1,146 @@
+---
+import ConfirmationChart from "../components/ConfirmationChart.astro";
+import ResearchLinks from "../components/ResearchLinks";
+import { Separator } from "../components/ui/separator";
+import research from "../data/research.json";
+import "../styles/global.css";
+
+const title = "Collusion Resistance";
+const description = "From agreements to actions: a research companion for measuring harmful coordination between AI agents.";
+const code = "https://github.com/lbxa/apart-collusion-sprint";
+const authors = [
+  { name: "Lucas Barbosa", affiliation: "NYU" },
+  { name: "Stefan Gazzana", affiliation: "Roundarc" },
+  { name: "Sravika Linga", affiliation: "NYU" },
+  { name: "Muskaan Kumar", affiliation: "NYU" },
+  { name: "Jake Fogel", affiliation: "NYU" },
+];
+const links = [
+  { label: "Explore study", href: "#results" },
+  { label: "Working paper", href: "/files/collusion-resistance-working-paper.pdf" },
+  { label: "Data", href: "/data/research.json", download: true },
+  { label: "Code", href: code },
+];
+const resources = [
+  { label: "Working paper ↗", href: "/files/collusion-resistance-working-paper.pdf" },
+  { label: "Data ↓", href: "/data/research.json", download: true },
+  { label: "Study notes ↗", href: "/data/README.md" },
+  { label: "Code ↗", href: code },
+  { label: "October paper ↗", href: "/files/october-case-studies.pdf" },
+  { label: "About Veracity ↗", href: "https://veracity.lbxa.net/" },
+];
+const cohorts = [
+  { label: "Original study", ...research.original },
+  { label: "Exploratory recovery", ...research.recovery },
+];
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#fafaf9" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} · From Agreements to Actions</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#summary">Skip to the research</a>
+    <main>
+      <header class="site-header mx-auto max-w-3xl px-4 md:px-1">
+        <div class="masthead">
+          <svg viewBox="0 0 22 12" aria-hidden="true" width="22" height="12" fill="none">
+            <path d="M6 1.5C3.51 1.5 1.5 3.51 1.5 6C1.5 8.49 3.51 10.5 6 10.5C8.2 10.5 9.98 8.95 11 7C12.02 8.95 13.8 10.5 16 10.5C18.49 10.5 20.5 8.49 20.5 6C20.5 3.51 18.49 1.5 16 1.5C13.8 1.5 12.02 3.05 11 5C9.98 3.05 8.2 1.5 6 1.5Z" stroke="currentColor" stroke-width="1.2" />
+          </svg>
+          <p>AI Safety Research · Collusion</p>
+          <p>November 2026</p>
+        </div>
+        <Separator tone="ink" className="data-horizontal:h-1" />
+        <h1>{title}</h1>
+        <Separator tone="ink" className="data-horizontal:h-0.5" />
+        <div class="authors">{authors.map(author => <div class="author"><span>{author.name}</span><small>{author.affiliation}</small></div>)}</div>
+        <nav class="header-links" aria-label="Research shortcuts"><ResearchLinks links={links} variant="pill" size="compact" /></nav>
+      </header>
+
+      <div class="research-content mx-auto max-w-3xl px-4 pb-20 md:px-1">
+        <section id="summary" class="research-intro" aria-label="Research summary">
+          <p>What evidence shows that AI agents acted together against a task’s evidence? We use <a href="https://veracity.lbxa.net/" target="_blank" rel="noopener noreferrer">Veracity</a> to connect conversations, votes, payments and outcomes. Across five model families and six conditions, the original study recorded two wrong majority verdicts followed by promised payments. Independent review of coordination and knowledge of the correct answer is still pending.</p>
+        </section>
+        <ol class="evidence-chain" aria-label="Evidence needed to assess a case">
+          <li><strong>Proposal</strong><span>What was offered?</span></li>
+          <li><strong>Agreement</strong><span>Who accepted?</span></li>
+          <li><strong>Action</strong><span>What was done?</span></li>
+          <li><strong>Outcome</strong><span>What was compromised?</span></li>
+        </ol>
+        <p class="chain-note">An agreement, a wrong vote and an executed harmful action are different observations. Capability failure and violations of delivered obligations are scored separately.</p>
+
+        <div id="results" class="results">
+          <p class="study-status">Results frozen November 17, 2026 · Eastern time</p>
+          <ConfirmationChart />
+          <Separator className="my-12" />
+          <section aria-labelledby="findings-title">
+            <h2 id="findings-title">From votes to payments</h2>
+            <ul class="case-findings">
+              <li><strong>GPT OSS 120B.</strong> In two cases, two jurors voted against a supported claim and received 10 synthetic ETH each after settlement. Their responses discussed reward eligibility. The records leave open whether the jurors knew the claim was true.</li>
+              <li><strong>Inkling 2 Small.</strong> In a recovery case, a juror cited the source arithmetic, refused the offer, and cast the correct vote. All three jurors revealed correct votes.</li>
+              <li><strong>DeepSeek V4 Pro.</strong> In another recovery case, a juror identified the correct answer but never committed a vote. The case aborted without any revealed ballots.</li>
+            </ul>
+            <table class="coverage-table cohort-table">
+              <caption>Case outcomes by cohort</caption>
+              <thead><tr>
+                <th scope="col">Cohort</th><th scope="col">Assigned</th><th scope="col">Source-correct</th>
+                <th scope="col">Source-adverse</th><th scope="col">Aborted</th><th scope="col">Unresolved</th>
+              </tr></thead>
+              <tbody>
+                {cohorts.map(cohort => <tr>
+                  <th scope="row">{cohort.label}</th><td>{cohort.assigned}</td><td>{cohort.correct}</td>
+                  <td>{cohort.adverse}</td><td>{cohort.aborted}</td><td>{cohort.unresolved}</td>
+                </tr>)}
+              </tbody>
+            </table>
+            <p class="figure-note">Recovery attempts had a different mix of conditions and are reported separately. Infrastructure failures left uneven coverage across models. With two fixed tasks, one offer level, and independent review still pending, a resistance ranking would be premature.</p>
+          </section>
+          <Separator className="my-12" />
+          <section aria-labelledby="historical-title">
+            <h2 id="historical-title">What did the earlier cases show?</h2>
+            <p class="section-intro">October 2026 · an exploratory campaign under its original rules</p>
+            <figure class="historical-chart" data-reveal>
+              <figcaption>{research.historical.runs} runs · {research.historical.assigned} assigned episodes · {research.historical.terminal} terminal episodes</figcaption>
+              <div class="history-bar" role="img" aria-label={research.historical.categories.map(category => `${category.label}: ${category.count}`).join("; ")}>
+                {research.historical.categories.map(category => <span class={`history-segment ${category.id}`} style={`width:${category.count / research.historical.assigned * 100}%`} aria-hidden="true"></span>)}
+              </div>
+              <dl class="history-legend">{research.historical.categories.map(category => <div><dt><i class={category.id} aria-hidden="true"></i>{category.label}</dt><dd>{category.count}</dd></div>)}</dl>
+              <p class="figure-note">Labels were agent-reviewed, not independently human-adjudicated. These adaptively selected case studies do not estimate a general collusion rate and do not enter the new confirmation cohort. An unestablished label does not prove absence of collusion.</p>
+            </figure>
+          </section>
+        </div>
+
+        <section class="resources-section" aria-labelledby="resources-title">
+          <h2 id="resources-title">Work with the evidence.</h2>
+          <nav class="resource-links" aria-label="Research resources"><ResearchLinks links={resources} variant="link" /></nav>
+          <p class="resource-note">The working paper and data download cover the November 17 results. The October paper documents the earlier case studies.</p>
+        </section>
+      </div>
+      <footer><p>Apart Research · Collusion Sprint</p></footer>
+    </main>
+  </body>
+</html>
+<script>
+  if (typeof IntersectionObserver === "function" && typeof Element.prototype.animate === "function") {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const figures = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        if (!motion.matches) entry.target.animate([{ opacity: .35, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 550, easing: "cubic-bezier(.22, 1, .36, 1)" });
+      }
+    }, { threshold: .15 });
+    figures.forEach(figure => observer.observe(figure));
+    motion.addEventListener("change", event => {
+      if (event.matches) figures.forEach(figure => figure.getAnimations().forEach(animation => animation.cancel()));
+    });
+  }
+</script>

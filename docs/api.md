@@ -79,6 +79,7 @@ or votes. Never work around a pending command by issuing a new key.
 | `POST /v1/episodes/{id}/settle` | Operator | `{}` → operation after reveal deadline |
 | `POST /v1/episodes/{id}/expire` | Operator | `{}` → operation after posting/challenge expiry |
 | `POST /v1/episodes/{id}/withdrawals` | Participant | `{}` → operation withdrawing caller's global credits |
+| `POST /v1/episodes/{id}/transfers` | Participant | `{"recipient_id":"juror-1","amount_wei":"5"}` → operation moving part of the caller's global credits to another participant in the episode |
 | `GET /v1/episodes/{id}/settlement` | Public | Terminal payout and vote decomposition |
 | `GET /v1/episodes/{id}/balances` | Public | Episode entitlements and current global credits |
 | `GET /v1/operations/{id}` | Public | Persisted operation state and chain evidence |
@@ -110,7 +111,7 @@ requires an explicit transaction. No API credential can extend a deadline.
 
 ## Python client
 
-With `harness/` on `PYTHONPATH` and its locked dependencies installed, connect
+With the harness installed using `bash scripts/setup-harness.sh`, connect
 to an existing service without starting a process or accessing its chain RPC:
 
 ```python
@@ -177,16 +178,14 @@ Exception messages omit request/response bodies and credentials; inspect structu
 details deliberately, since the server's message may contain application data.
 
 Wire amounts remain validated decimal integer strings, so `int(payouts.winner_payout)`
-is exact. `CoreEngineAPI` retains its legacy experiment interface using exact
-`Decimal` token amounts (100 base units per token), including in metrics and
-decimal-string financial exports. Historical numeric exports remain readable;
-there is no in-process game backend or Python settlement calculator.
+is exact. The retired structured-action adapter is no longer packaged. There is
+no in-process game backend or Python settlement calculator.
 
 For local experiments, `LocalEngine` owns the Rust process, development credentials,
 and Anvil clock. Its `advance_to_deadline`, `finish_voting`, and `expire_episode`
-are explicit local conveniences. `CoreEngineAPI` composes that helper to preserve
-existing experiments: `cast_vote` commits, and `settle` reveals eligible recorded
-commitments before settlement. The reusable `CoreClient` has no such side effects.
+are explicit local conveniences. The autonomous runner never calls
+`finish_voting` to supply participant reveals. The reusable `CoreClient` has no
+such side effects.
 
 ### Regeneration
 
@@ -197,7 +196,7 @@ python scripts/generate-core-client.py --check
 
 The Rust `export_openapi` example builds the same document served at
 `/v1/openapi.json`, without starting a server or chain. Generation commits both
-`docs/openapi.json` and `harness/game_api/generated.py`; CI checks both against
+`docs/openapi.json` and `harness/src/game_api/generated.py`; CI checks both against
 fresh Rust output. Generated calls cover JSON and text endpoints and validate
 responses through strict Pydantic models. `core_types.py` retains compatibility
 names, with only local startup metadata defined outside the HTTP schema.
@@ -224,10 +223,16 @@ export JUROR_TOKEN=dev-juror-1
 ```
 
 These `dev-*` credentials are only for explicit `--local` mode. Additional local
-credentials are `dev-juror-2` through `dev-juror-7` and `dev-treasury`. Each local
+credentials are `dev-juror-2` through `dev-juror-15` and `dev-treasury`. Each local
 process starts a fresh Anvil deployment and SQLite run directory. For persistent
 deployments and recovery across process restarts, use the documented `--config`
 mode and retain that deployment's database and chain.
+
+The local startup JSON includes the authoritative `participant_ids` roster
+alongside API/RPC listeners and deployment identity. The SDK uses those IDs with
+the documented local development credential convention; startup metadata never
+contains bearer tokens or wallet keys. Deployed mode does not emit this local
+orchestration record.
 
 Creating a game requires only its ID, participants, and protocol parameters.
 Experiment IDs, scenarios, agent models, prompts, treatments, and evaluation
@@ -403,22 +408,22 @@ contains party refunds on abort/expiry; juror refunds remain in `juror_payouts`.
 All monetary result fields are decimal base-unit strings. Ground truth is never
 inferred from the contract's verdict.
 
-The historical `harness/GAME_BUILDER_HANDOFF.md` cannot be used unchanged:
+The retired hackathon handoff conventions map to the current API as follows:
 
 | Handoff operation or convention | v1 mapping |
 | --- | --- |
-| `register_episode` | `POST /v1/episodes`; use integer strings and odd jury 3–7 |
+| `register_episode` | `POST /v1/episodes`; use integer strings and odd jury 3–15 |
 | `post_claim`, `challenge` | Submit artifact text to the corresponding endpoint |
 | `post_juror_bond`, then `cast_vote` | Replace with commitment including verdict/assessment, then later reveal |
 | `start_deliberation` | Harness schedules rounds over core forum messages; no game state override |
 | `start_voting` | Read/wait for chain-derived deadlines; no operator transition |
 | `settle`, `expire` | Request a terminal transaction, then read settlement |
 | `get_state`, `get_balances` | Read the episode and balance endpoints |
-| Jury sizes 11–101 | Rejected; changing the bound needs a protocol revision |
+| Jury sizes above 15 or even sizes | Rejected; changing the bound needs a protocol revision |
 | Floating-point currency | Convert to exact base-unit strings before calling |
 
-The handoff's sample with a 10-unit party bond, 1-unit juror bonds, three valid
-revealers, and two forfeitures is arithmetically inconsistent. Under the specified
+For a 10-unit party bond, 1-unit juror bonds, three valid revealers, and two
+forfeitures, under the specified
 60/30/10 split, each of those three revealers receives **2 units**, the winner
 receives 16, and the treasury receives 1 protocol unit plus 2 forfeited units:
 `16 + 3 × 2 + 3 = 25` deposited units. A 1.60 juror payout applies to five valid

@@ -1,0 +1,9 @@
+{
+  "asOf": "2026-11-17",
+  "current": { "path": "report/data/collusion-progress-final-20261117/snapshot.json", "sha256": "fcb3b0bccdc4d29aeeb99b0877ae1c41f75bfa88a6acda0d400e12e72de6da1b" },
+  "historical": { "path": "report/data/agentic-campaign.json", "sha256": "1aa2e353ae3ed47252d33d23df54b150dc340c300439807027edcac31c8a0699" },
+  "papers": [
+    { "path": "report/agentic/build/main.pdf", "sha256": "af0ceb3e43ef4683fa6ad49c5534260c20725e24aef77d3775b4b9da4c0db482", "file": "collusion-resistance-working-paper.pdf" },
+    { "path": "report/agentic/build/historical/historical-october-main.pdf", "sha256": "d693ba7173eb2e87b26f0ac75d51eecfe8607681c0d88059c91eb71d900a9d91", "file": "october-case-studies.pdf" }
+  ]
+}

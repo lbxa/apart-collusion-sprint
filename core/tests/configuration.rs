@@ -31,6 +31,31 @@ fn startup_requires_an_explicit_local_or_deployment_choice() {
 }
 
 #[test]
+fn local_chain_identity_options_apply_only_to_a_spawned_local_chain() {
+    let local = Cli::try_parse_from([
+        "veracity-game-service",
+        "--local",
+        "--local-key-seed",
+        "301",
+        "--local-genesis-timestamp",
+        "1793000000",
+    ])
+    .unwrap();
+    assert_eq!(local.local_key_seed, Some(301));
+    assert_eq!(local.local_genesis_timestamp, Some(1_793_000_000));
+    local.validate().unwrap();
+    let deployed = Cli::try_parse_from([
+        "veracity-game-service",
+        "--config",
+        "network.toml",
+        "--local-key-seed",
+        "301",
+    ])
+    .unwrap();
+    assert!(deployed.validate().is_err());
+}
+
+#[test]
 fn local_credentials_cannot_be_exposed_on_a_public_interface() {
     let local = Cli::try_parse_from(["veracity-game-service", "--local", "--bind", "0.0.0.0:8080"])
         .unwrap();

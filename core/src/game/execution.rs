@@ -329,6 +329,13 @@ impl GameInner {
             GameAction::Settle {} => Ok(ChainAction::Settle { episode_id }),
             GameAction::Expire {} => Ok(ChainAction::Expire { episode_id }),
             GameAction::Withdraw {} => Ok(ChainAction::Withdraw),
+            GameAction::TransferCredits {
+                recipient_id,
+                amount_wei,
+            } => Ok(ChainAction::TransferCredits {
+                recipient: self.chain.address(&recipient_id)?,
+                amount: super::validation::positive_amount("amount_wei", &amount_wei)?,
+            }),
         }
     }
 
