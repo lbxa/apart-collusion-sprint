@@ -52,11 +52,11 @@ Its short form omits the evidence and independent-judgment duties present in the
 fixed `principles` variant. New studies must choose and freeze delivered duties.
 An obligation absent from an old run cannot be applied through later code.
 
-Historical `harness-v2/research/`, `harness-v2/results/`, and referenced
-`harness-v2/examples/` inputs remain as archives; they are not executable package
-roots. The original harness guide is
-preserved as `harness/LEGACY.md`. Other historical exports, ledgers, review files,
-and references retain their recorded paths and interpretation. Source-only
+The historical protocols, results, and example inputs from `harness-v2/` now
+live together in [the October campaign archive](../../harness/archive/october-2026/).
+The archive preserves the original evidence bytes and paths relative to the
+campaign directory. The original harness guide is preserved as
+`harness/LEGACY.md`. Source-only
 collusion fixtures copied under `harness/research/` establish reusable inputs,
 not new results, a standardized suite, or permission to rerun a campaign.
 

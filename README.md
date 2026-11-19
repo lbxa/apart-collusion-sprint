@@ -33,11 +33,11 @@ Confidence calibration or an incorrect answer alone does not establish collusion
 See [the harness upgrade boundary](docs/research/harness-upgrade.md) and
 [import source provenance](harness/migration-source.json).
 
-The only active Python project is `harness/`. The former structured-action
-harness and `harness-v2` runtime have been replaced. Retained
-`harness-v2/research/` and `harness-v2/results/` paths are historical evidence,
-not a second executable package. [Legacy harness documentation](harness/LEGACY.md)
-is preserved for interpreting that history; its commands are retired.
+The only Python project is `harness/`. The
+[October campaign archive](harness/archive/october-2026/) holds the released
+evidence and original study inputs. The
+[legacy harness guide](harness/LEGACY.md) records how the earlier
+structured-action experiments worked.
 
 ## Swarm Alignment Hackathon 2026: preexisting-work notice
 

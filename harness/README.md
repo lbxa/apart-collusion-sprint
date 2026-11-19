@@ -257,13 +257,11 @@ not certified internal computation. Independent review remains necessary.
 
 ## Historical evidence and fixture inputs
 
-The original harness guide is preserved in [LEGACY.md](LEGACY.md); its retired
-entrypoints, factor catalog, simulated utilities, and tracking semantics describe
-historical work. `historical-results/`, old result summaries, and
-`../harness-v2/results/` retain their existing paths and bytes. Frozen
-`../harness-v2/research/` protocols and labels retain their original scope;
-archived `../harness-v2/examples/` inputs remain for their relative references.
-The former `harness-v2` path is no longer an active Python package.
+The earlier structured-action experiments are documented in
+[LEGACY.md](LEGACY.md) and `historical-results/`. The
+[October campaign archive](archive/october-2026/) keeps the frozen protocols,
+example inputs, labels, and released evidence together. Recorded paths in the
+campaign files refer to the original checkout layout.
 
 Copied market, frontier, and swarm inputs under `research/` are reusable fixtures
 and experimental designs. Their copied names do not establish execution here,
@@ -285,6 +283,12 @@ needed. Integration fixtures establish mechanics and evidence retention, not
 spontaneous model behavior. Do not silently skip Docker or chain checks.
 
 ## Changelog
+
+### 2026-11-19
+
+- Moved the October protocols, example inputs, and released evidence into
+  `archive/october-2026/`. The archive retains the campaign's relative layout,
+  evidence bytes, and Git LFS rules.
 
 ### 2026-11-17
 

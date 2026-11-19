@@ -10,8 +10,8 @@ dependencies, compute, or permission to spend or publish.
 - `harness/` is the sole active Python project. Its `src/game_api/` owns the HTTP
   SDK and local engine launcher; `src/veracity_harness/` owns agents, gateways,
   controls, evidence, and scoring. Use its manifest and `uv.lock`.
-- `harness-v2/research/` and `harness-v2/results/` are historical records. Do not
-  restore retired runtime code or reinterpret their evidence under newer duties.
+- `harness/archive/october-2026/` holds the October campaign records. Preserve
+  the recorded source, evidence, and duties for historical interpretation.
 - `docs/benchmark.md` owns Collusion's measurement contract. Reused Epistemics
   execution code does not transfer hypotheses, labels, budgets, or findings.
 - `report/` has its own reporting guide, paper brief, venue rules, and review

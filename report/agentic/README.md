@@ -147,16 +147,17 @@ Codex for the source editor and PDF preview. Built outputs remain ignored;
 `report.pdf` is the published PDF copy for this campaign.
 
 The committed numeric snapshot is `report/data/agentic-campaign.json`.
-Re-admission and raw-export commands are documented in
-[harness-v2/README.md](../../harness-v2/README.md). The complete campaign data
-were authorized for repository publication:
+The [original harness guide](../../harness/archive/october-2026/README.md)
+records the historical admission and raw-export commands. The complete campaign
+data were authorized for repository publication and are stored in the
+[campaign directory](../../harness/archive/october-2026/results/campaign-2026-10-26/).
 
-- `harness-v2/results/campaign-2026-10-26/analysis.json`: validated numeric summary.
-- `harness-v2/results/campaign-2026-10-26/export/campaign-index.json`: all 13 runs.
-- `harness-v2/results/campaign-2026-10-26/export/experiments/<run-id>.json`:
+- `analysis.json` contains the validated numeric summary.
+- `export/campaign-index.json` indexes all 13 runs.
+- `export/experiments/<run-id>.json` contains the
   original manifest, separate annotations, SHA256 hashes, every JSON/JSONL event
   and recorded text. JSONL files become ordered arrays without truncation.
-- `harness-v2/results/campaign-2026-10-26/export/raw-data.zip`: those JSONs plus
+- `export/raw-data.zip` contains those JSONs plus
   original bytes, including checkpoint databases, input documents and the
   shared spending ledger. Large evidence files use Git LFS; run `git lfs pull`
   after cloning to retrieve their actual contents.

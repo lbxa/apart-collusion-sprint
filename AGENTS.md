@@ -11,9 +11,9 @@ This repository implements the `SPEC.md` game engine and `/v1` API plus the Pyth
 
 `harness/` is the sole active Python project, containing `veracity_harness` and
 the retained `game_api` HTTP SDK under `src/`. Do not restore a second harness or
-the retired structured-action entrypoints. `harness-v2/research/` and
-`harness-v2/results/` are historical records, not active package roots. Preserve
-their bytes, paths, source hashes, ABI versions, and original duty text.
+the retired structured-action entrypoints. `harness/archive/october-2026/`
+holds the historical campaign records. Preserve their bytes, relative paths,
+source hashes, ABI versions, and original duty text.
 
 `docs/api.md` is the harness integration guide; `docs/architecture.md` records boundaries. `configs/` and `examples/` contain deployment and request templates. Shared skills live in `.agents/skills/`; `.claude/skills` points there. Agent definitions and hooks live in `.codex/` and `.claude/`.
 

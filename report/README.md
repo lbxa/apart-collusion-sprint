@@ -4,8 +4,10 @@ The current agentic study is [Payoff Coordination Against Truthful Claims](agent
 Build it with `make -C report agentic`; its PDF is `agentic/build/main.pdf`.
 It uses the separate [agentic campaign snapshot](data/agentic-campaign.json),
 [reproduction guide](agentic/README.md) and [review record](agentic/review.md).
-It does not pool the older results below. Complete experiment JSONs are in
-`harness-v2/results/campaign-2026-10-26/export/`; large evidence files use Git LFS.
+It does not pool the older results below.
+Complete experiment JSONs are in the
+[October campaign export](../harness/archive/october-2026/results/campaign-2026-10-26/export/).
+Large evidence files use Git LFS.
 The published PDF copy is [agentic/report.pdf](agentic/report.pdf).
 It includes all 13 agentic campaign runs, the 19 assigned episodes, and a
 run-by-run interpretation; Appendix B contains the complete episode tables
