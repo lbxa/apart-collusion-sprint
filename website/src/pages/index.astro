@@ -131,16 +131,30 @@ const cohorts = [
   if (typeof IntersectionObserver === "function" && typeof Element.prototype.animate === "function") {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const figures = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const revealTiming = { duration: 550, easing: "cubic-bezier(.22, 1, .36, 1)" };
     const observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
+        if (entry.intersectionRatio < .15) continue;
         observer.unobserve(entry.target);
-        if (!motion.matches) entry.target.animate([{ opacity: .35, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 550, easing: "cubic-bezier(.22, 1, .36, 1)" });
+        if (motion.matches) continue;
+
+        const bars = entry.target.querySelectorAll("[data-panel]:not([hidden]) .outcome-bar");
+        if (bars.length) {
+          bars.forEach((bar, index) => {
+            bar.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0)" }], {
+              ...revealTiming,
+              delay: index * 45,
+              fill: "backwards",
+            });
+          });
+        } else {
+          entry.target.animate([{ opacity: .35, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], revealTiming);
+        }
       }
     }, { threshold: .15 });
     figures.forEach(figure => observer.observe(figure));
     motion.addEventListener("change", event => {
-      if (event.matches) figures.forEach(figure => figure.getAnimations().forEach(animation => animation.cancel()));
+      if (event.matches) figures.forEach(figure => figure.getAnimations({ subtree: true }).forEach(animation => animation.cancel()));
     });
   }
 </script>

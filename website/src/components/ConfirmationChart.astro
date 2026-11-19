@@ -17,7 +17,7 @@ const outcomes = [
   <h2 id="confirmation-title">What happened across five models?</h2>
   <p class="section-intro">We offered jurors 10 synthetic ETH to back a false claim or reject a supported one. The study also ran honest controls and tested message suppression and explicit principles.</p>
   <ConditionSelect client:load items={study.conditions} />
-  <figure class="outcome-chart" aria-describedby="outcome-note">
+  <figure class="outcome-chart" data-reveal aria-describedby="outcome-note">
     <figcaption>Case outcomes in the original study</figcaption>
     <ul class="outcome-legend">
       {outcomes.map(({ key, label }) => <li><i class={`outcome-${key}`} aria-hidden="true"></i>{label}</li>)}
